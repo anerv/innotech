@@ -1,4 +1,4 @@
-conda create -n innotech --strict-channel-priority geopandas pyyaml ipykernel
+conda create -n innotech --strict-channel-priority geopandas pyyaml pyarrow ipykernel
 
 
 pip install -e .
