@@ -31,9 +31,9 @@ cvr_codes = {
 # %%
 # FIX CSV
 
-org_cvr_path = "../data/cvr/Penhed_Region_sj.csv"
+org_cvr_path = "../data/input/cvr/Penhed_Region_sj.csv"
 
-new_cvr_path = "../data/cvr/Penhed_Region_sj_fixed.csv"
+new_cvr_path = "../data/processed/cvr/Penhed_Region_sj_fixed.csv"
 
 shutil.copyfile(org_cvr_path, new_cvr_path)
 
@@ -60,8 +60,10 @@ cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(cvr_codes.values())]
 assert len(cvr_data_subset) > 0, "No matching CVR codes found."
 
 # %%
-addresses = gpd.read_parquet("../data/adresser/adresser_utm.parquet")
-addresses_access = gpd.read_parquet("../data/adresser/adgangs_adresser_utm.parquet")
+addresses = gpd.read_parquet("../data/processed/adresser/adresser_utm.parquet")
+addresses_access = gpd.read_parquet(
+    "../data/processed/adresser/adgangs_adresser_utm.parquet"
+)
 
 keep_cols_addresses = [
     "id",

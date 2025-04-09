@@ -1,6 +1,6 @@
 src.egg-info/*
 
-data/cvr/*
-data/adresser/*
+
 results/*
-data/DK_AdministrativeUnit/au_inspire.gpkg
+data/input/*
+data/processed/*
