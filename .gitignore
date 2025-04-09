@@ -1,6 +1,6 @@
 src.egg-info/*
 
-
+*.pyc
 results/*
 data/input/*
 data/processed/*
