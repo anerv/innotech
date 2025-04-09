@@ -14,7 +14,7 @@ cvr_codes = {
     "doctor-gp": 862100,
     "doctor-specialist": 862200,
     "dentist": 862300,
-    "physiotherapist": 869020,
+    # "physiotherapist": 869020,
     "pharmacy": 477300,
     "kindergarten": 889130,
     "nursery": 889120,
