@@ -60,8 +60,8 @@ cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(cvr_codes.values())]
 assert len(cvr_data_subset) > 0, "No matching CVR codes found."
 
 # %%
-addresses = gpd.read_parquet("../data/cvr/adresser_utm.parquet")
-addresses_access = gpd.read_parquet("../data/cvr/adgangs_adresser_utm.parquet")
+addresses = gpd.read_parquet("../data/adresser/adresser_utm.parquet")
+addresses_access = gpd.read_parquet("../data/adresser/adgangs_adresser_utm.parquet")
 
 keep_cols_addresses = [
     "id",
