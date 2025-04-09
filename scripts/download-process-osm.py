@@ -7,15 +7,7 @@ import geopandas as gpd
 import overpy
 
 # %%
-api = overpy.Overpass()
-result = api.query("""node["name"="Gielgen"];out body;""")
-# %%
-len(result.nodes)
-len(result.ways)
-len(result.relations)
-# %%
 
-# TODO: find extent of the area of interest
 administrative_boundaries = gpd.read_file(
     "../data/input/DK_AdministrativeUnit/au_inspire.gpkg", layer="administrativeunit"
 )
@@ -31,6 +23,14 @@ bbox = region_sj.total_bounds
 
 # %%
 
+api = overpy.Overpass()
+result = api.query("""node["name"="Gielgen"];out body;""")
+# %%
+len(result.nodes)
+len(result.ways)
+len(result.relations)
+
+#
 # TODO: get the OSM data for the area of interest
 
 # TODO: convert the OSM data to a GeoDataFrame
