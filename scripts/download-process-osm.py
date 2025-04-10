@@ -58,13 +58,12 @@ queries = {
     "supermarket": [{"shop": "supermarket"}, {"amenity": "convenience"}],
     "theatre": [{"amenity": "theatre"}],
     "library": [{"amenity": "library"}],
-    "sports_facility": [{"amenity": "sports_centre"}],
+    "sports_facility": [{"amenity": "sports_centre"}, {"club": "sport"}],
     "fitness": [
         {"leisure": "fitness_centre"},
         {"amenity": "fitness_centre"},
         {"amenity": "gym"},
     ],
-    "sports_club": [{"club": "sport"}],
     "movie_theater": [{"amenity": "cinema"}, {"amenity": "movie_theater"}],
     "swimming_hall": [
         {"leisure": "swimming_pool"},
@@ -74,7 +73,7 @@ queries = {
     "football": [{"sport": "football"}, {"sport": "soccer"}],
     "golf_course": [{"sport": "golf"}, {"leisure": "golf_course"}],
     "bowling": [{"leisure": "bowling_alley"}],
-    "forest": [{"landuse": "forest"}, {"natural": "wood"}],
+    # "forest": [{"landuse": "forest"}, {"natural": "wood"}],
 }
 
 
@@ -83,9 +82,7 @@ queries = {
 # connect to the overpass API
 api = overpy.Overpass()
 
-
-# Define the query
-tag_dict = {"amenity": "school"}
+all_osm = []
 
 for category, query_list in queries.items():
 
@@ -158,6 +155,18 @@ for category, query_list in queries.items():
     all_data = all_data.reset_index(drop=True)
     all_data["category"] = category
     all_data = all_data.drop_duplicates(subset=["geometry"])
-    all_data.to_file(f"../data/processed/osm_data/{category}_osm.gpkg", driver="GPKG")
+
+    all_data = gpd.clip(all_data, region_sj)
+
+    all_data["destination_type"] = category
+
+    all_data.to_file(f"../data/processed/osm/{category}_osm.gpkg", driver="GPKG")
+
+    all_osm.append(all_data)
+
+all_osm = pd.concat(all_osm, ignore_index=True)
+all_osm = all_osm.reset_index(drop=True)
+all_osm.to_file("../data/processed/osm/all_osm_destinations.gpkg", driver="GPKG")
+
 
 # %%
