@@ -2,6 +2,7 @@
 
 # Process CVR data
 
+# TODO: Include fitness centers???
 
 # %%
 import pandas as pd
@@ -131,11 +132,11 @@ cvr_address[cvr_address.Adr_id.isnull()]["destination_type"].value_counts()
 # Export
 
 cvr_address.to_file(
-    "../results/cvr-destinations-all.gpkg",
+    "../data/processed/cvr/cvr-destinations-all.gpkg",
 )
 
 cvr_address[cvr_address.Adr_id.notnull()].to_file(
-    "../results/cvr-destinations-w-address.gpkg",
+    "../data/processed/cvr/cvr-destinations-w-address.gpkg",
 )
 
 # %%
