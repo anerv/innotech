@@ -122,6 +122,9 @@ for category, query_list in queries.items():
                 # reproject to EPSG:25832
                 filtered_nodes_gdf.to_crs("EPSG:25832", inplace=True)
 
+            else:
+                filtered_nodes_gdf.crs = "EPSG:25832"
+
             if len(ways_gdf) > 0:
                 ways_gdf.to_crs("EPSG:25832", inplace=True)
                 # relations_gdf.to_crs("EPSG:25832", inplace=True)
