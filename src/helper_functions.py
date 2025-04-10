@@ -1,4 +1,5 @@
 import geopandas as gpd
+import pandas as pd
 import overpy
 from shapely.geometry import Point, Polygon, LineString
 
@@ -102,3 +103,14 @@ def combine_points_within_distance(points_gdf, distance=200):
     combined_points_gdf = gpd.GeoDataFrame(geometry=combined_points, crs=points_gdf.crs)
 
     return combined_points_gdf
+
+
+# Define the styling function for NaN values
+def highlight_nan(x):
+    return ["color: grey" if pd.isna(v) else "" for v in x]
+
+
+# Define the styling function for max values in each row
+def highlight_max(x):
+    is_max = x == x.max()
+    return ["background-color: yellow" if v else "" for v in is_max]
