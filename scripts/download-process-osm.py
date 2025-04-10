@@ -36,41 +36,45 @@ bbox_wgs84 = (bbox[1].item(), bbox[0].item(), bbox[3].item(), bbox[2].item())
 
 # %%
 
+
 queries = {
     "doctor-gp": [
-        "'amenity'='doctors'",
-        "'amenity'='general_practitioner'",
-        "'amenity'='clinic'",
-        "'healthcare'='doctor'",
+        {"amenity": "doctors"},
+        {"amenity": "general_practitioner"},
+        {"amenity": "clinic"},
+        {"healthcare": "doctor"},
     ],
     # "doctor-specialist": ,
     "dentist": [
-        "'amenity'='dentist'",
-        "'healthcare:specialty'='dentistry'",
-        "'healthcare'='dentist'",
+        {"amenity": "dentist"},
+        {"healthcare": "dentist"},
     ],
     # "physiotherapist": ,
-    "pharmacy": ["'amenity'='pharmacy'"],
-    "kindergarten": ["'amenity'='kindergarten'"],
-    "nursery": ["'amenity'='nursery'", "'amenity'='childcare'"],
-    "school": ["'amenity'='school'"],
-    "grocery_store": ["'shop'='grocery'"],
-    "supermarket": ["'shop'='supermarket|convenience'"],
-    "theatre": ["'amenity'='theatre'"],
-    "library": ["'amenity'='library'"],
-    "sports_facility": ["'amenity'='sports_centre'"],
-    "fitness": ["'amenity'='fitness_centre|gym'"],
-    "sports_club": ["'club'='sport'"],
-    "movie_theater": ["'amenity'='cinema'", "'amenity'='movie_theater'"],
-    "swimming_hall": [
-        "'leisure'='swimming_pool'",
-        "'amenity'='swimming_pool'",
-        "'sport'='swimming'",
+    "pharmacy": [{"amenity": "pharmacy"}],
+    "kindergarten": [{"amenity": "kindergarten"}],
+    "nursery": [{"amenity": "nursery"}, {"amenity": "childcare"}],
+    "school": [{"amenity": "school"}],
+    "grocery_store": [{"shop": "grocery"}],
+    "supermarket": [{"shop": "supermarket"}, {"amenity": "convenience"}],
+    "theatre": [{"amenity": "theatre"}],
+    "library": [{"amenity": "library"}],
+    "sports_facility": [{"amenity": "sports_centre"}],
+    "fitness": [
+        {"leisure": "fitness_centre"},
+        {"amenity": "fitness_centre"},
+        {"amenity": "gym"},
     ],
-    "football": ["'sport'='football'", "'sport'='soccer'"],
-    "golf_course": ["'sport'='golf'", "'leisure'='golf_course'"],
-    "forest": ["'landuse'='forest'", "'natural'='wood'"],
-    "bowling": ["'leisure'='bowling_alley'"],
+    "sports_club": [{"club": "sport"}],
+    "movie_theater": [{"amenity": "cinema"}, {"amenity": "movie_theater"}],
+    "swimming_hall": [
+        {"leisure": "swimming_pool"},
+        {"amenity": "swimming_pool"},
+        {"sport": "swimming"},
+    ],
+    "football": [{"sport": "football"}, {"sport": "soccer"}],
+    "golf_course": [{"sport": "golf"}, {"leisure": "golf_course"}],
+    "bowling": [{"leisure": "bowling_alley"}],
+    "forest": [{"landuse": "forest"}, {"natural": "wood"}],
 }
 
 
@@ -79,48 +83,78 @@ queries = {
 # connect to the overpass API
 api = overpy.Overpass()
 
+
 # Define the query
-tag_value = "'amenity'='school'"
+tag_dict = {"amenity": "school"}
 
-query = f"""
-(
-  node["amenity"="school"]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
-  way["amenity"="school"]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
-  relation["amenity"="school"]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
-);
-out body;
->;
-out skel qt;
-"""
+for category, query_list in queries.items():
 
-# Fetch the data
-result = api.query(query)
+    data_list = []
 
-# Create GeoDataFrames
-nodes_gdf = create_nodes_gdf(result.nodes)
-ways_gdf = create_ways_gdf(result.ways)
-# relations_gdf = create_relations_gdf(result, result.relations)
+    # for key, value in query_dict.items():
+    for query_dict in query_list:
 
-# filter out nodes that are part of ways
-filtered_nodes_gdf = drop_intersecting_nodes(nodes_gdf, ways_gdf)
+        for key, value in query_dict.items():
 
-# reproject to EPSG:25832
-filtered_nodes_gdf.to_crs("EPSG:25832", inplace=True)
-ways_gdf.to_crs("EPSG:25832", inplace=True)
-# relations_gdf.to_crs("EPSG:25832", inplace=True)
+            query = f"""
+            (
+            node[{key}={value}]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
+            way[{key}={value}]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
+            relation[{key}={value}]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
+            );
+            out body;
+            >;
+            out skel qt;
+            """
 
-ways_centroids = ways_gdf.copy()
-ways_centroids["geometry"] = ways_gdf.geometry.centroid
+            # Fetch the data
+            result = api.query(query)
 
-combined_gdf = pd.concat([filtered_nodes_gdf, ways_centroids], ignore_index=True)
-combined_gdf = combined_gdf.reset_index(drop=True)
+            # Create GeoDataFrames
+            nodes_gdf = create_nodes_gdf(result.nodes)
+            ways_gdf = create_ways_gdf(result.ways)
+            # relations_gdf = create_relations_gdf(result, result.relations)
 
-# combine nodes within 200 meters
-aggregated_gdf = combine_points_within_distance(combined_gdf, distance=200)
+            # filter out nodes that are part of ways
+            filtered_nodes_gdf = drop_intersecting_nodes(nodes_gdf, ways_gdf)
+
+            if len(filtered_nodes_gdf) > 0:
+                # reproject to EPSG:25832
+                filtered_nodes_gdf.to_crs("EPSG:25832", inplace=True)
+
+            if len(ways_gdf) > 0:
+                ways_gdf.to_crs("EPSG:25832", inplace=True)
+                # relations_gdf.to_crs("EPSG:25832", inplace=True)
+
+                ways_centroids = ways_gdf.copy()
+                ways_centroids["geometry"] = ways_gdf.geometry.centroid
+
+            if ways_gdf.empty and filtered_nodes_gdf.empty:
+
+                print(f"No data found for {key} = {value}")
+                continue
+
+            else:
+                combined_gdf = pd.concat(
+                    [filtered_nodes_gdf, ways_centroids], ignore_index=True
+                )
+                combined_gdf = combined_gdf.reset_index(drop=True)
+
+                # combine nodes within 200 meters
+                aggregated_gdf = combine_points_within_distance(
+                    combined_gdf, distance=200
+                )
+
+                data_list.append(aggregated_gdf)
+
+    if len(data_list) == 0:
+        print(f"No data found for {category}")
+        continue
+
+    all_data = pd.concat(data_list, ignore_index=True)
+    all_data = all_data.reset_index(drop=True)
+    all_data["category"] = category
+    all_data = all_data.drop_duplicates(subset=["geometry"])
+    all_data.to_file(f"../data/processed/osm_data/{category}_osm.gpkg", driver="GPKG")
 
 # %%
-
-
-# TODO: write function that passes query as string!
-
-# TODO: write function that combines output from multiple queries into single gdf
