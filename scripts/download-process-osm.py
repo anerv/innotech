@@ -10,9 +10,9 @@ import overpy
 from src.helper_functions import (
     create_nodes_gdf,
     create_ways_gdf,
-    create_relations_gdf,
-    drop_intersecting_nodes,
-    combine_points_within_distance,
+    # create_relations_gdf,
+    # drop_intersecting_nodes,
+    # combine_points_within_distance,
 )
 
 # %%
@@ -85,14 +85,10 @@ api = overpy.Overpass()
 all_osm = []
 
 for category, query_list in queries.items():
-
     data_list = []
 
-    # for key, value in query_dict.items():
     for query_dict in query_list:
-
         for key, value in query_dict.items():
-
             query = f"""
             (
             node[{key}={value}]({bbox_wgs84[0]},{bbox_wgs84[1]},{bbox_wgs84[2]},{bbox_wgs84[3]});
@@ -110,42 +106,47 @@ for category, query_list in queries.items():
             # Create GeoDataFrames
             nodes_gdf = create_nodes_gdf(result.nodes)
             ways_gdf = create_ways_gdf(result.ways)
-            # relations_gdf = create_relations_gdf(result, result.relations)
 
-            # filter out nodes that are part of ways
-            filtered_nodes_gdf = drop_intersecting_nodes(nodes_gdf, ways_gdf)
+            # Reproject to EPSG:25832 if necessary
+            if not nodes_gdf.empty:
+                # Drop nodes where the key is none (these nodes belong to a way)
+                nodes_gdf = nodes_gdf[nodes_gdf[key].notna()]
+                nodes_gdf = nodes_gdf.to_crs("EPSG:25832")
 
-            if len(filtered_nodes_gdf) > 0:
-                # reproject to EPSG:25832
-                filtered_nodes_gdf.to_crs("EPSG:25832", inplace=True)
+            if not ways_gdf.empty:
 
-            else:
-                filtered_nodes_gdf.crs = "EPSG:25832"
+                ways_gdf["geometry"] = ways_gdf.geometry.polygonize()
+                ways_gdf = ways_gdf.explode(index_parts=True).reset_index(drop=True)
 
-            if len(ways_gdf) > 0:
-                ways_gdf.to_crs("EPSG:25832", inplace=True)
-                # relations_gdf.to_crs("EPSG:25832", inplace=True)
-
+                ways_gdf = ways_gdf.to_crs("EPSG:25832")
                 ways_centroids = ways_gdf.copy()
                 ways_centroids["geometry"] = ways_gdf.geometry.centroid
+            else:
+                ways_centroids = None
 
-            if ways_gdf.empty and filtered_nodes_gdf.empty:
-
+            if nodes_gdf.empty and (ways_centroids is None):
                 print(f"No data found for {key} = {value}")
                 continue
 
-            else:
-                combined_gdf = pd.concat(
-                    [filtered_nodes_gdf, ways_centroids], ignore_index=True
-                )
-                combined_gdf = combined_gdf.reset_index(drop=True)
+            # Combine nodes and ways if both exist
+            if not nodes_gdf.empty and ways_centroids is not None:
 
-                # combine nodes within 200 meters
-                aggregated_gdf = combine_points_within_distance(
-                    combined_gdf, distance=200
-                )
+                combined_gdf = pd.concat([nodes_gdf, ways_centroids], ignore_index=True)
 
-                data_list.append(aggregated_gdf)
+                assert len(combined_gdf) == len(nodes_gdf) + len(ways_centroids)
+
+            elif not nodes_gdf.empty and ways_centroids is None:
+                # Only nodes exist
+                combined_gdf = nodes_gdf
+
+            elif nodes_gdf.empty and ways_centroids is not None:
+                # Only ways exist
+                combined_gdf = ways_centroids
+
+            data_list.append(combined_gdf)
+
+    if not data_list:
+        print(f"No data found for {category}")
 
     if len(data_list) == 0:
         print(f"No data found for {category}")
@@ -153,8 +154,7 @@ for category, query_list in queries.items():
 
     all_data = pd.concat(data_list, ignore_index=True)
     all_data = all_data.reset_index(drop=True)
-    all_data["category"] = category
-    all_data = all_data.drop_duplicates(subset=["geometry"])
+    # all_data = all_data.drop_duplicates(subset=["geometry"])
 
     all_data = gpd.clip(all_data, region_sj)
 
