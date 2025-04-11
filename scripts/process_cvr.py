@@ -136,7 +136,7 @@ cvr_address.to_file(
     "../data/processed/cvr/cvr-destinations-all.gpkg",
 )
 
-cvr_address[cvr_address.Adr_id.notnull()].to_file(
+cvr_address[(cvr_address.Adr_id.notnull()) & (cvr_address.geometry.notnull())].to_file(
     "../data/processed/cvr/cvr-destinations-w-address.gpkg",
 )
 
