@@ -4,3 +4,5 @@ src.egg-info/*
 results/*
 data/input/*
 data/processed/*
+
+todo.md
