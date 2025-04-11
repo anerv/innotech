@@ -56,16 +56,16 @@ def create_relations_gdf(overpass_result, relations):
     return gpd.GeoDataFrame(data, crs="EPSG:4326")
 
 
-def drop_intersecting_nodes(nodes_gdf, ways_gdf):
+# def drop_intersecting_nodes(nodes_gdf, ways_gdf):
 
-    # Function to check if a node intersects with any linestring
-    def node_intersects(node):
-        return ways_gdf.intersects(node).any()
+#     # Function to check if a node intersects with any linestring
+#     def node_intersects(node):
+#         return ways_gdf.intersects(node).any()
 
-    # Filter nodes that do not intersect with any linestring
-    filtered_nodes_gdf = nodes_gdf[~nodes_gdf.geometry.apply(node_intersects)].copy()
+#     # Filter nodes that do not intersect with any linestring
+#     filtered_nodes_gdf = nodes_gdf[~nodes_gdf.geometry.apply(node_intersects)].copy()
 
-    return filtered_nodes_gdf
+#     return filtered_nodes_gdf
 
 
 def combine_points_within_distance(points_gdf, distance=200):
