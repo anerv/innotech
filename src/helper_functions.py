@@ -105,6 +105,48 @@ def combine_points_within_distance(points_gdf, distance=200):
     return combined_points_gdf
 
 
+def aggregate_points_by_distance(
+    gdf, distance_threshold=50, destination_type_column="destination_type_main"
+):
+    """
+    Aggregates point geometries in a GeoDataFrame into one point if they are within a user-specified distance threshold
+    and share the same value for the column "destination-type".
+
+    Parameters:
+    gdf (geopandas.GeoDataFrame): The input GeoDataFrame containing point geometries.
+    distance_threshold (float): The distance threshold for aggregating points.
+    destination_type_column (str): The column name for the destination type.
+
+    Returns:
+    geopandas.GeoDataFrame: The aggregated GeoDataFrame.
+    """
+    # Ensure the GeoDataFrame is in a projected coordinate system
+    if gdf.crs is None or gdf.crs.is_geographic:
+        raise ValueError("GeoDataFrame must be in a projected coordinate system.")
+
+    aggregated_points = []
+
+    # Group by destination-type
+    for destination_type, group in gdf.groupby(destination_type_column):
+        # Combine points within the distance threshold for each group
+        combined_gdf = combine_points_within_distance(
+            group, distance=distance_threshold
+        )
+
+        # Add the destination-type column to the combined points
+        combined_gdf[destination_type_column] = destination_type
+
+        # Append the combined points to the aggregated points list
+        aggregated_points.append(combined_gdf)
+
+    # Concatenate all aggregated points into a single GeoDataFrame
+    aggregated_gdf = gpd.GeoDataFrame(
+        pd.concat(aggregated_points, ignore_index=True), crs=gdf.crs
+    )
+
+    return aggregated_gdf
+
+
 # Define the styling function for NaN values
 def highlight_nan(x):
     return ["color: grey" if pd.isna(v) else "" for v in x]
