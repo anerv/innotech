@@ -8,29 +8,34 @@ import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import contextily as cx
+from matplotlib_scalebar.scalebar import ScaleBar
 from src.helper_functions import (
     highlight_nan,
     highlight_max,
     aggregate_points_by_distance,
+    plot_destinations,
+    plot_destinations_combined,
+    plot_destinations_combined_subplot,
+    create_hex_grid,
+    count_destinations_in_hex_grid,
+    plot_hex_summaries,
 )
 
-from matplotlib_scalebar.scalebar import ScaleBar
-
-
+# Mapping between destination types and subcategories
 destination_to_cvr = {
-    "doctor": ["doctor-gp", "doctor-specialist", "dentist"],
-    "pharmacy": ["pharmacy"],
-    "nursery/kindergarten": ["nursery", "kindergarten"],
-    "school": ["school"],
+    "doctors": ["doctor-gp", "doctor-specialist", "dentist"],
+    "pharmacies": ["pharmacy"],
+    "nurseries/kindergartens": ["nursery", "kindergarten"],
+    "schools": ["school"],
     "recreation": ["theatre", "library", "sports_facility", "fitness", "movie_theater"],
     "shops": ["grocery_store", "supermarket", "discount_store"],
 }
 
 destination_to_osm = {
-    "doctor": ["doctor-gp", "dentist"],
-    "pharmacy": ["pharmacy"],
-    "nursery/kindergarten": ["nursery", "kindergarten"],
-    "school": ["school"],
+    "doctors": ["doctor-gp", "dentist"],
+    "pharmacies": ["pharmacy"],
+    "nurseries/kindergartens": ["nursery", "kindergarten"],
+    "schools": ["school"],
     "recreation": [
         "theatre",
         "library",
@@ -46,20 +51,22 @@ destination_to_osm = {
     "shops": ["grocery_store", "supermarket"],
 }
 
+osm_color = "#EE7733"
+cvr_color = "#009988"
 
 # %%
-
+# Load the data
 cvr_addresses = gpd.read_file("../data/processed/cvr/cvr-destinations-w-address.gpkg")
 cvr_all = gpd.read_file("../data/processed/cvr/cvr-destinations-all.gpkg")
 
 osm_destinations = gpd.read_file("../data/processed/osm/all_osm_destinations.gpkg")
-# %%
+
 cvr_addresses.sort_values("destination_type", inplace=True)
 cvr_all.sort_values("destination_type", inplace=True)
 osm_destinations.sort_values("destination_type", inplace=True)
 
 # %%
-
+# Compare number of destinations in each category
 destinations_compare = pd.DataFrame(
     {
         "cvr_addresses": cvr_addresses["destination_type"].value_counts(),
@@ -88,7 +95,7 @@ styled = (
 
 styled
 # %%
-
+# Compare number of destinations in each main category
 cvr_addresses["destination_type_main"] = cvr_addresses["destination_type"].map(
     lambda x: next(
         (key for key, values in destination_to_cvr.items() if x in values), None
@@ -139,6 +146,7 @@ styled_main = (
 styled_main
 
 # %%
+# Export combined spatial data set
 osm_destinations["source"] = "osm"
 cvr_addresses["source"] = "cvr"
 osm_cvr_combined = gpd.GeoDataFrame(
@@ -170,87 +178,14 @@ aggregated_gdf.to_file(
 
 # %%
 
-# TODO: Make maps for each category and sub-category - sep and combined for OSM and CVR?
-
-# Loop through each destination type and create a map for osm and for cvr and combined
-
+# Plot destinations for each subcategory for each data set
 region_sj = gpd.read_file("../data/processed/adm_boundaries/region_sj.gpkg")
-
-
-def plot_destinations(
-    data,
-    study_area,
-    destination_col,
-    destination,
-    color,
-    font_size,
-    fp,
-    attribution_text,
-    title,
-    figsize=(7, 7),
-    markersize=10,
-):
-
-    _, ax = plt.subplots(figsize=figsize)
-
-    label = destination.replace("_", " ").title()
-
-    study_area.plot(ax=ax, color="white", edgecolor="black", linewidth=0.5)
-
-    data[data[destination_col] == destination].plot(
-        ax=ax, color=color, markersize=markersize, label=label, legend=True
-    )
-
-    # TODO: fix legend position so that it is aligned with scale bar and attribution text
-    ax.legend(
-        loc="lower left",
-        fontsize=font_size,
-        # title_fontsize=10,
-        # title="OSM",
-        markerscale=2,
-        frameon=False,
-        bbox_to_anchor=(-0.1, -0.01),
-    )
-
-    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
-
-    ax.set_axis_off()
-
-    ax.add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower center",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    plt.show()
-
-    plt.savefig(
-        fp,
-        dpi=300,
-        bbox_inches="tight",
-    )
-    plt.close()
-
 
 for destination_type in osm_destinations["destination_type"].unique():
 
     fp = f"../results/maps/{destination_type}-osm.png"
     attribution_text = "(C) OSM Contributors"
-    color = "red"
+    color = osm_color
     dest_col = destination_type
     study_area = region_sj
     font_size = 10
@@ -274,7 +209,7 @@ for destination_type in cvr_addresses["destination_type"].unique():
 
     fp = f"../results/maps/{destination_type}-cvr.png"
     attribution_text = "(C) CVR"
-    color = "blue"
+    color = cvr_color
     dest_col = destination_type
     study_area = region_sj
     font_size = 10
@@ -295,13 +230,14 @@ for destination_type in cvr_addresses["destination_type"].unique():
 
 # %%
 
+# Plot destinations for each main category for each data set
 for destination_type in osm_destinations["destination_type_main"].unique():
 
     fp_type = destination_type.replace("/", "-")
 
     fp = f"../results/maps/main-{fp_type}-osm.png"
     attribution_text = "(C) OSM Contributors"
-    color = "red"
+    color = osm_color
     dest_col = destination_type
     study_area = region_sj
     font_size = 10
@@ -320,15 +256,13 @@ for destination_type in osm_destinations["destination_type_main"].unique():
         title,
     )
 
-# %%
-
 for destination_type in cvr_addresses["destination_type_main"].unique():
 
     fp_type = destination_type.replace("/", "-")
 
     fp = f"../results/maps/main-{fp_type}-cvr.png"
     attribution_text = "(C) CVR"
-    color = "blue"
+    color = cvr_color
     dest_col = destination_type
     study_area = region_sj
     font_size = 10
@@ -348,16 +282,123 @@ for destination_type in cvr_addresses["destination_type_main"].unique():
     )
 
 # %%
+
+# Make combined maps for each main category
 for destination_type in osm_cvr_combined["destination_type_main"].unique():
 
-    pass
+    fp_type = destination_type.replace("/", "-")
+
+    fp = f"../results/maps/main-{fp_type}-osm-cvr.png"
+    attribution_text = "(C) OSM, CVR"
+    color1 = osm_color
+    color2 = cvr_color
+    dest_col = destination_type
+    study_area = region_sj
+    font_size = 10
+    title = f"{destination_type.replace('_', ' ').title()}"
+    destination_col = "destination_type_main"
+
+    plot_destinations_combined(
+        osm_destinations,
+        cvr_addresses,
+        "OSM",
+        "CVR",
+        study_area,
+        destination_col,
+        destination_type,
+        color1,
+        color2,
+        font_size,
+        fp,
+        attribution_text,
+        title,
+    )
+
+
+# %%
+# Make one map with all main categories
+fp = f"../results/maps/main-all-osm-cvr.png"
+attribution_text = "(C) OSM, CVR"
+color1 = osm_color
+color2 = cvr_color
+dest_col = destination_type
+study_area = region_sj
+font_size = 10
+destination_col = "destination_type_main"
+
+plot_destinations_combined_subplot(
+    osm_destinations,
+    cvr_addresses,
+    "OSM",
+    "CVR",
+    study_area,
+    destination_col,
+    color1,
+    color2,
+    font_size,
+    fp,
+    attribution_text,
+)
+
 
 # %%
 
+# Aggregate points to a hex grid
 
-# TODO: Make subplot with all categories for osm and cvr
+# Create hex grid for the region of interest
+hex_grid = create_hex_grid(
+    region_sj, hex_resolution=6, crs="EPSG:25832", buffer_dist=100
+)
 
-# TODO: Aggregate to grid - count number of destinations in each grid cell
+hex_grid.sindex
+region_union = region_sj.union_all()
+hex_grid = hex_grid[hex_grid.intersects(region_union)]
+
+# %%
+# Count number of destinations in each hexagon for OSM and CVR data sets
+hex_grid_osm = count_destinations_in_hex_grid(
+    osm_destinations, hex_grid, "destination_type_main"
+)
+
+hex_grid_cvr = count_destinations_in_hex_grid(
+    cvr_addresses, hex_grid, "destination_type_main"
+)
+
+combined_grid = hex_grid_osm.merge(
+    hex_grid_cvr, on="grid_id", suffixes=("_osm", "_cvr")
+)
+
+combined_grid.drop(["geometry_osm"], axis=1, inplace=True)
+combined_grid.rename(columns={"geometry_cvr": "geometry"}, inplace=True)
+
+combined_grid.set_index("grid_id", inplace=True)
+
+for destination_type in osm_destinations["destination_type_main"].unique():
+    combined_grid[destination_type + "_diff"] = (
+        combined_grid[destination_type + "_osm"]
+        - combined_grid[destination_type + "_cvr"]
+    )
+
+combined_grid.to_file("../results/data/hex-grid-combined-osm-cvr.gpkg", driver="GPKG")
+
+
+# %%
+
+unique_destinations = destination_to_osm.keys()
+
+for i, destination in enumerate(unique_destinations):
+
+    fp_destination = destination_type.replace("/", "-")
+
+    fp = f"../results/maps/hex-grid-comparison-{fp_destination}.png"
+
+    plot_hex_summaries(
+        combined_grid,
+        destination,
+        fp,
+        figsize=(20, 10),
+        font_size=14,
+    )
 
 
 # %%
