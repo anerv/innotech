@@ -2,6 +2,13 @@ import geopandas as gpd
 import pandas as pd
 import overpy
 from shapely.geometry import Point, Polygon, LineString
+import matplotlib.pyplot as plt
+import contextily as cx
+from matplotlib_scalebar.scalebar import ScaleBar
+import h3
+from matplotlib import colors
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import math
 
 
 # Function to create a GeoDataFrame from nodes
@@ -156,3 +163,432 @@ def highlight_nan(x):
 def highlight_max(x):
     is_max = x == x.max()
     return ["background-color: yellow" if v else "" for v in is_max]
+
+
+def plot_destinations(
+    data,
+    study_area,
+    destination_col,
+    destination,
+    color,
+    font_size,
+    fp,
+    attribution_text,
+    title,
+    figsize=(7, 7),
+    markersize=10,
+):
+
+    _, ax = plt.subplots(figsize=figsize)
+
+    label = destination.replace("_", " ").title()
+
+    study_area.plot(ax=ax, color="white", edgecolor="black", linewidth=0.5)
+
+    data[data[destination_col] == destination].plot(
+        ax=ax, color=color, markersize=markersize, label=label, legend=True
+    )
+
+    # TODO: fix legend position so that it is aligned with scale bar and attribution text
+    ax.legend(
+        loc="lower left",
+        fontsize=font_size,
+        # title_fontsize=10,
+        # title="OSM",
+        markerscale=2,
+        frameon=False,
+        bbox_to_anchor=(-0.1, -0.01),
+    )
+
+    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+    ax.set_axis_off()
+
+    ax.add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower center",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        fp,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.show()
+    plt.close()
+
+
+def plot_destinations_combined(
+    data1,
+    data2,
+    data1_label,
+    data2_label,
+    study_area,
+    destination_col,
+    destination,
+    color1,
+    color2,
+    font_size,
+    fp,
+    attribution_text,
+    title,
+    figsize=(7, 7),
+    markersize=6,
+):
+
+    _, ax = plt.subplots(figsize=figsize)
+
+    label1 = destination.replace("_", " ").title() + " - " + data1_label
+    label2 = destination.replace("_", " ").title() + " - " + data2_label
+
+    study_area.plot(ax=ax, color="white", edgecolor="black", linewidth=0.5)
+
+    data1[data1[destination_col] == destination].plot(
+        ax=ax, color=color1, markersize=markersize, label=label1, legend=True, alpha=0.5
+    )
+
+    data2[data2[destination_col] == destination].plot(
+        ax=ax, color=color2, markersize=markersize, label=label2, legend=True, alpha=0.5
+    )
+
+    # TODO: fix legend position so that it is aligned with scale bar and attribution text
+    ax.legend(
+        loc="lower left",
+        fontsize=font_size,
+        # title_fontsize=10,
+        # title="OSM",
+        markerscale=2,
+        frameon=False,
+        bbox_to_anchor=(-0.1, -0.01),
+    )
+
+    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+    ax.set_axis_off()
+
+    ax.add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower center",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        fp,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.show()
+
+    plt.close()
+
+
+def plot_destinations_combined_subplot(
+    data1,
+    data2,
+    data1_label,
+    data2_label,
+    study_area,
+    destination_col,
+    color1,
+    color2,
+    font_size,
+    fp,
+    attribution_text,
+    figsize=(15, 15),
+    markersize=6,
+):
+
+    unique_destinations = set(data1[destination_col].unique()).union(
+        data2[destination_col].unique()
+    )
+
+    _, axes = plt.subplots(
+        nrows=2, ncols=int(len(unique_destinations) / 2), figsize=figsize
+    )
+
+    axes = axes.flatten()
+
+    for i, destination in enumerate(unique_destinations):
+
+        title = f"{destination.replace('_', ' ').title()}"
+
+        ax = axes[i]
+
+        study_area.plot(ax=ax, color="white", edgecolor="black", linewidth=0.5)
+
+        data1[data1[destination_col] == destination].plot(
+            ax=ax,
+            color=color1,
+            markersize=markersize,
+            label=data1_label,
+            legend=True,
+            alpha=0.5,
+        )
+
+        data2[data2[destination_col] == destination].plot(
+            ax=ax,
+            color=color2,
+            markersize=markersize,
+            label=data2_label,
+            legend=True,
+            alpha=0.5,
+        )
+
+        ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+        ax.set_axis_off()
+
+    # TODO: fix legend position so that it is aligned with scale bar and attribution text
+    middle_ax = axes[(len(axes) // 2) - 1]
+    middle_ax.legend(
+        loc="upper right",
+        fontsize=font_size,
+        # title_fontsize=10,
+        # title="OSM",
+        markerscale=3,
+        frameon=False,
+        bbox_to_anchor=(1, 1),
+    )
+
+    axes[len(axes) // 2].add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+
+    cx.add_attribution(ax=axes[-1], text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        fp,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.show()
+
+    plt.close()
+
+
+def create_hex_grid(polygon_gdf, hex_resolution, crs, buffer_dist):
+
+    # Inspired by https://stackoverflow.com/questions/51159241/how-to-generate-shapefiles-for-h3-hexagons-in-a-particular-area
+
+    poly_bounds = polygon_gdf.buffer(buffer_dist).to_crs("EPSG:4326").total_bounds
+
+    latlng_poly = h3.LatLngPoly(
+        [
+            (poly_bounds[0], poly_bounds[1]),
+            (poly_bounds[0], poly_bounds[3]),
+            (poly_bounds[2], poly_bounds[3]),
+            (poly_bounds[2], poly_bounds[1]),
+        ]
+    )
+
+    hex_list = []
+    hex_list.extend(h3.polygon_to_cells(latlng_poly, res=hex_resolution))
+
+    # Create hexagon data frame
+    hex_pd = pd.DataFrame(hex_list, columns=["hex_id"])
+
+    # Create hexagon geometry and GeoDataFrame
+    hex_pd["latlng_geometry"] = [
+        h3.cells_to_h3shape([x], tight=True) for x in hex_pd["hex_id"]
+    ]
+
+    hex_pd["geometry"] = hex_pd["latlng_geometry"].apply(lambda x: Polygon(x.outer))
+
+    grid = gpd.GeoDataFrame(hex_pd)
+
+    grid.set_crs("4326", inplace=True).to_crs(crs, inplace=True)
+
+    grid["grid_id"] = grid.hex_id
+
+    grid = grid[["grid_id", "geometry"]]
+
+    return grid
+
+
+def count_destinations_in_hex_grid(gdf, hex_grid, destination_col):
+
+    joined = gpd.sjoin(hex_grid, gdf, how="left", predicate="intersects")
+
+    counts = (
+        joined.groupby(["grid_id", "destination_type_main"])[destination_col]
+        .count()
+        .reset_index(name="count")
+    )
+
+    # Pivot the counts DataFrame to create a column for each destination type
+    counts_pivot = counts.pivot(
+        index="grid_id", columns="destination_type_main", values="count"
+    ).fillna(0)
+
+    # Merge the pivoted counts back into the hex grid
+    hex_grid = hex_grid.merge(
+        counts_pivot, left_on="grid_id", right_index=True, how="left"
+    )
+
+    # Fill NaN values with 0 for missing destination counts
+    hex_grid = hex_grid.fillna(0)
+
+    return hex_grid
+
+
+def plot_hex_summaries(
+    combined_grid,
+    destination,
+    fp,
+    figsize=(20, 10),
+    font_size=14,
+    attribution_text="(C) OSM, CVR",
+    titles=[
+        "OSM",
+        "CVR",
+        "Difference (OSM - CVR)",
+    ],
+    cmaps=[
+        "viridis",
+        "viridis",
+        "coolwarm",
+    ],
+):
+
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=figsize)
+
+    axes = axes.flatten()
+
+    suptitle = f"{destination.replace('_', ' ').title()}"
+
+    viridis_norm = plt.Normalize(
+        vmin=0,
+        vmax=max(
+            combined_grid[destination + "_osm"].max(),
+            combined_grid[destination + "_cvr"].max(),
+        ),
+    )
+    divnorm = colors.TwoSlopeNorm(
+        vmin=combined_grid[destination + "_diff"].min(),
+        vcenter=0.0,
+        vmax=combined_grid[destination + "_diff"].max(),
+    )
+
+    norms = [viridis_norm, viridis_norm, divnorm]
+
+    for j, col in enumerate(["_osm", "_cvr", "_diff"]):
+
+        ax = axes[j]
+
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="3.5%", pad="1%")
+        cax.tick_params(labelsize=font_size)
+
+        combined_grid.plot(
+            cax=cax,
+            ax=ax,
+            column=destination + col,
+            cmap=cmaps[j],
+            legend=True,
+            alpha=0.5,
+            legend_kwds={
+                "shrink": 0.9,
+                "aspect": 30,
+            },
+        )
+
+        sm = plt.cm.ScalarMappable(
+            cmap=cmaps[j],
+            norm=norms[j],
+        )
+        sm._A = []
+        cbar = fig.colorbar(sm, cax=cax)
+        cbar.outline.set_visible(False)
+
+        if j == 2:
+            min_val = math.floor(combined_grid[destination + "_diff"].min())
+            max_val = math.ceil(combined_grid[destination + "_diff"].max())
+            cbar.set_ticks(
+                [min_val, round(min_val / 2), 0, round(max_val / 2), max_val]
+            )
+
+        ax.set_axis_off()
+        ax.set_title(titles[j], fontsize=font_size)
+
+    fig.suptitle(
+        suptitle,
+        fontsize=font_size + 4,
+        fontdict={"fontweight": "bold"},
+    )
+
+    axes[0].add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+
+    cx.add_attribution(ax=axes[-1], text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    plt.show()
+
+    plt.savefig(
+        fp,
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
