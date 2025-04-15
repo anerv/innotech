@@ -9,6 +9,7 @@ import h3
 from matplotlib import colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import math
+import numpy as np
 
 
 # Function to create a GeoDataFrame from nodes
@@ -494,7 +495,7 @@ def plot_hex_summaries(
     cmaps=[
         "viridis",
         "viridis",
-        "coolwarm",
+        "RdBu_r",
     ],
 ):
 
@@ -511,10 +512,12 @@ def plot_hex_summaries(
             combined_grid[destination + "_cvr"].max(),
         ),
     )
+
+    largest_abs_value = combined_grid[destination + "_diff"].abs().max()
     divnorm = colors.TwoSlopeNorm(
-        vmin=combined_grid[destination + "_diff"].min(),
-        vcenter=0.0,
-        vmax=combined_grid[destination + "_diff"].max(),
+        vmin=-largest_abs_value,
+        vcenter=0,
+        vmax=largest_abs_value,
     )
 
     norms = [viridis_norm, viridis_norm, divnorm]
@@ -529,13 +532,25 @@ def plot_hex_summaries(
 
         study_area.plot(ax=ax, color="white", edgecolor="black")
 
-        combined_grid.replace([0], [None], inplace=True)
+        grid_subset = combined_grid[
+            (combined_grid[destination + "_osm"] > 0)
+            | (combined_grid[destination + "_cvr"] > 0)
+        ].copy()
 
-        combined_grid[combined_grid[destination + col].notna()].plot(
+        grid_subset[destination + "_osm"] = grid_subset[destination + "_osm"].replace(
+            {0: np.nan}
+        )
+
+        grid_subset[destination + "_cvr"] = grid_subset[destination + "_cvr"].replace(
+            {0: np.nan}
+        )
+
+        grid_subset.plot(
             cax=cax,
             ax=ax,
             column=destination + col,
             cmap=cmaps[j],
+            norm=norms[j],
             # legend=True,
             alpha=0.5,
             # legend_kwds={
@@ -553,8 +568,8 @@ def plot_hex_summaries(
         cbar.outline.set_visible(False)
 
         if j == 2:
-            min_val = math.floor(combined_grid[destination + "_diff"].min())
-            max_val = math.ceil(combined_grid[destination + "_diff"].max())
+            min_val = -largest_abs_value
+            max_val = largest_abs_value
             cbar.set_ticks(
                 [min_val, round(min_val / 2), 0, round(max_val / 2), max_val]
             )
