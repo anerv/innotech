@@ -75,17 +75,48 @@ destinations_compare = pd.DataFrame(
     }
 )
 
-destinations_compare.to_csv(
-    "../results/data/cvr-osm-comparison-subcategory.csv", index=True
+# Set the name of the index
+destinations_compare.index.name = "destination_type"
+
+# Reset the index to move the index into columns
+destinations_compare_reset = destinations_compare.reset_index()
+
+# Rename the columns to include the index name
+destinations_compare_reset.columns = [destinations_compare.index.name] + list(
+    destinations_compare.columns
 )
 
-# Apply the styling
-styled = (
-    destinations_compare.style.apply(
+
+destinations_compare_reset.to_csv(
+    "../results/data/cvr-osm-comparison-subcategory.csv", index=False
+)
+
+
+# Style
+def replace_nan_with_dash(val):
+    return "-" if pd.isna(val) else val
+
+
+styled_table = (
+    destinations_compare_reset.style.apply(
         highlight_nan, subset=["cvr_addresses", "cvr_all", "osm"], axis=1
     )
     .apply(highlight_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
-    .set_table_styles([{"selector": "th", "props": [("font-weight", "bold")]}])
+    .format(replace_nan_with_dash)  # Replace NaN with '-'
+    .hide(axis="index")  # Hide the index column
+    .set_table_styles(
+        [
+            {"selector": "th", "props": [("font-weight", "bold")]},
+            {
+                "selector": ".col0",
+                "props": [("font-weight", "bold")],
+            },  # Bold header for 'destination_type'
+            {
+                "selector": ".col0",
+                "props": [("font-weight", "bold")],
+            },  # Bold values for 'destination_type'
+        ]
+    )
     .set_properties(**{"text-align": "left", "font-size": "12px", "width": "100px"})
     .set_caption(
         "Comparison of destination types between CVR (w. addresses), CVR (all) and OSM data sets"
@@ -93,7 +124,15 @@ styled = (
     .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
 )
 
-styled
+styled_table
+# %%
+# Export the styled table to HTML
+html = styled_table.to_html()
+
+html_file = "../results/data/cvr-osm-comparison-subcategory.html"
+with open(html_file, "w") as f:
+    f.write(html)
+    f.close()
 # %%
 # Compare number of destinations in each main category
 cvr_addresses["destination_type_main"] = cvr_addresses["destination_type"].map(
@@ -126,16 +165,43 @@ destinations_compare_main = pd.DataFrame(
     }
 )
 
-destinations_compare_main.to_csv(
-    "../results/data/cvr-osm-comparison-main-category.csv", index=True
+# Set the name of the index
+destinations_compare_main.index.name = "destination_type_main"
+
+# Reset the index to move the index into columns
+destinations_compare_main_reset = destinations_compare_main.reset_index()
+
+# Rename the columns to include the index name
+destinations_compare_main_reset.columns = [destinations_compare_main.index.name] + list(
+    destinations_compare_main.columns
 )
 
-styled_main = (
-    destinations_compare_main.style.apply(
+destinations_compare_main_reset.to_csv(
+    "../results/data/cvr-osm-comparison-main-category.csv", index=False
+)
+
+# %%
+
+styled_table_main = (
+    destinations_compare_main_reset.style.apply(
         highlight_nan, subset=["cvr_addresses", "cvr_all", "osm"], axis=1
     )
     .apply(highlight_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
-    .set_table_styles([{"selector": "th", "props": [("font-weight", "bold")]}])
+    .format(replace_nan_with_dash)  # Replace NaN with '-'
+    .hide(axis="index")  # Hide the index column
+    .set_table_styles(
+        [
+            {"selector": "th", "props": [("font-weight", "bold")]},
+            {
+                "selector": ".col0",
+                "props": [("font-weight", "bold")],
+            },  # Bold header for 'destination_type'
+            {
+                "selector": ".col0",
+                "props": [("font-weight", "bold")],
+            },  # Bold values for 'destination_type'
+        ]
+    )
     .set_properties(**{"text-align": "left", "font-size": "12px", "width": "100px"})
     .set_caption(
         "Comparison of destination types between CVR (w. addresses), CVR (all) and OSM data sets"
@@ -143,7 +209,16 @@ styled_main = (
     .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
 )
 
-styled_main
+styled_table_main
+
+# %%
+
+html = styled_table_main.to_html()
+
+html_file = "../results/data/cvr-osm-comparison-maincategory.html"
+with open(html_file, "w") as f:
+    f.write(html)
+    f.close()
 
 # %%
 # Export combined spatial data set
@@ -179,7 +254,7 @@ aggregated_gdf.to_file(
 # %%
 
 # Plot destinations for each subcategory for each data set
-region_sj = gpd.read_file("../data/processed/adm_boundaries/region_sj.gpkg")
+study_area = gpd.read_file("../data/processed/adm_boundaries/region_sj.gpkg")
 
 for destination_type in osm_destinations["destination_type"].unique():
 
@@ -187,7 +262,7 @@ for destination_type in osm_destinations["destination_type"].unique():
     attribution_text = "(C) OSM Contributors"
     color = osm_color
     dest_col = destination_type
-    study_area = region_sj
+    study_area = study_area
     font_size = 10
     title = f"OSM {destination_type.replace('_', ' ').title()}"
     destination_col = "destination_type"
@@ -211,7 +286,7 @@ for destination_type in cvr_addresses["destination_type"].unique():
     attribution_text = "(C) CVR"
     color = cvr_color
     dest_col = destination_type
-    study_area = region_sj
+    study_area = study_area
     font_size = 10
     title = f"CVR {destination_type.replace('_', ' ').title()}"
     destination_col = "destination_type"
@@ -239,7 +314,7 @@ for destination_type in osm_destinations["destination_type_main"].unique():
     attribution_text = "(C) OSM Contributors"
     color = osm_color
     dest_col = destination_type
-    study_area = region_sj
+    study_area = study_area
     font_size = 10
     title = f"OSM {destination_type.replace('_', ' ').title()}"
     destination_col = "destination_type_main"
@@ -264,7 +339,7 @@ for destination_type in cvr_addresses["destination_type_main"].unique():
     attribution_text = "(C) CVR"
     color = cvr_color
     dest_col = destination_type
-    study_area = region_sj
+    study_area = study_area
     font_size = 10
     title = f"CVR {destination_type.replace('_', ' ').title()}"
     destination_col = "destination_type_main"
@@ -293,7 +368,7 @@ for destination_type in osm_cvr_combined["destination_type_main"].unique():
     color1 = osm_color
     color2 = cvr_color
     dest_col = destination_type
-    study_area = region_sj
+    study_area = study_area
     font_size = 10
     title = f"{destination_type.replace('_', ' ').title()}"
     destination_col = "destination_type_main"
@@ -322,7 +397,7 @@ attribution_text = "(C) OSM, CVR"
 color1 = osm_color
 color2 = cvr_color
 dest_col = destination_type
-study_area = region_sj
+study_area = study_area
 font_size = 10
 destination_col = "destination_type_main"
 
@@ -347,11 +422,11 @@ plot_destinations_combined_subplot(
 
 # Create hex grid for the region of interest
 hex_grid = create_hex_grid(
-    region_sj, hex_resolution=6, crs="EPSG:25832", buffer_dist=100
+    study_area, hex_resolution=6, crs="EPSG:25832", buffer_dist=100
 )
 
 hex_grid.sindex
-region_union = region_sj.union_all()
+region_union = study_area.union_all()
 hex_grid = hex_grid[hex_grid.intersects(region_union)]
 
 # %%
@@ -388,12 +463,13 @@ unique_destinations = destination_to_osm.keys()
 
 for i, destination in enumerate(unique_destinations):
 
-    fp_destination = destination_type.replace("/", "-")
+    fp_destination = destination.replace("/", "-")
 
     fp = f"../results/maps/hex-grid-comparison-{fp_destination}.png"
 
     plot_hex_summaries(
         combined_grid,
+        study_area,
         destination,
         fp,
         figsize=(20, 10),
