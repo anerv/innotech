@@ -2,7 +2,6 @@
 
 # Process CVR data
 
-# TODO: Include fitness centers???
 
 # %%
 import pandas as pd
