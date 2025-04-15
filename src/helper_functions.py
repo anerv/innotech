@@ -480,6 +480,7 @@ def count_destinations_in_hex_grid(gdf, hex_grid, destination_col):
 
 def plot_hex_summaries(
     combined_grid,
+    study_area,
     destination,
     fp,
     figsize=(20, 10),
@@ -526,17 +527,21 @@ def plot_hex_summaries(
         cax = divider.append_axes("right", size="3.5%", pad="1%")
         cax.tick_params(labelsize=font_size)
 
-        combined_grid.plot(
+        study_area.plot(ax=ax, color="white", edgecolor="black")
+
+        combined_grid.replace([0], [None], inplace=True)
+
+        combined_grid[combined_grid[destination + col].notna()].plot(
             cax=cax,
             ax=ax,
             column=destination + col,
             cmap=cmaps[j],
-            legend=True,
+            # legend=True,
             alpha=0.5,
-            legend_kwds={
-                "shrink": 0.9,
-                "aspect": 30,
-            },
+            # legend_kwds={
+            #     "shrink": 0.9,
+            #     "aspect": 30,
+            # },
         )
 
         sm = plt.cm.ScalarMappable(
@@ -584,11 +589,12 @@ def plot_hex_summaries(
 
     plt.tight_layout()
 
-    plt.show()
-
     plt.savefig(
         fp,
         dpi=300,
         bbox_inches="tight",
     )
+
+    plt.show()
+
     plt.close()
