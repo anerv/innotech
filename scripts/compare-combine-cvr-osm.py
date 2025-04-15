@@ -19,6 +19,8 @@ from src.helper_functions import (
     create_hex_grid,
     count_destinations_in_hex_grid,
     plot_hex_summaries,
+    highlight_next_max,
+    replace_nan_with_dash,
 )
 
 # Mapping between destination types and subcategories
@@ -91,17 +93,13 @@ destinations_compare_reset.to_csv(
     "../results/data/cvr-osm-comparison-subcategory.csv", index=False
 )
 
-
 # Style
-def replace_nan_with_dash(val):
-    return "-" if pd.isna(val) else val
-
-
 styled_table = (
     destinations_compare_reset.style.apply(
         highlight_nan, subset=["cvr_addresses", "cvr_all", "osm"], axis=1
     )
     .apply(highlight_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
+    .apply(highlight_next_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
     .format(replace_nan_with_dash)  # Replace NaN with '-'
     .hide(axis="index")  # Hide the index column
     .set_table_styles(
@@ -187,6 +185,7 @@ styled_table_main = (
         highlight_nan, subset=["cvr_addresses", "cvr_all", "osm"], axis=1
     )
     .apply(highlight_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
+    .apply(highlight_next_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
     .format(replace_nan_with_dash)  # Replace NaN with '-'
     .hide(axis="index")  # Hide the index column
     .set_table_styles(

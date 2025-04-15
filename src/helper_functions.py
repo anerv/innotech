@@ -166,6 +166,19 @@ def highlight_max(x):
     return ["background-color: yellow" if v else "" for v in is_max]
 
 
+def replace_nan_with_dash(val):
+    return "-" if pd.isna(val) else val
+
+
+def highlight_next_max(row, color="lightyellow"):
+    attr = f"background-color: {color}"
+    sorted_values = row.sort_values(ascending=False)
+    if len(sorted_values) > 1:
+        second_highest_value = sorted_values.iloc[1]
+        return [attr if val == second_highest_value else "" for val in row]
+    return [""] * len(row)
+
+
 def plot_destinations(
     data,
     study_area,
