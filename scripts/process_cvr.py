@@ -2,13 +2,21 @@
 
 # Process CVR data
 
-
 # %%
 import pandas as pd
 import geopandas as gpd
 import re
 import shutil
+import yaml
 
+# %%
+
+with open(r"../config.yml") as file:
+    parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+
+    org_cvr_path = parsed_yaml_file["cvr_fp"]
+    address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
+    address_access_fp_parquet = parsed_yaml_file["address_access_fp_parquet"]
 # %%
 cvr_codes = {
     "doctor-gp": 862100,
@@ -31,8 +39,6 @@ cvr_codes = {
 
 # %%
 # FIX CSV
-
-org_cvr_path = "../data/input/cvr/Penhed_Region_sj.csv"
 
 new_cvr_path = "../data/processed/cvr/Penhed_Region_sj_fixed.csv"
 
@@ -61,9 +67,9 @@ cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(cvr_codes.values())]
 assert len(cvr_data_subset) > 0, "No matching CVR codes found."
 
 # %%
-addresses = gpd.read_parquet("../data/processed/adresser/adresser_utm.parquet")
+addresses = gpd.read_parquet(address_fp_parquet)
 addresses_access = gpd.read_parquet(
-    "../data/processed/adresser/adgangs_adresser_utm.parquet"
+    address_access_fp_parquet,
 )
 
 keep_cols_addresses = [

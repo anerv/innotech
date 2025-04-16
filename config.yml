@@ -1,0 +1,11 @@
+
+# Filepaths for input data
+
+adm_boundaries_fp: "../data/input/DK_AdministrativeUnit/au_inspire.gpkg"
+study_area_fp: "../data/processed/adm_boundaries/region_sj.gpkg"
+address_fp: "../data/input/adresser/adresser_utm.gpkg"
+address_access_fp: "../data/input/adresser/adgangs_adresser_utm.gpkg"
+cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
+
+address_access_fp_parquet: "../data/processed/adresser/adgangs_adresser_utm.parquet"
+address_fp_parquet: "../data/processed/adresser/adresser_utm.parquet"

@@ -7,6 +7,7 @@
 import geopandas as gpd
 import pandas as pd
 import overpy
+import yaml
 from src.helper_functions import (
     create_nodes_gdf,
     create_ways_gdf,
@@ -16,6 +17,14 @@ from src.helper_functions import (
     # drop_intersecting_nodes,
     # combine_points_within_distance,
 )
+
+# %%
+
+with open(r"../config.yml") as file:
+    parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+
+    adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]
+    study_area_fp = parsed_yaml_file["study_area_fp"]
 
 # %%
 
