@@ -626,3 +626,30 @@ def plot_hex_summaries(
     plt.show()
 
     plt.close()
+
+
+def linestring_to_polygon(geom):
+    # Only convert if LineString is closed
+    if geom.is_ring:
+        return Polygon(geom)
+    else:
+        return None  # or raise a warning / try to close it manually
+
+
+def drop_contained_polygons(gdf, drop=True):
+    """
+    Find polygons that are fully contained by another polygon in the same GeoDataFrame.
+    """
+    contained_indices = set()
+
+    for idx, geom in gdf.geometry.items():
+        others = gdf.drop(idx)
+        for other_idx, other_geom in others.geometry.items():
+            if geom.within(other_geom):
+                contained_indices.add(idx)
+                break
+
+    if drop:
+        return gdf.drop(index=contained_indices)
+    else:
+        return list(contained_indices)

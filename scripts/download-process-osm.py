@@ -11,6 +11,8 @@ from src.helper_functions import (
     create_nodes_gdf,
     create_ways_gdf,
     # create_relations_gdf,
+    linestring_to_polygon,
+    drop_contained_polygons,
     # drop_intersecting_nodes,
     # combine_points_within_distance,
 )
@@ -113,12 +115,33 @@ for category, query_list in queries.items():
                 nodes_gdf = nodes_gdf[nodes_gdf[key].notna()]
                 nodes_gdf = nodes_gdf.to_crs("EPSG:25832")
 
+                nodes_gdf = nodes_gdf[
+                    [
+                        "id",
+                        key,
+                        "geometry",
+                    ]
+                ]
+
             if not ways_gdf.empty:
 
-                ways_gdf["geometry"] = ways_gdf.geometry.polygonize()
-                ways_gdf = ways_gdf.explode(index_parts=True).reset_index(drop=True)
+                ways_gdf["geometry"] = ways_gdf["geometry"].apply(linestring_to_polygon)
+                ways_gdf = ways_gdf[ways_gdf["geometry"].notnull()]
 
                 ways_gdf = ways_gdf.to_crs("EPSG:25832")
+
+                # Drop polygons completely contained by other polygons
+                ways_gdf = drop_contained_polygons(ways_gdf, drop=True)
+
+                ways_gdf = ways_gdf[
+                    [
+                        "id",
+                        key,
+                        "geometry",
+                    ]
+                ]
+                ways_gdf[key] = value
+
                 ways_centroids = ways_gdf.copy()
                 ways_centroids["geometry"] = ways_gdf.geometry.centroid
             else:
