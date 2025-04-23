@@ -3,7 +3,9 @@
 - Large data hetereogeneity in number of destinations *and* their locations - suggests data conflation/using both data sources might be most appropriate.
 - Data aggregation to a grid or by collapsing nearby destinations could speed up computation.
 - CVR data has a few missing addresses/locations for all destinations categories.
-- The data comparison could be improved by including more CVR codes.
+- The data comparison could be improved by including more CVR codes (for fitness, libraries, theaters, ungdomsuddannelser, dagpleje, etc.)
+- Why not include dagplejer?
+- There are some supermarkets that I can find in CVR that are not in the data set?? Same for daycares.
 
 ## Data completeness
 
