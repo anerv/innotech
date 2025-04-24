@@ -16,20 +16,9 @@ with open(r"../config.yml") as file:
 
     org_cvr_path = parsed_yaml_file["cvr_fp"]
     address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
-    address_access_fp_parquet = parsed_yaml_file["address_access_fp_parquet"]
-# %%
-cvr_codes = {
-    "doctor-gp": 862100,
-    "dentist": 862300,
-    "pharmacy": 477300,
-    "kindergarten": 889130,
-    "nursery": 889120,
-    "school": 852010,
-    "supermarket": 471120,
-    "discount_supermarket": 471130,
-    "library": 910110,
-    # "sports_facility": 931100,
-}
+    hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
+    # address_access_fp_parquet = parsed_yaml_file["address_access_fp_parquet"]
+
 
 # %%
 # FIX CSV
@@ -57,7 +46,7 @@ for find_value, replace_value in replace_dict.items():
 
 cvr_data = pd.read_csv(new_cvr_path, sep=";", encoding="latin1")
 
-cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(cvr_codes.values())]
+cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(hb_codes_dict.values())]
 assert len(cvr_data_subset) > 0, "No matching CVR codes found."
 
 # %%
@@ -101,7 +90,7 @@ cvr_address = addresses.merge(
 )
 
 cvr_address["destination_type"] = cvr_address["hb_kode"].map(
-    {v: k for k, v in cvr_codes.items()}
+    {v: k for k, v in hb_codes_dict.items()}
 )
 
 print(

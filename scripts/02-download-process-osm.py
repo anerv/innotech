@@ -28,6 +28,8 @@ with open(r"../config.yml") as file:
     adm_area_level = parsed_yaml_file["adm_area_level"]
     study_area_name = parsed_yaml_file["study_area_name"]
 
+    hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
+
 # %%
 
 administrative_boundaries = gpd.read_file(
@@ -68,9 +70,8 @@ queries = {
     "discount_supermarket": [{"amenity": "convenience"}],
     "library": [{"amenity": "library"}],
     "sports_facility": [{"amenity": "sports_centre"}, {"club": "sport"}],
-    "train_stations": [],  # TODO
+    "train_station": [{"railway": "station"}],
 }
-
 
 # %%
 
@@ -174,7 +175,7 @@ for category, query_list in queries.items():
 
     all_data = gpd.clip(all_data, region)
 
-    all_data["destination_type"] = category
+    all_data["service_type"] = category
 
     all_data.to_file(f"../data/processed/osm/{category}_osm.gpkg", driver="GPKG")
 
@@ -183,9 +184,19 @@ for category, query_list in queries.items():
 all_osm = pd.concat(all_osm, ignore_index=True)
 all_osm = all_osm.reset_index(drop=True)
 
+all_osm = all_osm[["id", "service_type", "geometry"]]
+
 # TODO: Find address ID
 # TODO: Fill out hb kodes
 
+# %%
+
+all_osm["hb_kode"] = all_osm["destination_type"].map(
+    {k: v for k, v in hb_codes_dict.items()}
+)
+
+# TODO: Fix train hb kode
+# %%
 all_osm.to_file("../data/processed/osm/all_osm_destinations.gpkg", driver="GPKG")
 
 
