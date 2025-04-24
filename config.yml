@@ -5,9 +5,21 @@ adm_boundaries_fp: "../data/input/DK_AdministrativeUnit/au_inspire.gpkg"
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
 adm_area_level: "2ndOrder" # Choose "2ndOrder" for region or "3rdOrder" for municipality
 study_area_name: "Region Sjælland" # Name of region in au_inspire datasæt. Must be a valid name of a Danish region or municipality
-# address_fp: "../data/input/adresser/adresser_utm.gpkg"
-# address_access_fp: "../data/input/adresser/adgangs_adresser_utm.gpkg"
+
 cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
 
-#address_access_fp_parquet: "../data/processed/adresser/adgangs_adresser_utm.parquet"
-address_fp_parquet: "../data/processed/adresser/adresser_utm.parquet" # TODO: Update after new data from Esbern
+
+address_fp_parquet: "../data/input/adresser/adresser_utm.parquet" # TODO: Update after new data from Esbern??
+
+
+hb_codes_dict:
+    doctor-gp: 862100,
+    dentist: 862300,
+    pharmacy: 477300,
+    kindergarten: 889130,
+    nursery: 889120,
+    school: 852010,
+    supermarket: 471120,
+    discount_supermarket: 471130,
+    library: 910110,
+    # "sports_facility": 931100,
