@@ -25,6 +25,8 @@ with open(r"../config.yml") as file:
 
     adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]
     study_area_fp = parsed_yaml_file["study_area_fp"]
+    adm_area_level = parsed_yaml_file["adm_area_level"]
+    study_area_name = parsed_yaml_file["study_area_name"]
 
 # %%
 
@@ -32,21 +34,20 @@ administrative_boundaries = gpd.read_file(
     "../data/input/DK_AdministrativeUnit/au_inspire.gpkg", layer="administrativeunit"
 )
 
-region_sj = administrative_boundaries[
-    (administrative_boundaries.nationallevel == "2ndOrder")
-    & (administrative_boundaries.name_gn_spell_spellofna_text == "Region Sjælland")
+region = administrative_boundaries[
+    (administrative_boundaries.nationallevel == adm_area_level)
+    & (administrative_boundaries.name_gn_spell_spellofna_text == study_area_name)
 ]
 
-region_sj.to_file("../data/processed/adm_boundaries/region_sj.gpkg")
+region.to_file("../data/processed/adm_boundaries/region.gpkg")
 
 # %%
-bbox = region_sj.to_crs("WGS84").total_bounds
+bbox = region.to_crs("WGS84").total_bounds
 
 bbox_wgs84 = (bbox[1].item(), bbox[0].item(), bbox[3].item(), bbox[2].item())
 
 
 # %%
-
 
 queries = {
     "doctor-gp": [
@@ -55,36 +56,19 @@ queries = {
         {"amenity": "clinic"},
         {"healthcare": "doctor"},
     ],
-    # "doctor-specialist": ,
     "dentist": [
         {"amenity": "dentist"},
         {"healthcare": "dentist"},
     ],
-    # "physiotherapist": ,
     "pharmacy": [{"amenity": "pharmacy"}],
     "kindergarten": [{"amenity": "kindergarten"}],
     "nursery": [{"amenity": "nursery"}, {"amenity": "childcare"}],
     "school": [{"amenity": "school"}],
-    "grocery_store": [{"shop": "grocery"}],
-    "supermarket": [{"shop": "supermarket"}, {"amenity": "convenience"}],
-    "theatre": [{"amenity": "theatre"}],
+    "supermarket": [{"shop": "supermarket"}, {"shop": "grocery"}],
+    "discount_supermarket": [{"amenity": "convenience"}],
     "library": [{"amenity": "library"}],
     "sports_facility": [{"amenity": "sports_centre"}, {"club": "sport"}],
-    "fitness": [
-        {"leisure": "fitness_centre"},
-        {"amenity": "fitness_centre"},
-        {"amenity": "gym"},
-    ],
-    "movie_theater": [{"amenity": "cinema"}, {"amenity": "movie_theater"}],
-    "swimming_hall": [
-        {"leisure": "swimming_pool"},
-        {"amenity": "swimming_pool"},
-        {"sport": "swimming"},
-    ],
-    "football": [{"sport": "football"}, {"sport": "soccer"}],
-    "golf_course": [{"sport": "golf"}, {"leisure": "golf_course"}],
-    "bowling": [{"leisure": "bowling_alley"}],
-    # "forest": [{"landuse": "forest"}, {"natural": "wood"}],
+    "train_stations": [],  # TODO
 }
 
 
@@ -188,7 +172,7 @@ for category, query_list in queries.items():
     all_data = all_data.reset_index(drop=True)
     # all_data = all_data.drop_duplicates(subset=["geometry"])
 
-    all_data = gpd.clip(all_data, region_sj)
+    all_data = gpd.clip(all_data, region)
 
     all_data["destination_type"] = category
 
@@ -198,6 +182,10 @@ for category, query_list in queries.items():
 
 all_osm = pd.concat(all_osm, ignore_index=True)
 all_osm = all_osm.reset_index(drop=True)
+
+# TODO: Find address ID
+# TODO: Fill out hb kodes
+
 all_osm.to_file("../data/processed/osm/all_osm_destinations.gpkg", driver="GPKG")
 
 

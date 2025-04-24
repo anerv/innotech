@@ -26,7 +26,7 @@ pip install -e .
 
 - Adresse-data (adresser og adgangsadresser fra DAWI) for den ønskede region.
 - CVR-data (Penheder) for den ønskede region.
-- Afgrænsning af studieområdet (INPSPIRE data med danske administrative områder. Opdater script 02 hvis et andet område end Region Sjælland ønskes.). 
+- Afgrænsning af studieområdet (INPSPIRE data med danske administrative områder. Opdater config.yml andet område end Region Sjælland ønskes.). 
 
 Se config.yml for forventede filnavne og placeringer.
 

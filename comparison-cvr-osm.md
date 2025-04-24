@@ -6,6 +6,7 @@
 - The data comparison could be improved by including more CVR codes (for fitness, libraries, theaters, ungdomsuddannelser, dagpleje, etc.) - is there a reason these are not included in the parameter list?
 - Why not include dagplejer in child care (often used in rural areas instead of vuggestue)?
 - There are some supermarkets and day cares (and possibly other categories) that are not in the CVR data set but searchable on the CVR website.
+(Daycare: Sølyst in Jyderup; Børnehuset Elverhøj, Holbæk. Supermarkets: Supermarkets in Kirke Hvalsø)
 
 ## Data completeness
 

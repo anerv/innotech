@@ -20,21 +20,15 @@ with open(r"../config.yml") as file:
 # %%
 cvr_codes = {
     "doctor-gp": 862100,
-    "doctor-specialist": 862200,
     "dentist": 862300,
-    # "physiotherapist": 869020,
     "pharmacy": 477300,
     "kindergarten": 889130,
     "nursery": 889120,
     "school": 852010,
-    "grocery_store": 471110,
     "supermarket": 471120,
-    "discount_store": 471130,
-    "theatre": 900100,
+    "discount_supermarket": 471130,
     "library": 910110,
-    "sports_facility": 931100,
-    "fitness": 931300,
-    "movie_theater": 591400,
+    # "sports_facility": 931100,
 }
 
 # %%
@@ -67,10 +61,11 @@ cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(cvr_codes.values())]
 assert len(cvr_data_subset) > 0, "No matching CVR codes found."
 
 # %%
+# TODO: Filter active
+
+
+# %%
 addresses = gpd.read_parquet(address_fp_parquet)
-addresses_access = gpd.read_parquet(
-    address_access_fp_parquet,
-)
 
 keep_cols_addresses = [
     "id",
@@ -87,19 +82,8 @@ keep_cols_addresses = [
     "geometry",
 ]
 
-keep_cols_addresses_access = [
-    "id",
-    "status",
-    "vejnavn",
-    "husnr",
-    "postnr",
-    "kommunekode",
-    "ddkn_km10",
-    "geometry",
-]
 
 addresses = addresses[keep_cols_addresses]
-addresses_access = addresses_access[keep_cols_addresses_access]
 
 addresses = addresses.rename(
     columns={
@@ -107,11 +91,7 @@ addresses = addresses.rename(
     }
 )
 
-addresses_access = addresses_access.rename(
-    columns={
-        "status": "adr_status",
-    }
-)
+
 # %%
 cvr_address = addresses.merge(
     cvr_data_subset,
@@ -133,6 +113,9 @@ print(
 
 print("Unmatched CVR locations in each category:")
 cvr_address[cvr_address.Adr_id.isnull()]["destination_type"].value_counts()
+
+
+# TODO: Match to closest adress within some threshold
 
 # %%
 # Export
