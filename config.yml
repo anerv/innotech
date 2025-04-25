@@ -21,6 +21,6 @@ hb_codes_dict:
     school: 852010
     supermarket: 471120
     discount_supermarket: 471130
-    library: 910110
+    library: 911100
     train_station: 49
     sports_facility: 93 #  931100,
