@@ -90,19 +90,19 @@ cvr_address = addresses_cleaned.merge(
 
 # %%
 
-cvr_address["destination_type"] = cvr_address["hb_kode"].map(
+cvr_address["service_type"] = cvr_address["hb_kode"].map(
     {v: k for k, v in hb_codes_dict.items()}
 )
 
 print(
-    f"{len(cvr_address[cvr_address.Adr_id.notnull()])} CVR locations matched to addresses."
+    f"{len(cvr_address[cvr_address.adresseIdentificerer.notnull()])} CVR locations matched to addresses."
 )
 print(
-    f"{len(cvr_address[cvr_address.Adr_id.isnull()])} CVR locations not matched to addresses."
+    f"{len(cvr_address[cvr_address.adresseIdentificerer.isnull()])} CVR locations not matched to addresses."
 )
 
 print("Unmatched CVR locations in each category:")
-cvr_address[cvr_address.Adr_id.isnull()]["destination_type"].value_counts()
+cvr_address[cvr_address.adresseIdentificerer.isnull()]["service_type"].value_counts()
 
 
 # %%
@@ -112,7 +112,9 @@ cvr_address.to_file(
     "../data/processed/cvr/cvr-services-all.gpkg",
 )
 
-cvr_address[(cvr_address.Adr_id.notnull()) & (cvr_address.geometry.notnull())].to_file(
+cvr_address[
+    (cvr_address.adresseIdentificerer.notnull()) & (cvr_address.geometry.notnull())
+].to_file(
     "../data/processed/cvr/cvr-services-w-address.gpkg",
 )
 
