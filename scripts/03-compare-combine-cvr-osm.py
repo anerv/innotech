@@ -50,7 +50,7 @@ cvr_color = "#009988"
 cvr_addresses = gpd.read_file("../data/processed/cvr/cvr-services-w-address.gpkg")
 cvr_all = gpd.read_file("../data/processed/cvr/cvr-services-all.gpkg")
 
-osm_destinations = gpd.read_file("../data/processed/osm/all_osm_destinations.gpkg")
+osm_destinations = gpd.read_file("../data/processed/osm/all_osm_services.gpkg")
 
 cvr_addresses.sort_values("service_type", inplace=True)
 cvr_all.sort_values("service_type", inplace=True)
