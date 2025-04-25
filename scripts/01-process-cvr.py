@@ -17,8 +17,6 @@ with open(r"../config.yml") as file:
     org_cvr_path = parsed_yaml_file["cvr_fp"]
     address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
-    # address_access_fp_parquet = parsed_yaml_file["address_access_fp_parquet"]
-
 
 # %%
 # FIX CSV
@@ -49,9 +47,14 @@ cvr_data = pd.read_csv(new_cvr_path, sep=";", encoding="latin1")
 cvr_data_subset = cvr_data[cvr_data["hb_kode"].isin(hb_codes_dict.values())]
 assert len(cvr_data_subset) > 0, "No matching CVR codes found."
 
-# %%
-# TODO: Filter active
+assert (
+    49 not in cvr_data_subset["hb_kode"].unique()
+), "CVR code 49 (train code) found in data."
 
+
+cvr_data_subset = cvr_data_subset[
+    cvr_data_subset["Status"].isin(["Aktiv"])  # "Under oprettelse"
+]
 
 # %%
 addresses = gpd.read_parquet(address_fp_parquet)
@@ -80,7 +83,6 @@ addresses = addresses.rename(
     }
 )
 
-
 # %%
 cvr_address = addresses.merge(
     cvr_data_subset,
@@ -103,8 +105,6 @@ print(
 print("Unmatched CVR locations in each category:")
 cvr_address[cvr_address.Adr_id.isnull()]["destination_type"].value_counts()
 
-
-# TODO: Match to closest adress within some threshold
 
 # %%
 # Export
