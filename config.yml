@@ -9,7 +9,7 @@ study_area_name: "Region Sjælland" # Name of region in au_inspire datasæt. Mus
 cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
 
 
-address_fp_parquet: "../data/input/adresser/adresser_utm.parquet" # TODO: Update after new data from Esbern??
+address_fp_parquet: "../data/input/adresser/alle_adr.parquet" 
 
 
 hb_codes_dict:
@@ -23,4 +23,4 @@ hb_codes_dict:
     discount_supermarket: 471130
     library: 910110
     train_station: 49
-    # "sports_facility": 931100,
+    sports_facility: 93 #  931100,
