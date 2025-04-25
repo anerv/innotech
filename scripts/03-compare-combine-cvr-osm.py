@@ -4,8 +4,7 @@
 
 # TODO:
 # Remove unnecessary plots
-# Export correct columns
-# Export to parquet
+
 
 # %%
 
@@ -256,119 +255,121 @@ aggregated_gdf = aggregate_points_by_distance(
 )
 
 
-aggregated_gdf.to_file(
-    "../results/data/osm-cvr-combined-aggregated.gpkg", driver="GPKG"
+aggregated_gdf.to_parquet(
+    "../results/data/osm-cvr-combined-aggregated.parquet",
 )
 
 # %%
 
 # Plot services for each subcategory for each data set
-study_area = gpd.read_file("../data/processed/adm_boundaries/region_sj.gpkg")
+study_area = gpd.read_file("../data/processed/adm_boundaries/region.gpkg")
 
-for service_type in osm_destinations["service_type"].unique():
+# TODO: TEST BUT LEAVE OUT FOR NOW
+# for service_type in osm_destinations["service_type"].unique():
 
-    fp = f"../results/maps/{service_type}-osm.png"
-    attribution_text = "(C) OSM Contributors"
-    color = osm_color
-    dest_col = service_type
-    study_area = study_area
-    font_size = 10
-    title = f"OSM {service_type.replace('_', ' ').title()}"
-    destination_col = "service_type"
+#     fp = f"../results/maps/{service_type}-osm.png"
+#     attribution_text = "(C) OSM Contributors"
+#     color = osm_color
+#     dest_col = service_type
+#     study_area = study_area
+#     font_size = 10
+#     title = f"OSM {service_type.replace('_', ' ').title()}"
+#     destination_col = "service_type"
 
-    plot_destinations(
-        osm_destinations,
-        study_area,
-        destination_col,
-        service_type,
-        color,
-        font_size,
-        fp,
-        attribution_text,
-        title,
-    )
+#     plot_destinations(
+#         osm_destinations,
+#         study_area,
+#         destination_col,
+#         service_type,
+#         color,
+#         font_size,
+#         fp,
+#         attribution_text,
+#         title,
+#     )
 
 
-for service_type in cvr_addresses["service_type"].unique():
+# for service_type in cvr_addresses["service_type"].unique():
 
-    fp = f"../results/maps/{service_type}-cvr.png"
-    attribution_text = "(C) CVR"
-    color = cvr_color
-    dest_col = service_type
-    study_area = study_area
-    font_size = 10
-    title = f"CVR {service_type.replace('_', ' ').title()}"
-    destination_col = "service_type"
+#     fp = f"../results/maps/{service_type}-cvr.png"
+#     attribution_text = "(C) CVR"
+#     color = cvr_color
+#     dest_col = service_type
+#     study_area = study_area
+#     font_size = 10
+#     title = f"CVR {service_type.replace('_', ' ').title()}"
+#     destination_col = "service_type"
 
-    plot_destinations(
-        cvr_addresses,
-        study_area,
-        destination_col,
-        service_type,
-        color,
-        font_size,
-        fp,
-        attribution_text,
-        title,
-    )
+#     plot_destinations(
+#         cvr_addresses,
+#         study_area,
+#         destination_col,
+#         service_type,
+#         color,
+#         font_size,
+#         fp,
+#         attribution_text,
+#         title,
+#     )
 
 # %%
 
 # Plot services for each main category for each data set
-for service_type in osm_destinations["service_type_main"].unique():
+# for service_type in osm_destinations["service_type_main"].unique():
 
-    fp_type = service_type.replace("/", "-")
+#     fp_type = service_type.replace("/", "-")
 
-    fp = f"../results/maps/main-{fp_type}-osm.png"
-    attribution_text = "(C) OSM Contributors"
-    color = osm_color
-    dest_col = service_type
-    study_area = study_area
-    font_size = 10
-    title = f"OSM {service_type.replace('_', ' ').title()}"
-    destination_col = "service_type_main"
+#     fp = f"../results/maps/main-{fp_type}-osm.png"
+#     attribution_text = "(C) OSM Contributors"
+#     color = osm_color
+#     dest_col = service_type
+#     study_area = study_area
+#     font_size = 10
+#     title = f"OSM {service_type.replace('_', ' ').title()}"
+#     destination_col = "service_type_main"
 
-    plot_destinations(
-        osm_destinations,
-        study_area,
-        destination_col,
-        service_type,
-        color,
-        font_size,
-        fp,
-        attribution_text,
-        title,
-    )
+#     plot_destinations(
+#         osm_destinations,
+#         study_area,
+#         destination_col,
+#         service_type,
+#         color,
+#         font_size,
+#         fp,
+#         attribution_text,
+#         title,
+#     )
 
-for service_type in cvr_addresses["service_type_main"].unique():
+# for service_type in cvr_addresses["service_type_main"].unique():
 
-    fp_type = service_type.replace("/", "-")
+#     fp_type = service_type.replace("/", "-")
 
-    fp = f"../results/maps/main-{fp_type}-cvr.png"
-    attribution_text = "(C) CVR"
-    color = cvr_color
-    dest_col = service_type
-    study_area = study_area
-    font_size = 10
-    title = f"CVR {service_type.replace('_', ' ').title()}"
-    destination_col = "service_type_main"
+#     fp = f"../results/maps/main-{fp_type}-cvr.png"
+#     attribution_text = "(C) CVR"
+#     color = cvr_color
+#     dest_col = service_type
+#     study_area = study_area
+#     font_size = 10
+#     title = f"CVR {service_type.replace('_', ' ').title()}"
+#     destination_col = "service_type_main"
 
-    plot_destinations(
-        cvr_addresses,
-        study_area,
-        destination_col,
-        service_type,
-        color,
-        font_size,
-        fp,
-        attribution_text,
-        title,
-    )
+#     plot_destinations(
+#         cvr_addresses,
+#         study_area,
+#         destination_col,
+#         service_type,
+#         color,
+#         font_size,
+#         fp,
+#         attribution_text,
+#         title,
+#     )
 
 # %%
 
+# TODO: FIX THIS or leave out for now?
 # Make combined maps for each main category
-for service_type in osm_cvr_combined["service_type_main"].unique():
+for service_type in osm_cvr_combined["service_type"].unique():
 
     fp_type = service_type.replace("/", "-")
 
@@ -380,7 +381,7 @@ for service_type in osm_cvr_combined["service_type_main"].unique():
     study_area = study_area
     font_size = 10
     title = f"{service_type.replace('_', ' ').title()}"
-    destination_col = "service_type_main"
+    destination_col = "service_type"
 
     plot_destinations_combined(
         osm_destinations,
@@ -400,6 +401,7 @@ for service_type in osm_cvr_combined["service_type_main"].unique():
 
 
 # %%
+# TODO: FIX
 # Make one map with all main categories
 fp = f"../results/maps/main-all-osm-cvr.png"
 attribution_text = "(C) OSM, CVR"
@@ -408,7 +410,7 @@ color2 = cvr_color
 dest_col = service_type
 study_area = study_area
 font_size = 10
-destination_col = "service_type_main"
+destination_col = "service_type"
 
 plot_destinations_combined_subplot(
     osm_destinations,
