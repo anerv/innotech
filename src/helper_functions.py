@@ -12,6 +12,31 @@ import math
 import numpy as np
 
 
+def drop_duplicates_custom(gdf, subset_columns, value_column):
+    """
+    Drop duplicates in a GeoDataFrame based on a subset of columns and custom criteria.
+
+    Parameters:
+    - gdf: GeoDataFrame
+      The input GeoDataFrame.
+    - subset_columns: list of str
+      The columns to consider for identifying duplicates.
+    - value_column: str
+      The column to use for determining which duplicate row to keep.
+
+    Returns:
+    - GeoDataFrame
+      The GeoDataFrame with duplicates dropped according to the specified criteria.
+    """
+    # Sort the GeoDataFrame by the value_column to prioritize rows with 'E', then '2', then the lowest value
+    gdf = gdf.sort_values(by=value_column, key=lambda x: x.map({"E": 1, "2": 2}.get))
+
+    # Drop duplicates based on the subset_columns, keeping the first occurrence
+    gdf = gdf.drop_duplicates(subset=subset_columns, keep="first")
+
+    return gdf
+
+
 # Function to create a GeoDataFrame from nodes
 def create_nodes_gdf(nodes):
     if not nodes:

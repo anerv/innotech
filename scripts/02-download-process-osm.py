@@ -16,6 +16,7 @@ from src.helper_functions import (
     drop_contained_polygons,
     # drop_intersecting_nodes,
     # combine_points_within_distance,
+    drop_duplicates_custom,
 )
 
 # %%
@@ -27,6 +28,8 @@ with open(r"../config.yml") as file:
     study_area_fp = parsed_yaml_file["study_area_fp"]
     adm_area_level = parsed_yaml_file["adm_area_level"]
     study_area_name = parsed_yaml_file["study_area_name"]
+
+    address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
 
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
@@ -181,23 +184,76 @@ for category, query_list in queries.items():
 
     all_osm.append(all_data)
 
-all_osm = pd.concat(all_osm, ignore_index=True)
-all_osm = all_osm.reset_index(drop=True)
+all_osm_gdf = pd.concat(all_osm, ignore_index=True)
+all_osm_gdf = all_osm_gdf.reset_index(drop=True)
 
-all_osm = all_osm[["id", "service_type", "geometry"]]
+all_osm_gdf = all_osm_gdf[["id", "service_type", "geometry"]]
+all_osm_gdf.rename(columns={"id": "osm_id"}, inplace=True)
 
-# TODO: Find address ID
-# TODO: Fill out hb kodes
 
 # %%
-
-all_osm["hb_kode"] = all_osm["destination_type"].map(
+# fill out hb codes
+all_osm_gdf["hb_kode"] = all_osm_gdf["service_type"].map(
     {k: v for k, v in hb_codes_dict.items()}
 )
 
-# TODO: Fix train hb kode
+assert (
+    all_osm_gdf["hb_kode"].notnull().all()
+), "Some service types are not in the hb_codes_dict"
+
+all_osm_gdf.drop_duplicates(subset=["osm_id", "service_type"], inplace=True)
+
 # %%
-all_osm.to_file("../data/processed/osm/all_osm_destinations.gpkg", driver="GPKG")
 
+#  match to closest addresses
+addresses = gpd.read_parquet(address_fp_parquet)  # adresseIdentificerer
+addresses.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
 
+join_threshold = 300  # meters
+assert all_osm_gdf.crs == addresses.crs, "CRS mismatch between all_osm and addresses"
+
+joined = gpd.sjoin_nearest(
+    all_osm_gdf,
+    addresses,
+    how="left",
+    max_distance=join_threshold,
+    lsuffix="osm",
+    rsuffix="addr",
+)
+
+joined["Adr_id"] = None
+joined.Adr_id = joined.adresseIdentificerer
+
+assert joined["Adr_id"].notnull().all(), "Some OSM data are not matched to addresses"
+
+# %%
+joined = joined[
+    [
+        "osm_id",
+        "service_type",
+        "hb_kode",
+        "Adr_id",
+        "enh023Boligtype",
+        "geometry",
+    ]
+]
+
+# %%
+joined.drop_duplicates(subset=["osm_id", "service_type", "Adr_id"], inplace=True)
+
+# %%
+
+# Drop duplicates based on housing type, keeping the one with 'E' first, then '2', then the lowest value
+
+joined_cleaned = drop_duplicates_custom(
+    joined, subset_columns=["osm_id", "service_type"], value_column="enh023Boligtype"
+)
+
+assert len(joined_cleaned) == len(
+    all_osm_gdf
+), "Some duplicates were not dropped correctly"
+#
+# %%
+
+joined_cleaned.to_file("../data/processed/osm/all_osm_services.gpkg", driver="GPKG")
 # %%
