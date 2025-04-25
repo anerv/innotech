@@ -109,11 +109,11 @@ cvr_address[cvr_address.Adr_id.isnull()]["destination_type"].value_counts()
 # Export
 
 cvr_address.to_file(
-    "../data/processed/cvr/cvr-destinations-all.gpkg",
+    "../data/processed/cvr/cvr-services-all.gpkg",
 )
 
 cvr_address[(cvr_address.Adr_id.notnull()) & (cvr_address.geometry.notnull())].to_file(
-    "../data/processed/cvr/cvr-destinations-w-address.gpkg",
+    "../data/processed/cvr/cvr-services-w-address.gpkg",
 )
 
 # %%
