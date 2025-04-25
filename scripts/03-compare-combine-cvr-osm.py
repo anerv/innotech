@@ -28,18 +28,20 @@ from src.helper_functions import (
     replace_nan_with_dash,
 )
 
+# %%
 # Mapping between service types and subcategories
 sub_service_to_main = {
-    "doctors": ["doctor-gp"],
-    "dentists": ["dentist"],
-    "pharmacies": ["pharmacy"],
-    "nurseries/kindergartens": ["nursery", "kindergarten"],
-    "schools": ["school"],
+    "doctor": ["doctor-gp"],
+    "dentist": ["dentist"],
+    "pharmacy": ["pharmacy"],
+    "nursery/kindergarten": ["nursery", "kindergarten"],
+    "school": ["school"],
     "recreation": [
         "library",
         "sports_facility",
     ],
-    "shops": ["supermarket", "discount_supermarket"],
+    "shop": ["supermarket", "discount_supermarket"],
+    "train_station": ["train_station"],
 }
 
 osm_color = "#EE7733"
@@ -112,6 +114,8 @@ styled_table = (
 )
 
 styled_table
+
+
 # %%
 # Export the styled table to HTML
 html = styled_table.to_html()
@@ -120,6 +124,8 @@ html_file = "../results/data/cvr-osm-comparison-subcategory.html"
 with open(html_file, "w") as f:
     f.write(html)
     f.close()
+
+
 # %%
 # Compare number of services in each main category
 cvr_addresses["service_type_main"] = cvr_addresses["service_type"].map(
@@ -210,23 +216,31 @@ with open(html_file, "w") as f:
 
 # %%
 
-# TODO: Make sure train stations are included
-
 # Export combined spatial data set
+keep_cols = [
+    "hb_kode",
+    "Adr_id",
+    "service_type",
+    "service_type_main",
+    "source",
+    "geometry",
+]
 osm_destinations["source"] = "osm"
 cvr_addresses["source"] = "cvr"
 osm_cvr_combined = gpd.GeoDataFrame(
     pd.concat(
         [
-            osm_destinations[
-                ["service_type", "service_type_main", "source", "geometry"]
-            ],
-            cvr_addresses[["service_type", "service_type_main", "source", "geometry"]],
+            osm_destinations[keep_cols],
+            cvr_addresses[keep_cols],
         ],
         ignore_index=True,
         sort=False,
     )
 )
+
+osm_cvr_combined["service_type"] = osm_cvr_combined["service_type_main"]
+osm_cvr_combined.drop(columns=["service_type_main"], inplace=True)
+
 assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_addresses)
 
 osm_cvr_combined.to_file("../results/data/osm-cvr-combined.gpkg", driver="GPKG")
@@ -234,9 +248,14 @@ osm_cvr_combined.to_file("../results/data/osm-cvr-combined.gpkg", driver="GPKG")
 # %%
 #  Collapse points in same category within XXX distance if they have the same main service type
 
-aggregated_gdf = aggregate_points_by_distance(osm_cvr_combined, distance_threshold=300)
+aggregated_gdf = aggregate_points_by_distance(
+    osm_cvr_combined,
+    distance_threshold=100,
+    destination_type_column="service_type",
+    inherit_columns=["Adr_id", "hb_kode"],
+)
 
-# TODO: Export correct columns
+
 aggregated_gdf.to_file(
     "../results/data/osm-cvr-combined-aggregated.gpkg", driver="GPKG"
 )
