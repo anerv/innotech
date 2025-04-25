@@ -13,13 +13,14 @@ address_fp_parquet: "../data/input/adresser/adresser_utm.parquet" # TODO: Update
 
 
 hb_codes_dict:
-    doctor-gp: 862100,
-    dentist: 862300,
-    pharmacy: 477300,
-    kindergarten: 889130,
-    nursery: 889120,
-    school: 852010,
-    supermarket: 471120,
-    discount_supermarket: 471130,
-    library: 910110,
+    doctor-gp: 862100
+    dentist: 862300
+    pharmacy: 477300
+    kindergarten: 889130
+    nursery: 889120
+    school: 852010
+    supermarket: 471120
+    discount_supermarket: 471130
+    library: 910110
+    train_station: 49
     # "sports_facility": 931100,
