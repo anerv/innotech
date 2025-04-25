@@ -8,6 +8,7 @@ import geopandas as gpd
 import re
 import shutil
 import yaml
+from src.helper_functions import drop_duplicates_custom
 
 # %%
 
@@ -51,45 +52,43 @@ assert (
     49 not in cvr_data_subset["hb_kode"].unique()
 ), "CVR code 49 (train code) found in data."
 
+assert (
+    49 not in cvr_data_subset["hb_kode"].unique()
+), "CVR code 93 (sport code) found in data."
+
 
 cvr_data_subset = cvr_data_subset[
     cvr_data_subset["Status"].isin(["Aktiv"])  # "Under oprettelse"
 ]
 
+cvr_data_subset.drop_duplicates(inplace=True, keep="first")
 # %%
 addresses = gpd.read_parquet(address_fp_parquet)
 
+addresses.drop_duplicates(inplace=True, keep="first")
+
+addresses_cleaned = drop_duplicates_custom(
+    addresses, subset_columns=["adresseIdentificerer"], value_column="enh023Boligtype"
+)
+
+
 keep_cols_addresses = [
-    "id",
-    "status",
-    "vejnavn",
-    "husnr",
-    "etage",
-    "dør",
-    "postnr",
-    "kommunekode",
-    "adgangsadresse_status",
-    "adgangsadresseid",
-    "ddkn_km10",
+    "adresseIdentificerer",
+    "enh023Boligtype",
     "geometry",
 ]
 
-
-addresses = addresses[keep_cols_addresses]
-
-addresses = addresses.rename(
-    columns={
-        "status": "adr_status",
-    }
-)
+addresses_cleaned = addresses_cleaned[keep_cols_addresses]
 
 # %%
-cvr_address = addresses.merge(
+cvr_address = addresses_cleaned.merge(
     cvr_data_subset,
-    left_on="id",
+    left_on="adresseIdentificerer",
     right_on="Adr_id",
     how="right",
 )
+
+# %%
 
 cvr_address["destination_type"] = cvr_address["hb_kode"].map(
     {v: k for k, v in hb_codes_dict.items()}
