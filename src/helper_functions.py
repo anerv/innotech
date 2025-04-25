@@ -101,17 +101,21 @@ def create_relations_gdf(overpass_result, relations):
 #     return filtered_nodes_gdf
 
 
-def combine_points_within_distance(points_gdf, distance=200):
+def combine_points_within_distance(points_gdf, distance=200, inherit_columns=None):
     """
     Combines all point geometries within a specified distance into one point.
 
     Parameters:
     points_gdf (geopandas.GeoDataFrame): GeoDataFrame containing the point geometries.
     distance (float): The distance in the same unit as the CRS of the GeoDataFrame.
+    inherit_columns (list of str): Columns whose values will be inherited from the first point within each buffer.
 
     Returns:
     geopandas.GeoDataFrame: GeoDataFrame with combined points.
     """
+    if inherit_columns is None:
+        inherit_columns = []
+
     # Create a buffer around each point
     buffered_points = points_gdf.geometry.buffer(distance)
 
@@ -127,19 +131,28 @@ def combine_points_within_distance(points_gdf, distance=200):
         if not points_within.empty:
             # Calculate the centroid of the combined points
             combined_point = points_within.geometry.union_all().centroid
-            combined_points.append(combined_point)
+
+            # Create a new row with the combined point and inherited values
+            combined_row = {
+                "geometry": combined_point,
+                **{column: points_within[column].iloc[0] for column in inherit_columns},
+            }
+            combined_points.append(combined_row)
 
             # Remove the combined points from the original GeoDataFrame
             points_gdf = points_gdf.drop(points_within.index)
 
     # Create a new GeoDataFrame with the combined points
-    combined_points_gdf = gpd.GeoDataFrame(geometry=combined_points, crs=points_gdf.crs)
+    combined_points_gdf = gpd.GeoDataFrame(combined_points, crs=points_gdf.crs)
 
     return combined_points_gdf
 
 
 def aggregate_points_by_distance(
-    gdf, distance_threshold=50, destination_type_column="destination_type_main"
+    gdf,
+    distance_threshold=50,
+    destination_type_column="destination_type_main",
+    inherit_columns=None,
 ):
     """
     Aggregates point geometries in a GeoDataFrame into one point if they are within a user-specified distance threshold
@@ -149,10 +162,14 @@ def aggregate_points_by_distance(
     gdf (geopandas.GeoDataFrame): The input GeoDataFrame containing point geometries.
     distance_threshold (float): The distance threshold for aggregating points.
     destination_type_column (str): The column name for the destination type.
+    inherit_columns (list of str): Columns whose values will be inherited from the first point within each buffer.
 
     Returns:
     geopandas.GeoDataFrame: The aggregated GeoDataFrame.
     """
+    if inherit_columns is None:
+        inherit_columns = []
+
     # Ensure the GeoDataFrame is in a projected coordinate system
     if gdf.crs is None or gdf.crs.is_geographic:
         raise ValueError("GeoDataFrame must be in a projected coordinate system.")
@@ -163,7 +180,7 @@ def aggregate_points_by_distance(
     for destination_type, group in gdf.groupby(destination_type_column):
         # Combine points within the distance threshold for each group
         combined_gdf = combine_points_within_distance(
-            group, distance=distance_threshold
+            group, distance=distance_threshold, inherit_columns=inherit_columns
         )
 
         # Add the destination-type column to the combined points
