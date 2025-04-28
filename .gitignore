@@ -5,5 +5,7 @@ results/*
 data/input/*
 data/processed/*
 
+illustrations/*
+
 todo.md
 data/repositories.lnk
