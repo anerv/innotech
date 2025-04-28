@@ -43,3 +43,10 @@ for f in result_subfolders:
         os.mkdir(os.path.join("results", f))
 
         print("Successfully created folder: " + os.path.join("results", f))
+
+
+# illustration folder
+if not os.path.exists("illustrations"):
+    os.mkdir("illustrations")
+
+    print("Successfully created folder: illustrations")
