@@ -389,6 +389,8 @@ def plot_destinations_combined_subplot(
         data2[destination_col].unique()
     )
 
+    unique_destinations = sorted(unique_destinations)
+
     _, axes = plt.subplots(
         nrows=2, ncols=int(len(unique_destinations) / 2), figsize=figsize
     )
@@ -513,14 +515,14 @@ def count_destinations_in_hex_grid(gdf, hex_grid, destination_col):
     joined = gpd.sjoin(hex_grid, gdf, how="left", predicate="intersects")
 
     counts = (
-        joined.groupby(["grid_id", "destination_type_main"])[destination_col]
+        joined.groupby(["grid_id", destination_col])[destination_col]
         .count()
         .reset_index(name="count")
     )
 
     # Pivot the counts DataFrame to create a column for each destination type
     counts_pivot = counts.pivot(
-        index="grid_id", columns="destination_type_main", values="count"
+        index="grid_id", columns=destination_col, values="count"
     ).fillna(0)
 
     # Merge the pivoted counts back into the hex grid
