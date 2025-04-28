@@ -16,244 +16,213 @@
 - The subcategories could be made more comparable (e.g. by including libraries, theaters, and fitness centers/gyms when subsetting data from CVR).
 
 <style type="text/css">
-#T_1d66f th {
+#T_a4e62 th {
   font-weight: bold;
 }
-#T_1d66f .col0 {
+#T_a4e62 .col0 {
   font-weight: bold;
 }
-#T_1d66f .col0 {
+#T_a4e62 .col0 {
   font-weight: bold;
 }
-#T_1d66f_row0_col0, #T_1d66f_row1_col0, #T_1d66f_row1_col3, #T_1d66f_row2_col0, #T_1d66f_row3_col0, #T_1d66f_row3_col3, #T_1d66f_row4_col0, #T_1d66f_row5_col0, #T_1d66f_row5_col3, #T_1d66f_row6_col0, #T_1d66f_row7_col0, #T_1d66f_row8_col0, #T_1d66f_row8_col3, #T_1d66f_row9_col0, #T_1d66f_row9_col3, #T_1d66f_row10_col0, #T_1d66f_row11_col0, #T_1d66f_row11_col1, #T_1d66f_row12_col0, #T_1d66f_row12_col3, #T_1d66f_row13_col0, #T_1d66f_row13_col3, #T_1d66f_row14_col0, #T_1d66f_row14_col1, #T_1d66f_row15_col0, #T_1d66f_row15_col3, #T_1d66f_row16_col0, #T_1d66f_row16_col1, #T_1d66f_row17_col0, #T_1d66f_row18_col0 {
+#T_a4e62_row0_col0, #T_a4e62_row0_col3, #T_a4e62_row1_col0, #T_a4e62_row2_col0, #T_a4e62_row2_col3, #T_a4e62_row3_col0, #T_a4e62_row3_col3, #T_a4e62_row4_col0, #T_a4e62_row4_col3, #T_a4e62_row5_col0, #T_a4e62_row5_col3, #T_a4e62_row6_col0, #T_a4e62_row6_col3, #T_a4e62_row7_col0, #T_a4e62_row7_col1, #T_a4e62_row8_col0, #T_a4e62_row9_col0, #T_a4e62_row9_col1, #T_a4e62_row10_col0 {
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_1d66f_row0_col1, #T_1d66f_row0_col2, #T_1d66f_row2_col3, #T_1d66f_row4_col3, #T_1d66f_row6_col1, #T_1d66f_row6_col2, #T_1d66f_row7_col1, #T_1d66f_row7_col2, #T_1d66f_row10_col1, #T_1d66f_row10_col2, #T_1d66f_row17_col1, #T_1d66f_row17_col2, #T_1d66f_row18_col1, #T_1d66f_row18_col2 {
+#T_a4e62_row0_col1, #T_a4e62_row1_col1, #T_a4e62_row2_col1, #T_a4e62_row3_col1, #T_a4e62_row4_col1, #T_a4e62_row5_col1, #T_a4e62_row6_col1, #T_a4e62_row7_col2, #T_a4e62_row9_col2 {
+  background-color: lightyellow;
+  text-align: left;
+  font-size: 12px;
+  width: 100px;
+}
+#T_a4e62_row0_col2, #T_a4e62_row1_col2, #T_a4e62_row2_col2, #T_a4e62_row3_col2, #T_a4e62_row4_col2, #T_a4e62_row5_col2, #T_a4e62_row6_col2, #T_a4e62_row7_col3, #T_a4e62_row8_col3, #T_a4e62_row9_col3, #T_a4e62_row10_col3 {
+  background-color: yellow;
+  text-align: left;
+  font-size: 12px;
+  width: 100px;
+}
+#T_a4e62_row1_col3, #T_a4e62_row8_col1, #T_a4e62_row8_col2, #T_a4e62_row10_col1, #T_a4e62_row10_col2 {
   color: grey;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_1d66f_row0_col3, #T_1d66f_row1_col2, #T_1d66f_row2_col2, #T_1d66f_row3_col2, #T_1d66f_row4_col2, #T_1d66f_row5_col2, #T_1d66f_row6_col3, #T_1d66f_row7_col3, #T_1d66f_row8_col2, #T_1d66f_row9_col2, #T_1d66f_row10_col3, #T_1d66f_row11_col3, #T_1d66f_row12_col2, #T_1d66f_row13_col2, #T_1d66f_row14_col3, #T_1d66f_row15_col2, #T_1d66f_row16_col3, #T_1d66f_row17_col3, #T_1d66f_row18_col3 {
-  background-color: yellow;
-  text-align: left;
-  font-size: 12px;
-  width: 100px;
-}
-#T_1d66f_row1_col1, #T_1d66f_row2_col1, #T_1d66f_row3_col1, #T_1d66f_row4_col1, #T_1d66f_row5_col1, #T_1d66f_row8_col1, #T_1d66f_row9_col1, #T_1d66f_row11_col2, #T_1d66f_row12_col1, #T_1d66f_row13_col1, #T_1d66f_row14_col2, #T_1d66f_row15_col1, #T_1d66f_row16_col2 {
-  background-color: lightyellow;
-  text-align: left;
-  font-size: 12px;
-  width: 100px;
-}
 </style>
-<table id="T_1d66f" style="width: 50%; border-collapse: collapse;">
-  <caption>Comparison of destination types between CVR (w. addresses), CVR (all) and OSM data sets</caption>
+<table id="T_a4e62" style="width: 50%; border-collapse: collapse;">
+  <caption>Comparison of service types between CVR (w. addresses), CVR (all) and OSM data sets</caption>
   <thead>
     <tr>
-      <th id="T_1d66f_level0_col0" class="col_heading level0 col0" >destination_type</th>
-      <th id="T_1d66f_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
-      <th id="T_1d66f_level0_col2" class="col_heading level0 col2" >cvr_all</th>
-      <th id="T_1d66f_level0_col3" class="col_heading level0 col3" >osm</th>
+      <th id="T_a4e62_level0_col0" class="col_heading level0 col0" >service_type</th>
+      <th id="T_a4e62_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
+      <th id="T_a4e62_level0_col2" class="col_heading level0 col2" >cvr_all</th>
+      <th id="T_a4e62_level0_col3" class="col_heading level0 col3" >osm</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_1d66f_row0_col0" class="data row0 col0" >bowling</td>
-      <td id="T_1d66f_row0_col1" class="data row0 col1" >-</td>
-      <td id="T_1d66f_row0_col2" class="data row0 col2" >-</td>
-      <td id="T_1d66f_row0_col3" class="data row0 col3" >13.0</td>
+      <td id="T_a4e62_row0_col0" class="data row0 col0" >dentist</td>
+      <td id="T_a4e62_row0_col1" class="data row0 col1" >300.0</td>
+      <td id="T_a4e62_row0_col2" class="data row0 col2" >400.0</td>
+      <td id="T_a4e62_row0_col3" class="data row0 col3" >20.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row1_col0" class="data row1 col0" >dentist</td>
-      <td id="T_1d66f_row1_col1" class="data row1 col1" >387.0</td>
-      <td id="T_1d66f_row1_col2" class="data row1 col2" >400.0</td>
-      <td id="T_1d66f_row1_col3" class="data row1 col3" >32.0</td>
+      <td id="T_a4e62_row1_col0" class="data row1 col0" >discount_supermarket</td>
+      <td id="T_a4e62_row1_col1" class="data row1 col1" >204.0</td>
+      <td id="T_a4e62_row1_col2" class="data row1 col2" >237.0</td>
+      <td id="T_a4e62_row1_col3" class="data row1 col3" >-</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row2_col0" class="data row2 col0" >discount_store</td>
-      <td id="T_1d66f_row2_col1" class="data row2 col1" >231.0</td>
-      <td id="T_1d66f_row2_col2" class="data row2 col2" >242.0</td>
-      <td id="T_1d66f_row2_col3" class="data row2 col3" >-</td>
+      <td id="T_a4e62_row2_col0" class="data row2 col0" >doctor-gp</td>
+      <td id="T_a4e62_row2_col1" class="data row2 col1" >334.0</td>
+      <td id="T_a4e62_row2_col2" class="data row2 col2" >406.0</td>
+      <td id="T_a4e62_row2_col3" class="data row2 col3" >41.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row3_col0" class="data row3 col0" >doctor-gp</td>
-      <td id="T_1d66f_row3_col1" class="data row3 col1" >402.0</td>
-      <td id="T_1d66f_row3_col2" class="data row3 col2" >408.0</td>
-      <td id="T_1d66f_row3_col3" class="data row3 col3" >56.0</td>
+      <td id="T_a4e62_row3_col0" class="data row3 col0" >kindergarten</td>
+      <td id="T_a4e62_row3_col1" class="data row3 col1" >190.0</td>
+      <td id="T_a4e62_row3_col2" class="data row3 col2" >206.0</td>
+      <td id="T_a4e62_row3_col3" class="data row3 col3" >153.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row4_col0" class="data row4 col0" >doctor-specialist</td>
-      <td id="T_1d66f_row4_col1" class="data row4 col1" >319.0</td>
-      <td id="T_1d66f_row4_col2" class="data row4 col2" >327.0</td>
-      <td id="T_1d66f_row4_col3" class="data row4 col3" >-</td>
+      <td id="T_a4e62_row4_col0" class="data row4 col0" >library</td>
+      <td id="T_a4e62_row4_col1" class="data row4 col1" >49.0</td>
+      <td id="T_a4e62_row4_col2" class="data row4 col2" >58.0</td>
+      <td id="T_a4e62_row4_col3" class="data row4 col3" >48.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row5_col0" class="data row5 col0" >fitness</td>
-      <td id="T_1d66f_row5_col1" class="data row5 col1" >198.0</td>
-      <td id="T_1d66f_row5_col2" class="data row5 col2" >200.0</td>
-      <td id="T_1d66f_row5_col3" class="data row5 col3" >55.0</td>
+      <td id="T_a4e62_row5_col0" class="data row5 col0" >nursery</td>
+      <td id="T_a4e62_row5_col1" class="data row5 col1" >12.0</td>
+      <td id="T_a4e62_row5_col2" class="data row5 col2" >15.0</td>
+      <td id="T_a4e62_row5_col3" class="data row5 col3" >11.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row6_col0" class="data row6 col0" >football</td>
-      <td id="T_1d66f_row6_col1" class="data row6 col1" >-</td>
-      <td id="T_1d66f_row6_col2" class="data row6 col2" >-</td>
-      <td id="T_1d66f_row6_col3" class="data row6 col3" >633.0</td>
+      <td id="T_a4e62_row6_col0" class="data row6 col0" >pharmacy</td>
+      <td id="T_a4e62_row6_col1" class="data row6 col1" >76.0</td>
+      <td id="T_a4e62_row6_col2" class="data row6 col2" >108.0</td>
+      <td id="T_a4e62_row6_col3" class="data row6 col3" >75.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row7_col0" class="data row7 col0" >golf_course</td>
-      <td id="T_1d66f_row7_col1" class="data row7 col1" >-</td>
-      <td id="T_1d66f_row7_col2" class="data row7 col2" >-</td>
-      <td id="T_1d66f_row7_col3" class="data row7 col3" >84.0</td>
+      <td id="T_a4e62_row7_col0" class="data row7 col0" >school</td>
+      <td id="T_a4e62_row7_col1" class="data row7 col1" >299.0</td>
+      <td id="T_a4e62_row7_col2" class="data row7 col2" >314.0</td>
+      <td id="T_a4e62_row7_col3" class="data row7 col3" >361.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row8_col0" class="data row8 col0" >grocery_store</td>
-      <td id="T_1d66f_row8_col1" class="data row8 col1" >105.0</td>
-      <td id="T_1d66f_row8_col2" class="data row8 col2" >112.0</td>
-      <td id="T_1d66f_row8_col3" class="data row8 col3" >3.0</td>
+      <td id="T_a4e62_row8_col0" class="data row8 col0" >sports_facility</td>
+      <td id="T_a4e62_row8_col1" class="data row8 col1" >-</td>
+      <td id="T_a4e62_row8_col2" class="data row8 col2" >-</td>
+      <td id="T_a4e62_row8_col3" class="data row8 col3" >88.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row9_col0" class="data row9 col0" >kindergarten</td>
-      <td id="T_1d66f_row9_col1" class="data row9 col1" >201.0</td>
-      <td id="T_1d66f_row9_col2" class="data row9 col2" >208.0</td>
-      <td id="T_1d66f_row9_col3" class="data row9 col3" >150.0</td>
+      <td id="T_a4e62_row9_col0" class="data row9 col0" >supermarket</td>
+      <td id="T_a4e62_row9_col1" class="data row9 col1" >227.0</td>
+      <td id="T_a4e62_row9_col2" class="data row9 col2" >269.0</td>
+      <td id="T_a4e62_row9_col3" class="data row9 col3" >429.0</td>
     </tr>
     <tr>
-      <td id="T_1d66f_row10_col0" class="data row10 col0" >library</td>
-      <td id="T_1d66f_row10_col1" class="data row10 col1" >-</td>
-      <td id="T_1d66f_row10_col2" class="data row10 col2" >-</td>
-      <td id="T_1d66f_row10_col3" class="data row10 col3" >50.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row11_col0" class="data row11 col0" >movie_theater</td>
-      <td id="T_1d66f_row11_col1" class="data row11 col1" >25.0</td>
-      <td id="T_1d66f_row11_col2" class="data row11 col2" >26.0</td>
-      <td id="T_1d66f_row11_col3" class="data row11 col3" >28.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row12_col0" class="data row12 col0" >nursery</td>
-      <td id="T_1d66f_row12_col1" class="data row12 col1" >13.0</td>
-      <td id="T_1d66f_row12_col2" class="data row12 col2" >15.0</td>
-      <td id="T_1d66f_row12_col3" class="data row12 col3" >10.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row13_col0" class="data row13 col0" >pharmacy</td>
-      <td id="T_1d66f_row13_col1" class="data row13 col1" >108.0</td>
-      <td id="T_1d66f_row13_col2" class="data row13 col2" >116.0</td>
-      <td id="T_1d66f_row13_col3" class="data row13 col3" >75.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row14_col0" class="data row14 col0" >school</td>
-      <td id="T_1d66f_row14_col1" class="data row14 col1" >308.0</td>
-      <td id="T_1d66f_row14_col2" class="data row14 col2" >314.0</td>
-      <td id="T_1d66f_row14_col3" class="data row14 col3" >380.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row15_col0" class="data row15 col0" >sports_facility</td>
-      <td id="T_1d66f_row15_col1" class="data row15 col1" >167.0</td>
-      <td id="T_1d66f_row15_col2" class="data row15 col2" >174.0</td>
-      <td id="T_1d66f_row15_col3" class="data row15 col3" >91.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row16_col0" class="data row16 col0" >supermarket</td>
-      <td id="T_1d66f_row16_col1" class="data row16 col1" >262.0</td>
-      <td id="T_1d66f_row16_col2" class="data row16 col2" >270.0</td>
-      <td id="T_1d66f_row16_col3" class="data row16 col3" >424.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row17_col0" class="data row17 col0" >swimming_hall</td>
-      <td id="T_1d66f_row17_col1" class="data row17 col1" >-</td>
-      <td id="T_1d66f_row17_col2" class="data row17 col2" >-</td>
-      <td id="T_1d66f_row17_col3" class="data row17 col3" >158.0</td>
-    </tr>
-    <tr>
-      <td id="T_1d66f_row18_col0" class="data row18 col0" >theatre</td>
-      <td id="T_1d66f_row18_col1" class="data row18 col1" >-</td>
-      <td id="T_1d66f_row18_col2" class="data row18 col2" >-</td>
-      <td id="T_1d66f_row18_col3" class="data row18 col3" >30.0</td>
+      <td id="T_a4e62_row10_col0" class="data row10 col0" >train_station</td>
+      <td id="T_a4e62_row10_col1" class="data row10 col1" >-</td>
+      <td id="T_a4e62_row10_col2" class="data row10 col2" >-</td>
+      <td id="T_a4e62_row10_col3" class="data row10 col3" >73.0</td>
     </tr>
   </tbody>
 </table>
 
-
 ### Main destination categories
 
 <style type="text/css">
-#T_900b3 th {
+#T_bd404 th {
   font-weight: bold;
 }
-#T_900b3 .col0 {
+#T_bd404 .col0 {
   font-weight: bold;
 }
-#T_900b3 .col0 {
+#T_bd404 .col0 {
   font-weight: bold;
 }
-#T_900b3_row0_col0, #T_900b3_row0_col3, #T_900b3_row1_col0, #T_900b3_row1_col3, #T_900b3_row2_col0, #T_900b3_row2_col3, #T_900b3_row3_col0, #T_900b3_row3_col1, #T_900b3_row4_col0, #T_900b3_row4_col1, #T_900b3_row5_col0, #T_900b3_row5_col3 {
+#T_bd404_row0_col0, #T_bd404_row0_col3, #T_bd404_row1_col0, #T_bd404_row1_col3, #T_bd404_row2_col0, #T_bd404_row2_col3, #T_bd404_row3_col0, #T_bd404_row3_col3, #T_bd404_row4_col0, #T_bd404_row4_col1, #T_bd404_row5_col0, #T_bd404_row5_col1, #T_bd404_row6_col0, #T_bd404_row6_col3, #T_bd404_row7_col0 {
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_900b3_row0_col1, #T_900b3_row1_col1, #T_900b3_row2_col1, #T_900b3_row3_col2, #T_900b3_row4_col2, #T_900b3_row5_col1 {
+#T_bd404_row0_col1, #T_bd404_row1_col1, #T_bd404_row2_col1, #T_bd404_row3_col1, #T_bd404_row4_col2, #T_bd404_row5_col2, #T_bd404_row6_col1 {
   background-color: lightyellow;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_900b3_row0_col2, #T_900b3_row1_col2, #T_900b3_row2_col2, #T_900b3_row3_col3, #T_900b3_row4_col3, #T_900b3_row5_col2 {
+#T_bd404_row0_col2, #T_bd404_row1_col2, #T_bd404_row2_col2, #T_bd404_row3_col2, #T_bd404_row4_col3, #T_bd404_row5_col3, #T_bd404_row6_col2, #T_bd404_row7_col3 {
   background-color: yellow;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
+#T_bd404_row7_col1, #T_bd404_row7_col2 {
+  color: grey;
+  text-align: left;
+  font-size: 12px;
+  width: 100px;
+}
 </style>
-<table id="T_900b3" style="width: 50%; border-collapse: collapse;">
-  <caption>Comparison of destination types between CVR (w. addresses), CVR (all) and OSM data sets</caption>
+<table id="T_bd404" style="width: 50%; border-collapse: collapse;">
+  <caption>Comparison of service types between CVR (w. addresses), CVR (all) and OSM data sets</caption>
   <thead>
     <tr>
-      <th id="T_900b3_level0_col0" class="col_heading level0 col0" >destination_type_main</th>
-      <th id="T_900b3_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
-      <th id="T_900b3_level0_col2" class="col_heading level0 col2" >cvr_all</th>
-      <th id="T_900b3_level0_col3" class="col_heading level0 col3" >osm</th>
+      <th id="T_bd404_level0_col0" class="col_heading level0 col0" >service_type_main</th>
+      <th id="T_bd404_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
+      <th id="T_bd404_level0_col2" class="col_heading level0 col2" >cvr_all</th>
+      <th id="T_bd404_level0_col3" class="col_heading level0 col3" >osm</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_900b3_row0_col0" class="data row0 col0" >doctors</td>
-      <td id="T_900b3_row0_col1" class="data row0 col1" >1108</td>
-      <td id="T_900b3_row0_col2" class="data row0 col2" >1135</td>
-      <td id="T_900b3_row0_col3" class="data row0 col3" >88</td>
+      <td id="T_bd404_row0_col0" class="data row0 col0" >dentist</td>
+      <td id="T_bd404_row0_col1" class="data row0 col1" >300.0</td>
+      <td id="T_bd404_row0_col2" class="data row0 col2" >400.0</td>
+      <td id="T_bd404_row0_col3" class="data row0 col3" >20</td>
     </tr>
     <tr>
-      <td id="T_900b3_row1_col0" class="data row1 col0" >nurseries/kindergartens</td>
-      <td id="T_900b3_row1_col1" class="data row1 col1" >214</td>
-      <td id="T_900b3_row1_col2" class="data row1 col2" >223</td>
-      <td id="T_900b3_row1_col3" class="data row1 col3" >160</td>
+      <td id="T_bd404_row1_col0" class="data row1 col0" >doctor</td>
+      <td id="T_bd404_row1_col1" class="data row1 col1" >334.0</td>
+      <td id="T_bd404_row1_col2" class="data row1 col2" >406.0</td>
+      <td id="T_bd404_row1_col3" class="data row1 col3" >41</td>
     </tr>
     <tr>
-      <td id="T_900b3_row2_col0" class="data row2 col0" >pharmacies</td>
-      <td id="T_900b3_row2_col1" class="data row2 col1" >108</td>
-      <td id="T_900b3_row2_col2" class="data row2 col2" >116</td>
-      <td id="T_900b3_row2_col3" class="data row2 col3" >75</td>
+      <td id="T_bd404_row2_col0" class="data row2 col0" >nursery/kindergarten</td>
+      <td id="T_bd404_row2_col1" class="data row2 col1" >202.0</td>
+      <td id="T_bd404_row2_col2" class="data row2 col2" >221.0</td>
+      <td id="T_bd404_row2_col3" class="data row2 col3" >164</td>
     </tr>
     <tr>
-      <td id="T_900b3_row3_col0" class="data row3 col0" >recreation</td>
-      <td id="T_900b3_row3_col1" class="data row3 col1" >390</td>
-      <td id="T_900b3_row3_col2" class="data row3 col2" >400</td>
-      <td id="T_900b3_row3_col3" class="data row3 col3" >1142</td>
+      <td id="T_bd404_row3_col0" class="data row3 col0" >pharmacy</td>
+      <td id="T_bd404_row3_col1" class="data row3 col1" >76.0</td>
+      <td id="T_bd404_row3_col2" class="data row3 col2" >108.0</td>
+      <td id="T_bd404_row3_col3" class="data row3 col3" >75</td>
     </tr>
     <tr>
-      <td id="T_900b3_row4_col0" class="data row4 col0" >schools</td>
-      <td id="T_900b3_row4_col1" class="data row4 col1" >308</td>
-      <td id="T_900b3_row4_col2" class="data row4 col2" >314</td>
-      <td id="T_900b3_row4_col3" class="data row4 col3" >380</td>
+      <td id="T_bd404_row4_col0" class="data row4 col0" >recreation</td>
+      <td id="T_bd404_row4_col1" class="data row4 col1" >49.0</td>
+      <td id="T_bd404_row4_col2" class="data row4 col2" >58.0</td>
+      <td id="T_bd404_row4_col3" class="data row4 col3" >136</td>
     </tr>
     <tr>
-      <td id="T_900b3_row5_col0" class="data row5 col0" >shops</td>
-      <td id="T_900b3_row5_col1" class="data row5 col1" >598</td>
-      <td id="T_900b3_row5_col2" class="data row5 col2" >624</td>
-      <td id="T_900b3_row5_col3" class="data row5 col3" >427</td>
+      <td id="T_bd404_row5_col0" class="data row5 col0" >school</td>
+      <td id="T_bd404_row5_col1" class="data row5 col1" >299.0</td>
+      <td id="T_bd404_row5_col2" class="data row5 col2" >314.0</td>
+      <td id="T_bd404_row5_col3" class="data row5 col3" >361</td>
+    </tr>
+    <tr>
+      <td id="T_bd404_row6_col0" class="data row6 col0" >shop</td>
+      <td id="T_bd404_row6_col1" class="data row6 col1" >431.0</td>
+      <td id="T_bd404_row6_col2" class="data row6 col2" >506.0</td>
+      <td id="T_bd404_row6_col3" class="data row6 col3" >429</td>
+    </tr>
+    <tr>
+      <td id="T_bd404_row7_col0" class="data row7 col0" >train_station</td>
+      <td id="T_bd404_row7_col1" class="data row7 col1" >-</td>
+      <td id="T_bd404_row7_col2" class="data row7 col2" >-</td>
+      <td id="T_bd404_row7_col3" class="data row7 col3" >73</td>
     </tr>
   </tbody>
 </table>
@@ -272,13 +241,14 @@ For all destination categories, Region Sjælland both has areas with more destin
 
 *Red values: More destinations in OSM. Blue: More destinations in CVR.*
 
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-doctors.png "doctors")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-pharmacies.png "pharmacies")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-nurseries-kindergartens.png "nurseries/kindergartens")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-schools.png "schools")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-shops.png "shops")
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-doctor.png "doctors")
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-dentist.png "dentist")
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-pharmacy.png "pharmacies")
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-nursery-kindergarten.png "nurseries/kindergartens")
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-school.png "schools")
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-shop.png "shops")
 ![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-recreation.png "recreation")
-
+![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-train_station.png "train stations")
 
 ## Data consistency
 
