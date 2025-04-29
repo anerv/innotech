@@ -8,7 +8,8 @@ import geopandas as gpd
 from shapely import wkt
 import yaml
 
-with open(r"../config.yml") as file:
+
+with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     org_cvr_path = parsed_yaml_file["cvr_fp"]
@@ -18,9 +19,12 @@ with open(r"../config.yml") as file:
     address_points_fp = parsed_yaml_file["address_points_fp"]
     housenumbers_fp = parsed_yaml_file["housenumbers_fp"]
 
+    study_area_fp = parsed_yaml_file["study_area_fp"]
+    adm_area_level = parsed_yaml_file["adm_area_level"]
+    study_area_name = parsed_yaml_file["study_area_name"]
+
 
 # %%
-
 
 address = pd.read_parquet(input_address_fp)
 address_points = pd.read_parquet(address_points_fp)
@@ -55,10 +59,34 @@ addresses_with_geoms = pd.merge(
 )
 
 # %%
+# filter addresses to only include those within the region
+
 addresses_with_geoms.rename(
     columns={"id_lokalId": "adresseIdentificerer"}, inplace=True
 )
 
-addresses_with_geoms.to_parquet(address_fp_parquet, index=False)
 
+administrative_boundaries = gpd.read_file(
+    "../data/input/DK_AdministrativeUnit/au_inspire.gpkg", layer="administrativeunit"
+)
+
+region = administrative_boundaries[
+    (administrative_boundaries.nationallevel == adm_area_level)
+    & (administrative_boundaries.name_gn_spell_spellofna_text == study_area_name)
+]
+
+region = region[["nationallevel", "geometry"]]
+
+
+region.sindex
+addresses_with_geoms.sindex
+
+region_add = gpd.sjoin(region, addresses_with_geoms, predicate="intersects")
+
+addresses_region = addresses_with_geoms[
+    addresses_with_geoms.index.isin(region_add.index_right)
+]
+
+
+addresses_region.to_parquet(address_fp_parquet, index=False)
 # %%
