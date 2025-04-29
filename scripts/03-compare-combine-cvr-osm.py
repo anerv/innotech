@@ -2,9 +2,6 @@
 
 # COMPARISON OF DESTINATION DATA FOR CVR AND OSM DATA
 
-# TODO:
-# Remove unnecessary plots
-
 
 # %%
 
@@ -420,7 +417,7 @@ fp = f"../results/maps/main-all-osm-cvr.png"
 attribution_text = "(C) OSM, CVR"
 color1 = osm_color
 color2 = cvr_color
-dest_col = service_type
+dest_col = "service_type"
 study_area = study_area
 font_size = 10
 destination_col = "service_type_main"
