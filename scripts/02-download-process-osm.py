@@ -100,11 +100,11 @@ for category, query_list in queries.items():
             """
 
             # Fetch the data
-            result = api.query(query)
+            joined = api.query(query)
 
             # Create GeoDataFrames
-            nodes_gdf = create_nodes_gdf(result.nodes)
-            ways_gdf = create_ways_gdf(result.ways)
+            nodes_gdf = create_nodes_gdf(joined.nodes)
+            ways_gdf = create_ways_gdf(joined.ways)
 
             # Reproject to EPSG:25832 if necessary
             if not nodes_gdf.empty:
@@ -207,10 +207,19 @@ all_osm_gdf.drop_duplicates(subset=["osm_id", "service_type"], inplace=True)
 
 #  match to closest addresses
 addresses = gpd.read_parquet(address_fp_parquet)  # adresseIdentificerer
-addresses.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
+# addresses.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
 
 join_threshold = 300  # meters
 assert all_osm_gdf.crs == addresses.crs, "CRS mismatch between all_osm and addresses"
+
+# joined = gpd.sjoin_nearest(
+#     all_osm_gdf,
+#     addresses,
+#     how="left",
+#     max_distance=join_threshold,
+#     lsuffix="osm",
+#     rsuffix="addr",
+# )
 
 joined = gpd.sjoin_nearest(
     all_osm_gdf,
@@ -220,6 +229,12 @@ joined = gpd.sjoin_nearest(
     lsuffix="osm",
     rsuffix="addr",
 )
+
+# Handle ties by random selection (many addresses can be close to the same OSM point)
+# Group by the index of gdf1 and randomly select one row from each group
+joined = joined.groupby(joined.index).apply(lambda x: x.sample(1) if len(x) > 1 else x)
+
+joined.reset_index(drop=True, inplace=True)
 
 joined["Adr_id"] = None
 joined.Adr_id = joined.adresseIdentificerer
@@ -233,27 +248,12 @@ joined = joined[
         "service_type",
         "hb_kode",
         "Adr_id",
-        "enh023Boligtype",
+        # "enh023Boligtype",
         "geometry",
     ]
 ]
 
 # %%
-joined.drop_duplicates(subset=["osm_id", "service_type", "Adr_id"], inplace=True)
 
-# %%
-
-# Drop duplicates based on housing type, keeping the one with 'E' first, then '2', then the lowest value
-
-joined_cleaned = drop_duplicates_custom(
-    joined, subset_columns=["osm_id", "service_type"], value_column="enh023Boligtype"
-)
-
-assert len(joined_cleaned) == len(
-    all_osm_gdf
-), "Some duplicates were not dropped correctly"
-#
-# %%
-
-joined_cleaned.to_file("../data/processed/osm/all_osm_services.gpkg", driver="GPKG")
+joined.to_file("../data/processed/osm/all_osm_services.gpkg", driver="GPKG")
 # %%

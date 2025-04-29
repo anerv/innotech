@@ -8,7 +8,6 @@ import geopandas as gpd
 import re
 import shutil
 import yaml
-from src.helper_functions import drop_duplicates_custom
 
 # %%
 
@@ -65,23 +64,10 @@ cvr_data_subset.drop_duplicates(inplace=True, keep="first")
 # %%
 addresses = gpd.read_parquet(address_fp_parquet)
 
-addresses.drop_duplicates(inplace=True, keep="first")
-
-addresses_cleaned = drop_duplicates_custom(
-    addresses, subset_columns=["adresseIdentificerer"], value_column="enh023Boligtype"
-)
-
-
-keep_cols_addresses = [
-    "adresseIdentificerer",
-    "enh023Boligtype",
-    "geometry",
-]
-
-addresses_cleaned = addresses_cleaned[keep_cols_addresses]
+addresses = addresses[["adresseIdentificerer", "geometry"]]
 
 # %%
-cvr_address = addresses_cleaned.merge(
+cvr_address = addresses.merge(
     cvr_data_subset,
     left_on="adresseIdentificerer",
     right_on="Adr_id",
