@@ -13,7 +13,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     org_cvr_path = parsed_yaml_file["cvr_fp"]
-    address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
+    address_cvr_fp = parsed_yaml_file["address_export_cvr_fp"]
+    address_bbr_fp = parsed_yaml_file["address_export_bbr_fp"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
     input_address_fp = parsed_yaml_file["input_address_fp"]
     address_points_fp = parsed_yaml_file["address_points_fp"]
@@ -26,10 +27,18 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
 # %%
 
-address = pd.read_parquet(input_address_fp)
-address_points = pd.read_parquet(address_points_fp)
-housenumbers = pd.read_parquet(housenumbers_fp)
+if input_address_fp.endswith(".parquet"):
 
+    address = pd.read_parquet(input_address_fp)
+    address_points = pd.read_parquet(address_points_fp)
+    housenumbers = pd.read_parquet(housenumbers_fp)
+
+else:
+    address = pd.read_csv(input_address_fp, sep=",")
+    address_points = pd.read_csv(address_points_fp, sep=",")
+    housenumbers = pd.read_csv(housenumbers_fp, sep=",")
+
+# %%
 address_points["geometry"] = address_points["position"].apply(wkt.loads)
 address_gdf = gpd.GeoDataFrame(address_points, geometry="geometry", crs="EPSG:25832")
 
@@ -88,5 +97,5 @@ addresses_region = addresses_with_geoms[
 ]
 
 
-addresses_region.to_parquet(address_fp_parquet, index=False)
+addresses_region.to_parquet(address_cvr_fp, index=False)
 # %%

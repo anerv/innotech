@@ -15,7 +15,7 @@ with open(r"../config.yml") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     org_cvr_path = parsed_yaml_file["cvr_fp"]
-    address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
+    address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
 # %%
@@ -62,7 +62,7 @@ cvr_data_subset = cvr_data_subset[
 
 cvr_data_subset.drop_duplicates(inplace=True, keep="first")
 # %%
-addresses = gpd.read_parquet(address_fp_parquet)
+addresses = gpd.read_parquet(address_cvr_fp)
 
 addresses = addresses[["adresseIdentificerer", "geometry"]]
 

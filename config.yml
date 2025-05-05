@@ -9,12 +9,12 @@ study_area_name: "Region Sjælland" # Name of region in au_inspire datasæt. Mus
 cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
 
 
-address_fp_parquet: "../data/processed/adresser/all_addresses.parquet" # "../data/input/adresser/alle_adr.parquet" 
+address_cvr_fp: "../data/processed/adresser/all_addresses_cvr.parquet" 
+address_bbr_fp: "../data/processed/adresser/all_addresses_bbr.parquet"
 
-
-input_address_fp: "../data/input/adresser/Adresse.parquet"
-address_points_fp: "../data/input/adresser/Adressepunkt.parquet"
-housenumbers_fp: "../data/input/adresser/Husnummer.parquet"
+input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adresse.parquet"
+address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adressepunkt.parquet"
+housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
 
 hb_codes_dict:
     doctor-gp: 862100
