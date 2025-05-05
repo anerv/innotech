@@ -7,11 +7,9 @@
 
 import pandas as pd
 import geopandas as gpd
-import matplotlib.pyplot as plt
-import contextily as cx
-from matplotlib_scalebar.scalebar import ScaleBar
 import os
 import sys
+import yaml
 
 os.environ["GDAL_DATA"] = os.path.join(
     f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
@@ -29,6 +27,12 @@ from src.helper_functions import (
     highlight_next_max,
     replace_nan_with_dash,
 )
+
+with open(r"../config.yml", encoding="utf-8") as file:
+    parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+
+    osm_export_types = parsed_yaml_file["osm_export_types"]
+    cvr_export_types = parsed_yaml_file["cvr_export_types"]
 
 
 # %%
@@ -222,8 +226,7 @@ with open(html_file, "w") as f:
     f.close()
 
 # %%
-
-# Export combined spatial data set
+# Make combined spatial data set
 keep_cols = [
     "hb_kode",
     "Adr_id",
@@ -245,28 +248,8 @@ osm_cvr_combined = gpd.GeoDataFrame(
     )
 )
 
-# Drop subtypes and keep only main types in exported data set
-osm_cvr_combined["service_type"] = osm_cvr_combined["service_type_main"]
-osm_cvr_combined.drop(columns=["service_type_main"], inplace=True)
-
 assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_addresses)
 
-osm_cvr_combined.to_parquet("../results/data/osm-cvr-combined.parquet")
-
-# %%
-#  Collapse points in same category within XXX distance if they have the same main service type
-
-aggregated_gdf = aggregate_points_by_distance(
-    osm_cvr_combined,
-    distance_threshold=100,
-    destination_type_column="service_type",
-    inherit_columns=["Adr_id", "hb_kode"],
-)
-
-
-aggregated_gdf.to_parquet(
-    "../results/data/osm-cvr-combined-aggregated.parquet",
-)
 
 # %%
 
@@ -379,7 +362,7 @@ plot_combined_data = False
 
 if plot_combined_data:
     # Make combined maps for each main category
-    for service_type in osm_cvr_combined["service_type"].unique():
+    for service_type in osm_cvr_combined["service_type_main"].unique():
 
         fp_type = service_type.replace("/", "-")
 
@@ -411,7 +394,7 @@ if plot_combined_data:
 
 
 # %%
-# TODO: FIX
+
 # Make one map with all main categories
 fp = f"../results/maps/main-all-osm-cvr.png"
 attribution_text = "(C) OSM, CVR"
@@ -513,5 +496,49 @@ for i, service in enumerate(unique_destinations):
         font_size=14,
     )
 
+
+# %%
+# EXPORT
+
+# only keep services with this main type
+
+# Drop subtypes and keep only main types in exported data set
+osm_cvr_combined["service_type"] = osm_cvr_combined["service_type_main"]
+osm_cvr_combined.drop(columns=["service_type_main"], inplace=True)
+# %%
+# Drop subtypes and keep only main types in exported data set
+osm_cvr_combined.drop(
+    osm_cvr_combined[
+        (osm_cvr_combined["source"] == "osm")
+        & (~osm_cvr_combined["service_type"].isin(osm_export_types))
+    ].index,
+    inplace=True,
+)
+
+
+osm_cvr_combined.drop(
+    osm_cvr_combined[
+        (osm_cvr_combined["source"] == "cvr")
+        & (~osm_cvr_combined["service_type"].isin(cvr_export_types))
+    ].index,
+    inplace=True,
+)
+
+osm_cvr_combined.to_parquet("../results/data/osm-cvr-combined.parquet")
+
+# %%
+#  Collapse points in same category within XXX distance if they have the same main service type
+
+aggregated_gdf = aggregate_points_by_distance(
+    osm_cvr_combined,
+    distance_threshold=100,
+    destination_type_column="service_type",
+    inherit_columns=["Adr_id", "hb_kode"],
+)
+
+
+aggregated_gdf.to_parquet(
+    "../results/data/osm-cvr-combined-aggregated.parquet",
+)
 
 # %%

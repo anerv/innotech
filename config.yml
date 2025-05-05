@@ -28,3 +28,27 @@ hb_codes_dict:
     library: 911100
     train_station: 49
     sports_facility: 93 #  931100,
+
+# Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
+# All service types will be included in the comparison of data sources
+osm_export_types:
+- doctor
+- dentist
+- pharmacy
+- nursery/kindergarten
+-  #school
+- recreation
+- shop
+- train_station
+
+cvr_export_types:
+- doctor
+- dentist
+- pharmacy
+- nursery/kindergarten
+- school
+- recreation
+- shop
+- train_station
+
+
