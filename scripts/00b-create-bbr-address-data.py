@@ -17,6 +17,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
     address_points_fp = parsed_yaml_file["address_points_fp"]
     housenumbers_fp = parsed_yaml_file["housenumbers_fp"]
 
+    bbr_fp = parsed_yaml_file["bbr_fp"]
+
     study_area_fp = parsed_yaml_file["study_area_fp"]
     adm_area_level = parsed_yaml_file["adm_area_level"]
     study_area_name = parsed_yaml_file["study_area_name"]
@@ -27,8 +29,6 @@ with open(r"../config.yml", encoding="utf-8") as file:
 ##### BBR Adress data ######
 
 # Read BBR
-bbr_fp = "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"  # "../data/input/bbr/BBR_V1_Bygning_TotalDownload_csv_Current_257.csv"
-
 read_columns = ["id_lokalId", "adresseIdentificerer", "enh023Boligtype", "kommunekode"]
 if bbr_fp.endswith(".parquet"):
 

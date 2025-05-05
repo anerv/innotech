@@ -8,6 +8,7 @@ study_area_name: "Region Sjælland" # Name of region in au_inspire datasæt. Mus
 
 cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
 
+bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
 address_cvr_fp: "../data/processed/adresser/all_addresses_cvr.parquet" 
 address_bbr_fp: "../data/processed/adresser/all_addresses_bbr.parquet"
