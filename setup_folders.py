@@ -21,8 +21,8 @@ for f in data_folders:
 input_base = "data/input"
 processed_base = "data/processed"
 
-input_subfolders = ["cvr", "adresser", "DK_AdministrativeUnit"]
-processed_subfolders = ["cvr", "adresser", "adm_boundaries"]
+input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit"]
+processed_subfolders = ["cvr", "adresser", "bbr", "adm_boundaries"]
 
 for f in input_subfolders:
     if not os.path.exists(os.path.join(input_base, f)):
