@@ -99,9 +99,8 @@ for destination, title in destination_dict.items():
 
 # %%
 
-# NOTE: Uses a household data set not included in the repo!
 householddata = gpd.read_parquet(
-    "../data/input/households/unique_helaars_adresser.parquet"
+    "../data/processed/adresser/all_addresses_bbr.parquet",
 )
 
 # %%
