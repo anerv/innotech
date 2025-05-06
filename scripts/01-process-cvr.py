@@ -18,6 +18,57 @@ with open(r"../config.yml") as file:
     address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
+
+# %%
+cvr_address_fp = "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
+cvr_brancher_fp = "../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Current_8.csv"
+cvr_penhed_fp = (
+    "../data/input/cvr/CVR_V1_Produktionsenhed_TotalDownload_csv_Current_8.csv"
+)
+
+cvr_addresses = pd.read_csv(
+    cvr_address_fp,
+    sep=",",
+    encoding="utf-8",
+    usecols=[
+        "AdresseringAnvendelse",
+        "CVREnhedsId",
+        "Adresse",
+        "CVRAdresse_kommunekode",
+    ],
+)
+cvr_brancher = pd.read_csv(
+    cvr_brancher_fp,
+    sep=",",
+    encoding="utf-8",
+    usecols=["CVREnhedsId", "vaerdi", "vaerdiTekst"],
+)
+cvr_penhed = pd.read_csv(
+    cvr_penhed_fp,
+    sep=",",
+    encoding="utf-8",
+    usecols=["id", "pNummer", "tilknyttetVirksomhedsCVRNummer", "status"],
+)
+
+
+# %%
+# Merge dataframes
+cvr_data = cvr_penhed.merge(
+    cvr_brancher, left_on="id", right_on="CVREnhedsId", how="left"
+)
+
+# TODO: penheder are no longer unique! maybe does not matter?
+
+
+# %%
+# TODO: fix, check
+cvr_data = cvr_data.merge(
+    cvr_addresses, left_on="CVREnhedsId", right_on="CVREnhedsId", how="left"
+)
+
+# TODO: compare number of rows with org data
+# %%
+
 # %%
 # FIX CSV
 
