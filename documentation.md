@@ -27,7 +27,7 @@ pip install -e .
 - Adresse-data (adresser, husnumre, og adganspunkter) for den ønskede region.
 - BBR-data (enheder) for den ønskede region.
 - CVR-data (Penheder) for den ønskede region.
-- Afgrænsning af studieområdet (INPSPIRE data med danske administrative områder. Opdater config.yml andet område end Region Sjælland ønskes.). 
+- Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml andet område end Region Sjælland ønskes.). 
 
 Se config.yml for forventede filnavne og placeringer.
 

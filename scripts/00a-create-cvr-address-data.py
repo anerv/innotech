@@ -1,7 +1,6 @@
 # %%
 
 # Create address data for the project with ids for CVR and geometries
-# %%
 
 import pandas as pd
 import geopandas as gpd
@@ -21,7 +20,7 @@ with open(r"../config.yml", encoding="utf-8") as file:
     housenumbers_fp = parsed_yaml_file["housenumbers_fp"]
 
     study_area_fp = parsed_yaml_file["study_area_fp"]
-    adm_area_level = parsed_yaml_file["adm_area_level"]
+    adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]
     study_area_name = parsed_yaml_file["study_area_name"]
 
 
@@ -41,13 +40,16 @@ elif input_address_fp.endswith(".csv"):
 else:
     raise ValueError("Input file must be a .parquet or .csv file.")
 # %%
+
+address.drop_duplicates(subset=["id_lokalId"], inplace=True)
+
 address_points["geometry"] = address_points["position"].apply(wkt.loads)
 address_gdf = gpd.GeoDataFrame(address_points, geometry="geometry", crs="EPSG:25832")
 
 # %%
 housenumbers_with_geoms = pd.merge(
     address_gdf[["id_lokalId", "geometry"]],
-    housenumbers[["adgangspunkt", "id_lokalId"]],
+    housenumbers[["adgangspunkt", "id_lokalId", "vejpunkt"]],
     left_on="id_lokalId",
     right_on="adgangspunkt",
     how="inner",
@@ -74,19 +76,40 @@ addresses_with_geoms.rename(
 )
 
 # %%
+addresses_with_geoms = pd.merge(
+    addresses_with_geoms,
+    address_gdf[["id_lokalId", "geometry"]],
+    left_on="vejpunkt",
+    right_on="id_lokalId",
+    how="left",
+    suffixes=("_adr", "_vej"),
+)
+
+
+# Analysis requires WGS84 coordinates
+addresses_with_geoms["vej_pos_lat"] = addresses_with_geoms.geometry_vej.to_crs("4326").y
+addresses_with_geoms["vej_pos_lon"] = addresses_with_geoms.geometry_vej.to_crs("4326").x
+
+
+addresses_with_geoms.rename(
+    columns={
+        "geometry_adr": "geometry",
+    },
+    inplace=True,
+)
+addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
+
+# %%
 # filter addresses to only include those within the region
 
 
-administrative_boundaries = gpd.read_file(
-    "../data/input/DK_AdministrativeUnit/au_inspire.gpkg", layer="administrativeunit"
-)
+administrative_boundaries = gpd.read_file(adm_boundaries_fp)
 
-region = administrative_boundaries[
-    (administrative_boundaries.nationallevel == adm_area_level)
-    & (administrative_boundaries.name_gn_spell_spellofna_text == study_area_name)
-]
 
-region = region[["nationallevel", "geometry"]]
+region = administrative_boundaries[administrative_boundaries["navn"] == study_area_name]
+
+
+region = region[["navn", "geometry"]]
 
 
 region.sindex
@@ -97,7 +120,6 @@ region_add = gpd.sjoin(region, addresses_with_geoms, predicate="intersects")
 addresses_region = addresses_with_geoms[
     addresses_with_geoms.index.isin(region_add.index_right)
 ]
-
 
 addresses_region.to_parquet(address_cvr_fp, index=False)
 # %%

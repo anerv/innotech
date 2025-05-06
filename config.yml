@@ -1,10 +1,9 @@
 
 # Filepaths for input data
 
-adm_boundaries_fp: "../data/input/DK_AdministrativeUnit/au_inspire.gpkg"
+adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" #"../data/input/DK_AdministrativeUnit/au_inspire.gpkg"
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
-adm_area_level: "2ndOrder" # Choose "2ndOrder" for region or "3rdOrder" for municipality
-study_area_name: "Region Sjælland" # Name of region in au_inspire datasæt. Must be a valid name of a Danish region or municipality
+study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
 
 cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
 
