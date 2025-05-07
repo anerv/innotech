@@ -34,16 +34,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
 # %%
 
-administrative_boundaries = gpd.read_file(adm_boundaries_fp)
+region = gpd.read_file(study_area_fp)
 
-region = administrative_boundaries[administrative_boundaries["navn"] == study_area_name]
-
-region = region[["navn", "geometry"]]
-
-
-region.to_file("../data/processed/adm_boundaries/region.gpkg")
-
-# %%
 bbox = region.to_crs("WGS84").total_bounds
 
 bbox_wgs84 = (bbox[1].item(), bbox[0].item(), bbox[3].item(), bbox[2].item())

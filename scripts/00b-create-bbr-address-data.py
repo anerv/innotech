@@ -174,12 +174,7 @@ bbr_access_points.rename(
 # %%
 
 # filter addresses to only include those within the region
-administrative_boundaries = gpd.read_file(adm_boundaries_fp)
-
-region = administrative_boundaries[administrative_boundaries["navn"] == study_area_name]
-
-
-region = region[["navn", "geometry"]]
+region = gpd.read_file(study_area_fp)
 
 
 region.sindex
