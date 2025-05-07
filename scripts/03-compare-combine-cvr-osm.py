@@ -2,7 +2,6 @@
 
 # COMPARISON OF DESTINATION DATA FOR CVR AND OSM DATA
 
-
 import pandas as pd
 import geopandas as gpd
 import os
@@ -15,7 +14,6 @@ os.environ["GDAL_DATA"] = os.path.join(
 from src.helper_functions import (
     highlight_nan,
     highlight_max,
-    aggregate_points_by_distance,
     plot_destinations,
     plot_destinations_combined,
     plot_destinations_combined_subplot,
@@ -31,6 +29,9 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     osm_export_types = parsed_yaml_file["osm_export_types"]
     cvr_export_types = parsed_yaml_file["cvr_export_types"]
+
+    sub_adm_boundaries_fp = parsed_yaml_file["sub_adm_boundaries_fp"]
+    study_area_fp = parsed_yaml_file["study_area_fp"]
 
 
 # %%
@@ -54,7 +55,7 @@ cvr_color = "#009988"
 
 
 # Plot services for each subcategory for each data set
-study_area = gpd.read_file("../data/processed/adm_boundaries/region.gpkg")
+study_area = gpd.read_file(study_area_fp)
 
 
 # %%
@@ -496,51 +497,22 @@ for i, service in enumerate(unique_destinations):
 
 
 # %%
-# EXPORT
 
-# only keep services with this main type
+analyse_destionations_per_municipality = True
+if analyse_destionations_per_municipality:
 
-# Drop subtypes and keep only main types in exported data set
-osm_cvr_combined["service_type"] = osm_cvr_combined["service_type_main"]
-osm_cvr_combined.drop(columns=["service_type_main"], inplace=True)
-# %%
-# Drop subtypes and keep only main types in exported data set
-osm_cvr_combined.drop(
-    osm_cvr_combined[
-        (osm_cvr_combined["source"] == "osm")
-        & (~osm_cvr_combined["service_type"].isin(osm_export_types))
-    ].index,
-    inplace=True,
-)
+    # Load municipality data
+    muni_data = gpd.read_file(sub_adm_boundaries_fp)
 
 
-osm_cvr_combined.drop(
-    osm_cvr_combined[
-        (osm_cvr_combined["source"] == "cvr")
-        & (~osm_cvr_combined["service_type"].isin(cvr_export_types))
-    ].index,
-    inplace=True,
-)
+# TODO: count and plot number of services per municipality
 
-osm_cvr_combined = osm_cvr_combined[
-    ["service_type", "hb_kode", "Adr_id", "source", "geometry"]
-]
+# TODO: add to documentation
+# TODO: add file to config.yml
+# TODO: download and read muni data
 
-osm_cvr_combined.to_parquet("../results/data/osm-cvr-combined.parquet")
 
 # %%
-#  Collapse points in same category within XXX distance if they have the same main service type
 
-aggregated_gdf = aggregate_points_by_distance(
-    osm_cvr_combined,
-    distance_threshold=100,
-    destination_type_column="service_type",
-    inherit_columns=["Adr_id", "hb_kode"],
-)
-
-
-aggregated_gdf.to_parquet(
-    "../results/data/osm-cvr-combined-aggregated.parquet",
-)
 
 # %%
