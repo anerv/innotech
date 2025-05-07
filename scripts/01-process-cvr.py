@@ -1,10 +1,9 @@
-# %%[markdown]
+# %%
 
 # Process CVR data
 
 import pandas as pd
 import geopandas as gpd
-
 import yaml
 
 # %%
