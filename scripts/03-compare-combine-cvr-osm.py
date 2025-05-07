@@ -522,6 +522,10 @@ osm_cvr_combined.drop(
     inplace=True,
 )
 
+osm_cvr_combined = osm_cvr_combined[
+    ["service_type", "hb_kode", "Adr_id", "source", "geometry"]
+]
+
 osm_cvr_combined.to_parquet("../results/data/osm-cvr-combined.parquet")
 
 # %%
