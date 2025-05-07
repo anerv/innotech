@@ -504,12 +504,21 @@ if analyse_destionations_per_municipality:
     # Load municipality data
     muni_data = gpd.read_file(sub_adm_boundaries_fp)
 
+    # get munis that intersect with the study area # NOTE: requires high quality data with identical boundaries!
+    muni_subset = muni_data[muni_data.intersects(study_area.union_all())].copy()
+
+    # TODO: join muni data with combined osm_cvr data
+    # TODO: count number of services in each category per municipality
+
+    muni_destinations = muni_subset.sjoin(
+        osm_cvr_combined, how="inner", predicate="intersects"
+    )
+    # group by municipality and service type
+    # Store the count of each service type in a new column for each muni
 
 # TODO: count and plot number of services per municipality
 
 # TODO: add to documentation
-# TODO: add file to config.yml
-# TODO: download and read muni data
 
 
 # %%
