@@ -1,7 +1,8 @@
 
 # Filepaths for input data
 
-adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" #"../data/input/DK_AdministrativeUnit/au_inspire.gpkg"
+adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" # Data set with administrative boundaries
+sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" # Data set with administrative boundaries
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
 study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
 
@@ -60,4 +61,26 @@ cvr_export_types:
 - shop
 - train_station
 
+
+# Mapping between service types and subcategories
+sub_service_to_main: 
+    doctor: 
+        - doctor-gp
+    dentist: 
+        - dentist
+    pharmacy: 
+        - pharmacy
+    nursery/kindergarten:
+        - nursery
+        - kindergarten
+    school: 
+        - school
+    recreation:
+        - library
+        - sports_facility
+    shop: 
+        - supermarket
+        - discount_supermarket
+    train_station: 
+        - train_station
 
