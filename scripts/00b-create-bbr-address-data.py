@@ -1,7 +1,6 @@
 # %%
 
 # Create address household data for the project
-# %%
 
 import pandas as pd
 import geopandas as gpd

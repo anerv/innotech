@@ -11,7 +11,6 @@ import yaml
 with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
-    org_cvr_path = parsed_yaml_file["cvr_fp"]
     address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     address_cvr_fp_all = parsed_yaml_file["address_cvr_fp_all"]
     address_bbr_fp = parsed_yaml_file["address_bbr_fp"]
