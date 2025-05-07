@@ -3,8 +3,6 @@
 # COMPARISON OF DESTINATION DATA FOR CVR AND OSM DATA
 
 
-# %%
-
 import pandas as pd
 import geopandas as gpd
 import os
