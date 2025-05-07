@@ -5,22 +5,25 @@ adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regions
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
 study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
 
+# INPUT DATA
 cvr_address_fp: "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
 cvr_brancher_fp: "../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Current_8.csv"
 cvr_penhed_fp: "../data/input/cvr/CVR_V1_Produktionsenhed_TotalDownload_csv_Current_8.csv"
+
+input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adresse.parquet"
+address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adressepunkt.parquet"
+housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
 
 
 #cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
 
 bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
+# PROCESSED DATA
 address_cvr_fp: "../data/processed/adresser/all_addresses_cvr.parquet" 
 address_cvr_fp_all: "../data/processed/adresser/cvr-addresses-full.parquet"
 address_bbr_fp: "../data/processed/adresser/all_addresses_bbr.parquet"
 
-input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adresse.parquet"
-address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adressepunkt.parquet"
-housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
 
 hb_codes_dict:
     doctor-gp: 862100
