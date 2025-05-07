@@ -1,9 +1,8 @@
-# %%[markdown]
+# %%
 
 # Download and process OSM data
 
 
-# %%
 import geopandas as gpd
 import pandas as pd
 import overpy
@@ -28,7 +27,7 @@ with open(r"../config.yml", encoding="utf-8") as file:
     study_area_fp = parsed_yaml_file["study_area_fp"]
     study_area_name = parsed_yaml_file["study_area_name"]
 
-    address_fp_parquet = parsed_yaml_file["address_fp_parquet"]
+    address_fp_parquet = parsed_yaml_file["address_cvr_fp"]
 
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
