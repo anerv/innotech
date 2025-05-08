@@ -499,6 +499,7 @@ for i, service in enumerate(unique_destinations):
 # %%
 
 analyse_destionations_per_municipality = True
+
 if analyse_destionations_per_municipality:
 
     # Load municipality data
@@ -506,19 +507,59 @@ if analyse_destionations_per_municipality:
 
     # get munis that intersect with the study area # NOTE: requires high quality data with identical boundaries!
     muni_subset = muni_data[muni_data.intersects(study_area.union_all())].copy()
-
-    # TODO: join muni data with combined osm_cvr data
-    # TODO: count number of services in each category per municipality
+    muni_subset = muni_subset[["kommunekode", "navn", "geometry"]]
 
     muni_destinations = muni_subset.sjoin(
         osm_cvr_combined, how="inner", predicate="intersects"
     )
-    # group by municipality and service type
-    # Store the count of each service type in a new column for each muni
 
-# TODO: count and plot number of services per municipality
+    muni_service_counts = (
+        muni_destinations.groupby(["navn", "service_type_main"])
+        .size()
+        .reset_index(name="count")
+    )
 
-# TODO: add to documentation
+    muni_service_pivot = muni_service_counts.pivot(
+        index="navn", columns="service_type_main", values="count"
+    ).fillna(0)
+
+    muni_service_pivot.loc["Total"] = muni_service_pivot.sum()
+
+    muni_service_pivot.to_csv(
+        "../results/data/municipal-service-counts.csv", index=True
+    )
+
+    df_styled = (
+        muni_service_pivot.style.apply(
+            highlight_nan, subset=muni_service_pivot.columns, axis=1
+        )
+        .set_table_styles(
+            [
+                {"selector": "th", "props": [("font-weight", "bold")]},
+            ]
+        )
+        .set_properties(
+            **{"text-align": "right", "font-size": "12px", "width": "100px"}
+        )
+        .set_caption("Municipal service counts")
+    )
+    df_styled = df_styled.set_table_attributes(
+        'style="width: 50%; border-collapse: collapse;"'
+    )
+
+    # muni_subset_with_counts = muni_subset.merge(
+    #     muni_service_pivot, left_on="navn", right_index=True, how="left"
+    # )
+
+    # muni_subset_with_counts = muni_subset_with_counts.fillna(0)
+
+    df_styled.to_html(
+        "../results/data/municipal-service-counts.html",
+    )
+
+    df_styled
+
+# %%
 
 
 # %%

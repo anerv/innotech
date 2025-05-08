@@ -14,242 +14,475 @@
 
 - Comparison across subcategories is difficult, as the CVR categories and OSM tagging does not align - for example, OSM tagging is often more detailed for leisure than CVR, with OSM categories divided into detailed purpuses such as 'bowling' and 'swimming', while the OSM category supermarket correspond to both 'grocery store' and 'supermarket' in CVR.
 - The subcategories could be made more comparable (e.g. by including libraries, theaters, and fitness centers/gyms when subsetting data from CVR).
+
 <style type="text/css">
-#T_face3 th {
+#T_12e17 th {
   font-weight: bold;
 }
-#T_face3 .col0 {
+#T_12e17 .col0 {
   font-weight: bold;
 }
-#T_face3 .col0 {
+#T_12e17 .col0 {
   font-weight: bold;
 }
-#T_face3_row0_col0, #T_face3_row0_col3, #T_face3_row1_col0, #T_face3_row2_col0, #T_face3_row2_col3, #T_face3_row3_col0, #T_face3_row3_col3, #T_face3_row4_col0, #T_face3_row4_col3, #T_face3_row5_col0, #T_face3_row5_col3, #T_face3_row6_col0, #T_face3_row6_col3, #T_face3_row7_col0, #T_face3_row7_col1, #T_face3_row8_col0, #T_face3_row9_col0, #T_face3_row9_col1, #T_face3_row10_col0 {
+#T_12e17_row0_col0, #T_12e17_row0_col3, #T_12e17_row1_col0, #T_12e17_row2_col0, #T_12e17_row2_col3, #T_12e17_row3_col0, #T_12e17_row3_col3, #T_12e17_row4_col0, #T_12e17_row4_col3, #T_12e17_row5_col0, #T_12e17_row5_col3, #T_12e17_row6_col0, #T_12e17_row6_col3, #T_12e17_row7_col0, #T_12e17_row8_col0, #T_12e17_row9_col0, #T_12e17_row10_col0 {
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_face3_row0_col1, #T_face3_row1_col1, #T_face3_row2_col1, #T_face3_row3_col1, #T_face3_row4_col1, #T_face3_row5_col1, #T_face3_row6_col1, #T_face3_row7_col2, #T_face3_row9_col2 {
+#T_12e17_row0_col1, #T_12e17_row0_col2, #T_12e17_row1_col1, #T_12e17_row1_col2, #T_12e17_row2_col1, #T_12e17_row2_col2, #T_12e17_row3_col1, #T_12e17_row3_col2, #T_12e17_row4_col1, #T_12e17_row4_col2, #T_12e17_row5_col1, #T_12e17_row5_col2, #T_12e17_row6_col1, #T_12e17_row6_col2 {
+  background-color: yellow;
   background-color: lightyellow;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_face3_row0_col2, #T_face3_row1_col2, #T_face3_row2_col2, #T_face3_row3_col2, #T_face3_row4_col2, #T_face3_row5_col2, #T_face3_row6_col2, #T_face3_row7_col3, #T_face3_row8_col3, #T_face3_row9_col3, #T_face3_row10_col3 {
-  background-color: yellow;
-  text-align: left;
-  font-size: 12px;
-  width: 100px;
-}
-#T_face3_row1_col3, #T_face3_row8_col1, #T_face3_row8_col2, #T_face3_row10_col1, #T_face3_row10_col2 {
+#T_12e17_row1_col3, #T_12e17_row8_col1, #T_12e17_row8_col2, #T_12e17_row10_col1, #T_12e17_row10_col2 {
   color: grey;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
+#T_12e17_row7_col1, #T_12e17_row7_col2, #T_12e17_row9_col1, #T_12e17_row9_col2 {
+  background-color: lightyellow;
+  text-align: left;
+  font-size: 12px;
+  width: 100px;
+}
+#T_12e17_row7_col3, #T_12e17_row8_col3, #T_12e17_row9_col3, #T_12e17_row10_col3 {
+  background-color: yellow;
+  text-align: left;
+  font-size: 12px;
+  width: 100px;
+}
 </style>
-<table id="T_face3" style="width: 50%; border-collapse: collapse;">
+<table id="T_12e17" style="width: 50%; border-collapse: collapse;">
   <caption>Comparison of service types between CVR (w. addresses), CVR (all) and OSM data sets</caption>
   <thead>
     <tr>
-      <th id="T_face3_level0_col0" class="col_heading level0 col0" >service_type</th>
-      <th id="T_face3_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
-      <th id="T_face3_level0_col2" class="col_heading level0 col2" >cvr_all</th>
-      <th id="T_face3_level0_col3" class="col_heading level0 col3" >osm</th>
+      <th id="T_12e17_level0_col0" class="col_heading level0 col0" >service_type</th>
+      <th id="T_12e17_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
+      <th id="T_12e17_level0_col2" class="col_heading level0 col2" >cvr_all</th>
+      <th id="T_12e17_level0_col3" class="col_heading level0 col3" >osm</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_face3_row0_col0" class="data row0 col0" >dentist</td>
-      <td id="T_face3_row0_col1" class="data row0 col1" >388.0</td>
-      <td id="T_face3_row0_col2" class="data row0 col2" >400.0</td>
-      <td id="T_face3_row0_col3" class="data row0 col3" >20.0</td>
+      <td id="T_12e17_row0_col0" class="data row0 col0" >dentist</td>
+      <td id="T_12e17_row0_col1" class="data row0 col1" >397.0</td>
+      <td id="T_12e17_row0_col2" class="data row0 col2" >397.0</td>
+      <td id="T_12e17_row0_col3" class="data row0 col3" >20.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row1_col0" class="data row1 col0" >discount_supermarket</td>
-      <td id="T_face3_row1_col1" class="data row1 col1" >232.0</td>
-      <td id="T_face3_row1_col2" class="data row1 col2" >237.0</td>
-      <td id="T_face3_row1_col3" class="data row1 col3" >-</td>
+      <td id="T_12e17_row1_col0" class="data row1 col0" >discount_supermarket</td>
+      <td id="T_12e17_row1_col1" class="data row1 col1" >250.0</td>
+      <td id="T_12e17_row1_col2" class="data row1 col2" >250.0</td>
+      <td id="T_12e17_row1_col3" class="data row1 col3" >-</td>
     </tr>
     <tr>
-      <td id="T_face3_row2_col0" class="data row2 col0" >doctor-gp</td>
-      <td id="T_face3_row2_col1" class="data row2 col1" >401.0</td>
-      <td id="T_face3_row2_col2" class="data row2 col2" >406.0</td>
-      <td id="T_face3_row2_col3" class="data row2 col3" >41.0</td>
+      <td id="T_12e17_row2_col0" class="data row2 col0" >doctor-gp</td>
+      <td id="T_12e17_row2_col1" class="data row2 col1" >419.0</td>
+      <td id="T_12e17_row2_col2" class="data row2 col2" >419.0</td>
+      <td id="T_12e17_row2_col3" class="data row2 col3" >41.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row3_col0" class="data row3 col0" >kindergarten</td>
-      <td id="T_face3_row3_col1" class="data row3 col1" >200.0</td>
-      <td id="T_face3_row3_col2" class="data row3 col2" >206.0</td>
-      <td id="T_face3_row3_col3" class="data row3 col3" >153.0</td>
+      <td id="T_12e17_row3_col0" class="data row3 col0" >kindergarten</td>
+      <td id="T_12e17_row3_col1" class="data row3 col1" >225.0</td>
+      <td id="T_12e17_row3_col2" class="data row3 col2" >225.0</td>
+      <td id="T_12e17_row3_col3" class="data row3 col3" >152.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row4_col0" class="data row4 col0" >library</td>
-      <td id="T_face3_row4_col1" class="data row4 col1" >56.0</td>
-      <td id="T_face3_row4_col2" class="data row4 col2" >58.0</td>
-      <td id="T_face3_row4_col3" class="data row4 col3" >48.0</td>
+      <td id="T_12e17_row4_col0" class="data row4 col0" >library</td>
+      <td id="T_12e17_row4_col1" class="data row4 col1" >64.0</td>
+      <td id="T_12e17_row4_col2" class="data row4 col2" >64.0</td>
+      <td id="T_12e17_row4_col3" class="data row4 col3" >48.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row5_col0" class="data row5 col0" >nursery</td>
-      <td id="T_face3_row5_col1" class="data row5 col1" >14.0</td>
-      <td id="T_face3_row5_col2" class="data row5 col2" >15.0</td>
-      <td id="T_face3_row5_col3" class="data row5 col3" >11.0</td>
+      <td id="T_12e17_row5_col0" class="data row5 col0" >nursery</td>
+      <td id="T_12e17_row5_col1" class="data row5 col1" >19.0</td>
+      <td id="T_12e17_row5_col2" class="data row5 col2" >19.0</td>
+      <td id="T_12e17_row5_col3" class="data row5 col3" >11.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row6_col0" class="data row6 col0" >pharmacy</td>
-      <td id="T_face3_row6_col1" class="data row6 col1" >101.0</td>
-      <td id="T_face3_row6_col2" class="data row6 col2" >108.0</td>
-      <td id="T_face3_row6_col3" class="data row6 col3" >75.0</td>
+      <td id="T_12e17_row6_col0" class="data row6 col0" >pharmacy</td>
+      <td id="T_12e17_row6_col1" class="data row6 col1" >111.0</td>
+      <td id="T_12e17_row6_col2" class="data row6 col2" >111.0</td>
+      <td id="T_12e17_row6_col3" class="data row6 col3" >76.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row7_col0" class="data row7 col0" >school</td>
-      <td id="T_face3_row7_col1" class="data row7 col1" >308.0</td>
-      <td id="T_face3_row7_col2" class="data row7 col2" >314.0</td>
-      <td id="T_face3_row7_col3" class="data row7 col3" >361.0</td>
+      <td id="T_12e17_row7_col0" class="data row7 col0" >school</td>
+      <td id="T_12e17_row7_col1" class="data row7 col1" >330.0</td>
+      <td id="T_12e17_row7_col2" class="data row7 col2" >330.0</td>
+      <td id="T_12e17_row7_col3" class="data row7 col3" >362.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row8_col0" class="data row8 col0" >sports_facility</td>
-      <td id="T_face3_row8_col1" class="data row8 col1" >-</td>
-      <td id="T_face3_row8_col2" class="data row8 col2" >-</td>
-      <td id="T_face3_row8_col3" class="data row8 col3" >88.0</td>
+      <td id="T_12e17_row8_col0" class="data row8 col0" >sports_facility</td>
+      <td id="T_12e17_row8_col1" class="data row8 col1" >-</td>
+      <td id="T_12e17_row8_col2" class="data row8 col2" >-</td>
+      <td id="T_12e17_row8_col3" class="data row8 col3" >89.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row9_col0" class="data row9 col0" >supermarket</td>
-      <td id="T_face3_row9_col1" class="data row9 col1" >263.0</td>
-      <td id="T_face3_row9_col2" class="data row9 col2" >269.0</td>
-      <td id="T_face3_row9_col3" class="data row9 col3" >426.0</td>
+      <td id="T_12e17_row9_col0" class="data row9 col0" >supermarket</td>
+      <td id="T_12e17_row9_col1" class="data row9 col1" >298.0</td>
+      <td id="T_12e17_row9_col2" class="data row9 col2" >298.0</td>
+      <td id="T_12e17_row9_col3" class="data row9 col3" >426.0</td>
     </tr>
     <tr>
-      <td id="T_face3_row10_col0" class="data row10 col0" >train_station</td>
-      <td id="T_face3_row10_col1" class="data row10 col1" >-</td>
-      <td id="T_face3_row10_col2" class="data row10 col2" >-</td>
-      <td id="T_face3_row10_col3" class="data row10 col3" >73.0</td>
+      <td id="T_12e17_row10_col0" class="data row10 col0" >train_station</td>
+      <td id="T_12e17_row10_col1" class="data row10 col1" >-</td>
+      <td id="T_12e17_row10_col2" class="data row10 col2" >-</td>
+      <td id="T_12e17_row10_col3" class="data row10 col3" >73.0</td>
     </tr>
   </tbody>
 </table>
+
 
 
 ### Main destination categories
 
 <style type="text/css">
-#T_aa6bb th {
+#T_7c68a th {
   font-weight: bold;
 }
-#T_aa6bb .col0 {
+#T_7c68a .col0 {
   font-weight: bold;
 }
-#T_aa6bb .col0 {
+#T_7c68a .col0 {
   font-weight: bold;
 }
-#T_aa6bb_row0_col0, #T_aa6bb_row0_col3, #T_aa6bb_row1_col0, #T_aa6bb_row1_col3, #T_aa6bb_row2_col0, #T_aa6bb_row2_col3, #T_aa6bb_row3_col0, #T_aa6bb_row3_col3, #T_aa6bb_row4_col0, #T_aa6bb_row4_col1, #T_aa6bb_row5_col0, #T_aa6bb_row5_col1, #T_aa6bb_row6_col0, #T_aa6bb_row6_col3, #T_aa6bb_row7_col0 {
+#T_7c68a_row0_col0, #T_7c68a_row0_col3, #T_7c68a_row1_col0, #T_7c68a_row1_col3, #T_7c68a_row2_col0, #T_7c68a_row2_col3, #T_7c68a_row3_col0, #T_7c68a_row3_col3, #T_7c68a_row4_col0, #T_7c68a_row5_col0, #T_7c68a_row6_col0, #T_7c68a_row6_col3, #T_7c68a_row7_col0 {
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_aa6bb_row0_col1, #T_aa6bb_row1_col1, #T_aa6bb_row2_col1, #T_aa6bb_row3_col1, #T_aa6bb_row4_col2, #T_aa6bb_row5_col2, #T_aa6bb_row6_col1 {
+#T_7c68a_row0_col1, #T_7c68a_row0_col2, #T_7c68a_row1_col1, #T_7c68a_row1_col2, #T_7c68a_row2_col1, #T_7c68a_row2_col2, #T_7c68a_row3_col1, #T_7c68a_row3_col2, #T_7c68a_row6_col1, #T_7c68a_row6_col2 {
+  background-color: yellow;
   background-color: lightyellow;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_aa6bb_row0_col2, #T_aa6bb_row1_col2, #T_aa6bb_row2_col2, #T_aa6bb_row3_col2, #T_aa6bb_row4_col3, #T_aa6bb_row5_col3, #T_aa6bb_row6_col2, #T_aa6bb_row7_col3 {
+#T_7c68a_row4_col1, #T_7c68a_row4_col2, #T_7c68a_row5_col1, #T_7c68a_row5_col2 {
+  background-color: lightyellow;
+  text-align: left;
+  font-size: 12px;
+  width: 100px;
+}
+#T_7c68a_row4_col3, #T_7c68a_row5_col3, #T_7c68a_row7_col3 {
   background-color: yellow;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
-#T_aa6bb_row7_col1, #T_aa6bb_row7_col2 {
+#T_7c68a_row7_col1, #T_7c68a_row7_col2 {
   color: grey;
   text-align: left;
   font-size: 12px;
   width: 100px;
 }
 </style>
-<table id="T_aa6bb" style="width: 50%; border-collapse: collapse;">
+<table id="T_7c68a" style="width: 50%; border-collapse: collapse;">
   <caption>Comparison of service types between CVR (w. addresses), CVR (all) and OSM data sets</caption>
   <thead>
     <tr>
-      <th id="T_aa6bb_level0_col0" class="col_heading level0 col0" >service_type_main</th>
-      <th id="T_aa6bb_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
-      <th id="T_aa6bb_level0_col2" class="col_heading level0 col2" >cvr_all</th>
-      <th id="T_aa6bb_level0_col3" class="col_heading level0 col3" >osm</th>
+      <th id="T_7c68a_level0_col0" class="col_heading level0 col0" >service_type_main</th>
+      <th id="T_7c68a_level0_col1" class="col_heading level0 col1" >cvr_addresses</th>
+      <th id="T_7c68a_level0_col2" class="col_heading level0 col2" >cvr_all</th>
+      <th id="T_7c68a_level0_col3" class="col_heading level0 col3" >osm</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_aa6bb_row0_col0" class="data row0 col0" >dentist</td>
-      <td id="T_aa6bb_row0_col1" class="data row0 col1" >388.0</td>
-      <td id="T_aa6bb_row0_col2" class="data row0 col2" >400.0</td>
-      <td id="T_aa6bb_row0_col3" class="data row0 col3" >20</td>
+      <td id="T_7c68a_row0_col0" class="data row0 col0" >dentist</td>
+      <td id="T_7c68a_row0_col1" class="data row0 col1" >397.0</td>
+      <td id="T_7c68a_row0_col2" class="data row0 col2" >397.0</td>
+      <td id="T_7c68a_row0_col3" class="data row0 col3" >20</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row1_col0" class="data row1 col0" >doctor</td>
-      <td id="T_aa6bb_row1_col1" class="data row1 col1" >401.0</td>
-      <td id="T_aa6bb_row1_col2" class="data row1 col2" >406.0</td>
-      <td id="T_aa6bb_row1_col3" class="data row1 col3" >41</td>
+      <td id="T_7c68a_row1_col0" class="data row1 col0" >doctor</td>
+      <td id="T_7c68a_row1_col1" class="data row1 col1" >419.0</td>
+      <td id="T_7c68a_row1_col2" class="data row1 col2" >419.0</td>
+      <td id="T_7c68a_row1_col3" class="data row1 col3" >41</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row2_col0" class="data row2 col0" >nursery/kindergarten</td>
-      <td id="T_aa6bb_row2_col1" class="data row2 col1" >214.0</td>
-      <td id="T_aa6bb_row2_col2" class="data row2 col2" >221.0</td>
-      <td id="T_aa6bb_row2_col3" class="data row2 col3" >164</td>
+      <td id="T_7c68a_row2_col0" class="data row2 col0" >nursery/kindergarten</td>
+      <td id="T_7c68a_row2_col1" class="data row2 col1" >244.0</td>
+      <td id="T_7c68a_row2_col2" class="data row2 col2" >244.0</td>
+      <td id="T_7c68a_row2_col3" class="data row2 col3" >163</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row3_col0" class="data row3 col0" >pharmacy</td>
-      <td id="T_aa6bb_row3_col1" class="data row3 col1" >101.0</td>
-      <td id="T_aa6bb_row3_col2" class="data row3 col2" >108.0</td>
-      <td id="T_aa6bb_row3_col3" class="data row3 col3" >75</td>
+      <td id="T_7c68a_row3_col0" class="data row3 col0" >pharmacy</td>
+      <td id="T_7c68a_row3_col1" class="data row3 col1" >111.0</td>
+      <td id="T_7c68a_row3_col2" class="data row3 col2" >111.0</td>
+      <td id="T_7c68a_row3_col3" class="data row3 col3" >76</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row4_col0" class="data row4 col0" >recreation</td>
-      <td id="T_aa6bb_row4_col1" class="data row4 col1" >56.0</td>
-      <td id="T_aa6bb_row4_col2" class="data row4 col2" >58.0</td>
-      <td id="T_aa6bb_row4_col3" class="data row4 col3" >136</td>
+      <td id="T_7c68a_row4_col0" class="data row4 col0" >recreation</td>
+      <td id="T_7c68a_row4_col1" class="data row4 col1" >64.0</td>
+      <td id="T_7c68a_row4_col2" class="data row4 col2" >64.0</td>
+      <td id="T_7c68a_row4_col3" class="data row4 col3" >137</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row5_col0" class="data row5 col0" >school</td>
-      <td id="T_aa6bb_row5_col1" class="data row5 col1" >308.0</td>
-      <td id="T_aa6bb_row5_col2" class="data row5 col2" >314.0</td>
-      <td id="T_aa6bb_row5_col3" class="data row5 col3" >361</td>
+      <td id="T_7c68a_row5_col0" class="data row5 col0" >school</td>
+      <td id="T_7c68a_row5_col1" class="data row5 col1" >330.0</td>
+      <td id="T_7c68a_row5_col2" class="data row5 col2" >330.0</td>
+      <td id="T_7c68a_row5_col3" class="data row5 col3" >362</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row6_col0" class="data row6 col0" >shop</td>
-      <td id="T_aa6bb_row6_col1" class="data row6 col1" >495.0</td>
-      <td id="T_aa6bb_row6_col2" class="data row6 col2" >506.0</td>
-      <td id="T_aa6bb_row6_col3" class="data row6 col3" >426</td>
+      <td id="T_7c68a_row6_col0" class="data row6 col0" >shop</td>
+      <td id="T_7c68a_row6_col1" class="data row6 col1" >548.0</td>
+      <td id="T_7c68a_row6_col2" class="data row6 col2" >548.0</td>
+      <td id="T_7c68a_row6_col3" class="data row6 col3" >426</td>
     </tr>
     <tr>
-      <td id="T_aa6bb_row7_col0" class="data row7 col0" >train_station</td>
-      <td id="T_aa6bb_row7_col1" class="data row7 col1" >-</td>
-      <td id="T_aa6bb_row7_col2" class="data row7 col2" >-</td>
-      <td id="T_aa6bb_row7_col3" class="data row7 col3" >73</td>
+      <td id="T_7c68a_row7_col0" class="data row7 col0" >train_station</td>
+      <td id="T_7c68a_row7_col1" class="data row7 col1" >-</td>
+      <td id="T_7c68a_row7_col2" class="data row7 col2" >-</td>
+      <td id="T_7c68a_row7_col3" class="data row7 col3" >73</td>
     </tr>
   </tbody>
 </table>
 
+## Counts per municipality
 
+<style type="text/css">
+#T_d09fa th {
+  font-weight: bold;
+}
+#T_d09fa_row0_col0, #T_d09fa_row0_col1, #T_d09fa_row0_col2, #T_d09fa_row0_col3, #T_d09fa_row0_col4, #T_d09fa_row0_col5, #T_d09fa_row0_col6, #T_d09fa_row0_col7, #T_d09fa_row1_col0, #T_d09fa_row1_col1, #T_d09fa_row1_col2, #T_d09fa_row1_col3, #T_d09fa_row1_col4, #T_d09fa_row1_col5, #T_d09fa_row1_col6, #T_d09fa_row1_col7, #T_d09fa_row2_col0, #T_d09fa_row2_col1, #T_d09fa_row2_col2, #T_d09fa_row2_col3, #T_d09fa_row2_col4, #T_d09fa_row2_col5, #T_d09fa_row2_col6, #T_d09fa_row2_col7, #T_d09fa_row3_col0, #T_d09fa_row3_col1, #T_d09fa_row3_col2, #T_d09fa_row3_col3, #T_d09fa_row3_col4, #T_d09fa_row3_col5, #T_d09fa_row3_col6, #T_d09fa_row3_col7, #T_d09fa_row4_col0, #T_d09fa_row4_col1, #T_d09fa_row4_col2, #T_d09fa_row4_col3, #T_d09fa_row4_col4, #T_d09fa_row4_col5, #T_d09fa_row4_col6, #T_d09fa_row4_col7, #T_d09fa_row5_col0, #T_d09fa_row5_col1, #T_d09fa_row5_col2, #T_d09fa_row5_col3, #T_d09fa_row5_col4, #T_d09fa_row5_col5, #T_d09fa_row5_col6, #T_d09fa_row5_col7, #T_d09fa_row6_col0, #T_d09fa_row6_col1, #T_d09fa_row6_col2, #T_d09fa_row6_col3, #T_d09fa_row6_col4, #T_d09fa_row6_col5, #T_d09fa_row6_col6, #T_d09fa_row6_col7, #T_d09fa_row7_col0, #T_d09fa_row7_col1, #T_d09fa_row7_col2, #T_d09fa_row7_col3, #T_d09fa_row7_col4, #T_d09fa_row7_col5, #T_d09fa_row7_col6, #T_d09fa_row7_col7, #T_d09fa_row8_col0, #T_d09fa_row8_col1, #T_d09fa_row8_col2, #T_d09fa_row8_col3, #T_d09fa_row8_col4, #T_d09fa_row8_col5, #T_d09fa_row8_col6, #T_d09fa_row8_col7, #T_d09fa_row9_col0, #T_d09fa_row9_col1, #T_d09fa_row9_col2, #T_d09fa_row9_col3, #T_d09fa_row9_col4, #T_d09fa_row9_col5, #T_d09fa_row9_col6, #T_d09fa_row9_col7, #T_d09fa_row10_col0, #T_d09fa_row10_col1, #T_d09fa_row10_col2, #T_d09fa_row10_col3, #T_d09fa_row10_col4, #T_d09fa_row10_col5, #T_d09fa_row10_col6, #T_d09fa_row10_col7, #T_d09fa_row11_col0, #T_d09fa_row11_col1, #T_d09fa_row11_col2, #T_d09fa_row11_col3, #T_d09fa_row11_col4, #T_d09fa_row11_col5, #T_d09fa_row11_col6, #T_d09fa_row11_col7, #T_d09fa_row12_col0, #T_d09fa_row12_col1, #T_d09fa_row12_col2, #T_d09fa_row12_col3, #T_d09fa_row12_col4, #T_d09fa_row12_col5, #T_d09fa_row12_col6, #T_d09fa_row12_col7, #T_d09fa_row13_col0, #T_d09fa_row13_col1, #T_d09fa_row13_col2, #T_d09fa_row13_col3, #T_d09fa_row13_col4, #T_d09fa_row13_col5, #T_d09fa_row13_col6, #T_d09fa_row13_col7, #T_d09fa_row14_col0, #T_d09fa_row14_col1, #T_d09fa_row14_col2, #T_d09fa_row14_col3, #T_d09fa_row14_col4, #T_d09fa_row14_col5, #T_d09fa_row14_col6, #T_d09fa_row14_col7, #T_d09fa_row15_col0, #T_d09fa_row15_col1, #T_d09fa_row15_col2, #T_d09fa_row15_col3, #T_d09fa_row15_col4, #T_d09fa_row15_col5, #T_d09fa_row15_col6, #T_d09fa_row15_col7, #T_d09fa_row16_col0, #T_d09fa_row16_col1, #T_d09fa_row16_col2, #T_d09fa_row16_col3, #T_d09fa_row16_col4, #T_d09fa_row16_col5, #T_d09fa_row16_col6, #T_d09fa_row16_col7, #T_d09fa_row17_col0, #T_d09fa_row17_col1, #T_d09fa_row17_col2, #T_d09fa_row17_col3, #T_d09fa_row17_col4, #T_d09fa_row17_col5, #T_d09fa_row17_col6, #T_d09fa_row17_col7 {
+  text-align: right;
+  font-size: 12px;
+  width: 100px;
+}
+</style>
+<table id="T_d09fa" style="width: 50%; border-collapse: collapse;">
+  <caption>Municipal service counts</caption>
+  <thead>
+    <tr>
+      <th class="index_name level0" >service_type_main</th>
+      <th id="T_d09fa_level0_col0" class="col_heading level0 col0" >dentist</th>
+      <th id="T_d09fa_level0_col1" class="col_heading level0 col1" >doctor</th>
+      <th id="T_d09fa_level0_col2" class="col_heading level0 col2" >nursery/kindergarten</th>
+      <th id="T_d09fa_level0_col3" class="col_heading level0 col3" >pharmacy</th>
+      <th id="T_d09fa_level0_col4" class="col_heading level0 col4" >recreation</th>
+      <th id="T_d09fa_level0_col5" class="col_heading level0 col5" >school</th>
+      <th id="T_d09fa_level0_col6" class="col_heading level0 col6" >shop</th>
+      <th id="T_d09fa_level0_col7" class="col_heading level0 col7" >train_station</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >navn</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+      <th class="blank col5" >&nbsp;</th>
+      <th class="blank col6" >&nbsp;</th>
+      <th class="blank col7" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_d09fa_level0_row0" class="row_heading level0 row0" >Faxe</th>
+      <td id="T_d09fa_row0_col0" class="data row0 col0" >8</td>
+      <td id="T_d09fa_row0_col1" class="data row0 col1" >21</td>
+      <td id="T_d09fa_row0_col2" class="data row0 col2" >11</td>
+      <td id="T_d09fa_row0_col3" class="data row0 col3" >5</td>
+      <td id="T_d09fa_row0_col4" class="data row0 col4" >5</td>
+      <td id="T_d09fa_row0_col5" class="data row0 col5" >33</td>
+      <td id="T_d09fa_row0_col6" class="data row0 col6" >37</td>
+      <td id="T_d09fa_row0_col7" class="data row0 col7" >4</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row1" class="row_heading level0 row1" >Greve</th>
+      <td id="T_d09fa_row1_col0" class="data row1 col0" >24</td>
+      <td id="T_d09fa_row1_col1" class="data row1 col1" >30</td>
+      <td id="T_d09fa_row1_col2" class="data row1 col2" >42</td>
+      <td id="T_d09fa_row1_col3" class="data row1 col3" >8</td>
+      <td id="T_d09fa_row1_col4" class="data row1 col4" >12</td>
+      <td id="T_d09fa_row1_col5" class="data row1 col5" >37</td>
+      <td id="T_d09fa_row1_col6" class="data row1 col6" >39</td>
+      <td id="T_d09fa_row1_col7" class="data row1 col7" >2</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row2" class="row_heading level0 row2" >Guldborgsund</th>
+      <td id="T_d09fa_row2_col0" class="data row2 col0" >24</td>
+      <td id="T_d09fa_row2_col1" class="data row2 col1" >33</td>
+      <td id="T_d09fa_row2_col2" class="data row2 col2" >31</td>
+      <td id="T_d09fa_row2_col3" class="data row2 col3" >16</td>
+      <td id="T_d09fa_row2_col4" class="data row2 col4" >26</td>
+      <td id="T_d09fa_row2_col5" class="data row2 col5" >39</td>
+      <td id="T_d09fa_row2_col6" class="data row2 col6" >91</td>
+      <td id="T_d09fa_row2_col7" class="data row2 col7" >6</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row3" class="row_heading level0 row3" >Holbæk</th>
+      <td id="T_d09fa_row3_col0" class="data row3 col0" >42</td>
+      <td id="T_d09fa_row3_col1" class="data row3 col1" >31</td>
+      <td id="T_d09fa_row3_col2" class="data row3 col2" >21</td>
+      <td id="T_d09fa_row3_col3" class="data row3 col3" >17</td>
+      <td id="T_d09fa_row3_col4" class="data row3 col4" >18</td>
+      <td id="T_d09fa_row3_col5" class="data row3 col5" >65</td>
+      <td id="T_d09fa_row3_col6" class="data row3 col6" >93</td>
+      <td id="T_d09fa_row3_col7" class="data row3 col7" >10</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row4" class="row_heading level0 row4" >Kalundborg</th>
+      <td id="T_d09fa_row4_col0" class="data row4 col0" >18</td>
+      <td id="T_d09fa_row4_col1" class="data row4 col1" >20</td>
+      <td id="T_d09fa_row4_col2" class="data row4 col2" >36</td>
+      <td id="T_d09fa_row4_col3" class="data row4 col3" >13</td>
+      <td id="T_d09fa_row4_col4" class="data row4 col4" >14</td>
+      <td id="T_d09fa_row4_col5" class="data row4 col5" >59</td>
+      <td id="T_d09fa_row4_col6" class="data row4 col6" >60</td>
+      <td id="T_d09fa_row4_col7" class="data row4 col7" >3</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row5" class="row_heading level0 row5" >Køge</th>
+      <td id="T_d09fa_row5_col0" class="data row5 col0" >31</td>
+      <td id="T_d09fa_row5_col1" class="data row5 col1" >39</td>
+      <td id="T_d09fa_row5_col2" class="data row5 col2" >30</td>
+      <td id="T_d09fa_row5_col3" class="data row5 col3" >21</td>
+      <td id="T_d09fa_row5_col4" class="data row5 col4" >14</td>
+      <td id="T_d09fa_row5_col5" class="data row5 col5" >43</td>
+      <td id="T_d09fa_row5_col6" class="data row5 col6" >66</td>
+      <td id="T_d09fa_row5_col7" class="data row5 col7" >8</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row6" class="row_heading level0 row6" >Lejre</th>
+      <td id="T_d09fa_row6_col0" class="data row6 col0" >6</td>
+      <td id="T_d09fa_row6_col1" class="data row6 col1" >11</td>
+      <td id="T_d09fa_row6_col2" class="data row6 col2" >20</td>
+      <td id="T_d09fa_row6_col3" class="data row6 col3" >2</td>
+      <td id="T_d09fa_row6_col4" class="data row6 col4" >10</td>
+      <td id="T_d09fa_row6_col5" class="data row6 col5" >24</td>
+      <td id="T_d09fa_row6_col6" class="data row6 col6" >27</td>
+      <td id="T_d09fa_row6_col7" class="data row6 col7" >2</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row7" class="row_heading level0 row7" >Lolland</th>
+      <td id="T_d09fa_row7_col0" class="data row7 col0" >21</td>
+      <td id="T_d09fa_row7_col1" class="data row7 col1" >20</td>
+      <td id="T_d09fa_row7_col2" class="data row7 col2" >13</td>
+      <td id="T_d09fa_row7_col3" class="data row7 col3" >14</td>
+      <td id="T_d09fa_row7_col4" class="data row7 col4" >12</td>
+      <td id="T_d09fa_row7_col5" class="data row7 col5" >34</td>
+      <td id="T_d09fa_row7_col6" class="data row7 col6" >60</td>
+      <td id="T_d09fa_row7_col7" class="data row7 col7" >6</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row8" class="row_heading level0 row8" >Næstved</th>
+      <td id="T_d09fa_row8_col0" class="data row8 col0" >39</td>
+      <td id="T_d09fa_row8_col1" class="data row8 col1" >39</td>
+      <td id="T_d09fa_row8_col2" class="data row8 col2" >35</td>
+      <td id="T_d09fa_row8_col3" class="data row8 col3" >14</td>
+      <td id="T_d09fa_row8_col4" class="data row8 col4" >11</td>
+      <td id="T_d09fa_row8_col5" class="data row8 col5" >70</td>
+      <td id="T_d09fa_row8_col6" class="data row8 col6" >87</td>
+      <td id="T_d09fa_row8_col7" class="data row8 col7" >3</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row9" class="row_heading level0 row9" >Odsherred</th>
+      <td id="T_d09fa_row9_col0" class="data row9 col0" >15</td>
+      <td id="T_d09fa_row9_col1" class="data row9 col1" >16</td>
+      <td id="T_d09fa_row9_col2" class="data row9 col2" >10</td>
+      <td id="T_d09fa_row9_col3" class="data row9 col3" >7</td>
+      <td id="T_d09fa_row9_col4" class="data row9 col4" >10</td>
+      <td id="T_d09fa_row9_col5" class="data row9 col5" >37</td>
+      <td id="T_d09fa_row9_col6" class="data row9 col6" >50</td>
+      <td id="T_d09fa_row9_col7" class="data row9 col7" >8</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row10" class="row_heading level0 row10" >Ringsted</th>
+      <td id="T_d09fa_row10_col0" class="data row10 col0" >18</td>
+      <td id="T_d09fa_row10_col1" class="data row10 col1" >11</td>
+      <td id="T_d09fa_row10_col2" class="data row10 col2" >17</td>
+      <td id="T_d09fa_row10_col3" class="data row10 col3" >7</td>
+      <td id="T_d09fa_row10_col4" class="data row10 col4" >5</td>
+      <td id="T_d09fa_row10_col5" class="data row10 col5" >27</td>
+      <td id="T_d09fa_row10_col6" class="data row10 col6" >41</td>
+      <td id="T_d09fa_row10_col7" class="data row10 col7" >1</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row11" class="row_heading level0 row11" >Roskilde</th>
+      <td id="T_d09fa_row11_col0" class="data row11 col0" >66</td>
+      <td id="T_d09fa_row11_col1" class="data row11 col1" >72</td>
+      <td id="T_d09fa_row11_col2" class="data row11 col2" >53</td>
+      <td id="T_d09fa_row11_col3" class="data row11 col3" >21</td>
+      <td id="T_d09fa_row11_col4" class="data row11 col4" >23</td>
+      <td id="T_d09fa_row11_col5" class="data row11 col5" >69</td>
+      <td id="T_d09fa_row11_col6" class="data row11 col6" >88</td>
+      <td id="T_d09fa_row11_col7" class="data row11 col7" >4</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row12" class="row_heading level0 row12" >Slagelse</th>
+      <td id="T_d09fa_row12_col0" class="data row12 col0" >37</td>
+      <td id="T_d09fa_row12_col1" class="data row12 col1" >41</td>
+      <td id="T_d09fa_row12_col2" class="data row12 col2" >28</td>
+      <td id="T_d09fa_row12_col3" class="data row12 col3" >13</td>
+      <td id="T_d09fa_row12_col4" class="data row12 col4" >13</td>
+      <td id="T_d09fa_row12_col5" class="data row12 col5" >65</td>
+      <td id="T_d09fa_row12_col6" class="data row12 col6" >95</td>
+      <td id="T_d09fa_row12_col7" class="data row12 col7" >2</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row13" class="row_heading level0 row13" >Solrød</th>
+      <td id="T_d09fa_row13_col0" class="data row13 col0" >19</td>
+      <td id="T_d09fa_row13_col1" class="data row13 col1" >21</td>
+      <td id="T_d09fa_row13_col2" class="data row13 col2" >22</td>
+      <td id="T_d09fa_row13_col3" class="data row13 col3" >3</td>
+      <td id="T_d09fa_row13_col4" class="data row13 col4" >2</td>
+      <td id="T_d09fa_row13_col5" class="data row13 col5" >11</td>
+      <td id="T_d09fa_row13_col6" class="data row13 col6" >17</td>
+      <td id="T_d09fa_row13_col7" class="data row13 col7" >2</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row14" class="row_heading level0 row14" >Sorø</th>
+      <td id="T_d09fa_row14_col0" class="data row14 col0" >16</td>
+      <td id="T_d09fa_row14_col1" class="data row14 col1" >16</td>
+      <td id="T_d09fa_row14_col2" class="data row14 col2" >10</td>
+      <td id="T_d09fa_row14_col3" class="data row14 col3" >9</td>
+      <td id="T_d09fa_row14_col4" class="data row14 col4" >6</td>
+      <td id="T_d09fa_row14_col5" class="data row14 col5" >19</td>
+      <td id="T_d09fa_row14_col6" class="data row14 col6" >36</td>
+      <td id="T_d09fa_row14_col7" class="data row14 col7" >5</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row15" class="row_heading level0 row15" >Stevns</th>
+      <td id="T_d09fa_row15_col0" class="data row15 col0" >8</td>
+      <td id="T_d09fa_row15_col1" class="data row15 col1" >11</td>
+      <td id="T_d09fa_row15_col2" class="data row15 col2" >7</td>
+      <td id="T_d09fa_row15_col3" class="data row15 col3" >5</td>
+      <td id="T_d09fa_row15_col4" class="data row15 col4" >6</td>
+      <td id="T_d09fa_row15_col5" class="data row15 col5" >12</td>
+      <td id="T_d09fa_row15_col6" class="data row15 col6" >23</td>
+      <td id="T_d09fa_row15_col7" class="data row15 col7" >5</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row16" class="row_heading level0 row16" >Vordingborg</th>
+      <td id="T_d09fa_row16_col0" class="data row16 col0" >25</td>
+      <td id="T_d09fa_row16_col1" class="data row16 col1" >28</td>
+      <td id="T_d09fa_row16_col2" class="data row16 col2" >21</td>
+      <td id="T_d09fa_row16_col3" class="data row16 col3" >12</td>
+      <td id="T_d09fa_row16_col4" class="data row16 col4" >14</td>
+      <td id="T_d09fa_row16_col5" class="data row16 col5" >48</td>
+      <td id="T_d09fa_row16_col6" class="data row16 col6" >64</td>
+      <td id="T_d09fa_row16_col7" class="data row16 col7" >2</td>
+    </tr>
+    <tr>
+      <th id="T_d09fa_level0_row17" class="row_heading level0 row17" >Total</th>
+      <td id="T_d09fa_row17_col0" class="data row17 col0" >417</td>
+      <td id="T_d09fa_row17_col1" class="data row17 col1" >460</td>
+      <td id="T_d09fa_row17_col2" class="data row17 col2" >407</td>
+      <td id="T_d09fa_row17_col3" class="data row17 col3" >187</td>
+      <td id="T_d09fa_row17_col4" class="data row17 col4" >201</td>
+      <td id="T_d09fa_row17_col5" class="data row17 col5" >692</td>
+      <td id="T_d09fa_row17_col6" class="data row17 col6" >974</td>
+      <td id="T_d09fa_row17_col7" class="data row17 col7" >73</td>
+    </tr>
+  </tbody>
+</table>
 
-### Local heterogeneity
-
-For all destination categories, Region Sjælland both has areas with more destinations in OSM and areas with more destinations in CVR. This pattern suggests that the two data sources not only include a different *number* of destinations, but also completely *different* observations.
-
-#### All destinations
-
-![Maps of all CVR and OSM destinations](results/maps/main-all-osm-cvr.png "destinations")
-
-
-#### Comparison of local destination count
-
-*Red values: More destinations in OSM. Blue: More destinations in CVR.*
-
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-doctor.png "doctors")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-dentist.png "dentist")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-pharmacy.png "pharmacies")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-nursery-kindergarten.png "nurseries/kindergartens")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-school.png "schools")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-shop.png "shops")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-recreation.png "recreation")
-![Maps comparing the local count of destinations](results/maps/hex-grid-comparison-train_station.png "train stations")
 
 ## Data consistency
 
