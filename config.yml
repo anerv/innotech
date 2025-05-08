@@ -21,10 +21,14 @@ housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Cur
 bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
 # PROCESSED DATA
-address_cvr_fp: "../data/processed/adresser/all_addresses_cvr.parquet" 
-address_cvr_fp_all: "../data/processed/adresser/cvr-addresses-full.parquet"
-address_bbr_fp: "../data/processed/adresser/all_addresses_bbr.parquet"
+addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
 
+# RESULTS
+address_cvr_fp: "../data/results/data/all_addresses_cvr.parquet" 
+address_bbr_fp: "../data/results/data/all_addresses_bbr.parquet"
+
+destinations_combined_agg_fp: "../results/data/osm-cvr-combined-aggregated.parquet"
+destinations_combined_fp: "../results/data/osm-cvr-combined.parquet"
 
 hb_codes_dict:
     doctor-gp: 862100

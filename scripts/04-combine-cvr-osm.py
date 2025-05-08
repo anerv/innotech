@@ -27,6 +27,9 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     sub_service_to_main = parsed_yaml_file["sub_service_to_main"]
 
+    destinations_combined_fp = parsed_yaml_file["destinations_combined_fp"]
+    destinations_combined_agg_fp = parsed_yaml_file["destinations_combined_agg_fp"]
+
 
 # %%
 
@@ -109,7 +112,7 @@ osm_cvr_combined = osm_cvr_combined[
     ["service_type", "hb_kode", "Adr_id", "source", "geometry"]
 ]
 
-osm_cvr_combined.to_parquet("../results/data/osm-cvr-combined.parquet")
+osm_cvr_combined.to_parquet(destinations_combined_fp)
 
 
 #  Collapse points in same category within XXX distance if they have the same main service type
@@ -123,7 +126,7 @@ aggregated_gdf = aggregate_points_by_distance(
 
 
 aggregated_gdf.to_parquet(
-    "../results/data/osm-cvr-combined-aggregated.parquet",
+    destinations_combined_agg_fp,
 )
 
 # %%

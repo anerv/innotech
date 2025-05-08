@@ -12,7 +12,7 @@ with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
-    address_cvr_fp_all = parsed_yaml_file["address_cvr_fp_all"]
+    addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
     address_bbr_fp = parsed_yaml_file["address_bbr_fp"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
     input_address_fp = parsed_yaml_file["input_address_fp"]

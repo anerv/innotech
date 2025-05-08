@@ -15,7 +15,7 @@ with open(r"../config.yml") as file:
     cvr_brancher_fp = parsed_yaml_file["cvr_brancher_fp"]
     cvr_penhed_fp = parsed_yaml_file["cvr_penhed_fp"]
     address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
-    address_cvr_fp_all = parsed_yaml_file["address_cvr_fp_all"]
+    addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
     study_area_fp = parsed_yaml_file["study_area_fp"]

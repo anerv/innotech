@@ -92,7 +92,8 @@ destinations_compare_reset.columns = [destinations_compare.index.name] + list(
 
 
 destinations_compare_reset.to_csv(
-    "../results/data/cvr-osm-comparison-subcategory.csv", index=False
+    "../results/destination_data_evaluation/cvr-osm-comparison-subcategory.csv",
+    index=False,
 )
 
 # Style
@@ -131,7 +132,7 @@ styled_table
 # Export the styled table to HTML
 html = styled_table.to_html()
 
-html_file = "../results/data/cvr-osm-comparison-subcategory.html"
+html_file = "../results/destination_data_evaluation/cvr-osm-comparison-subcategory.html"
 with open(html_file, "w") as f:
     f.write(html)
     f.close()
@@ -181,7 +182,8 @@ destinations_compare_main_reset.columns = [destinations_compare_main.index.name]
 )
 
 destinations_compare_main_reset.to_csv(
-    "../results/data/cvr-osm-comparison-main-category.csv", index=False
+    "../results/destination_data_evaluation/cvr-osm-comparison-main-category.csv",
+    index=False,
 )
 
 styled_table_main = (
@@ -219,7 +221,9 @@ styled_table_main
 # Export to HTML
 html = styled_table_main.to_html()
 
-html_file = "../results/data/cvr-osm-comparison-maincategory.html"
+html_file = (
+    "../results/destination_data_evaluation/cvr-osm-comparison-maincategory.html"
+)
 with open(html_file, "w") as f:
     f.write(html)
     f.close()
@@ -473,7 +477,10 @@ for service_type in all_destinations:
         combined_grid[service_type + "_osm"] - combined_grid[service_type + "_cvr"]
     )
 
-combined_grid.to_file("../results/data/hex-grid-combined-osm-cvr.gpkg", driver="GPKG")
+combined_grid.to_file(
+    "../results/destination_data_evaluation/hex-grid-combined-osm-cvr.gpkg",
+    driver="GPKG",
+)
 
 
 # %%
@@ -568,10 +575,10 @@ if analyse_destionations_per_municipality:
     muni_subset = muni_data[muni_data.intersects(study_area.union_all())].copy()
     muni_subset = muni_subset[["kommunekode", "navn", "geometry"]]
 
-    html_fp_main = "../results/data/municipal-service-counts-service-type-main.html"
-    html_fp_sub = "../results/data/municipal-service-counts-service-type-sub.html"
-    csv_fp_main = "../results/data/municipal-service-counts-service-type-main.csv"
-    csv_fp_sub = "../results/data/municipal-service-counts-service-type-sub.csv"
+    html_fp_main = "../results/destination_data_evaluation/municipal-service-counts-service-type-main.html"
+    html_fp_sub = "../results/destination_data_evaluation/municipal-service-counts-service-type-sub.html"
+    csv_fp_main = "../results/destination_data_evaluation/municipal-service-counts-service-type-main.csv"
+    csv_fp_sub = "../results/destination_data_evaluation/municipal-service-counts-service-type-sub.csv"
 
     dest_count_main = count_destinations_in_municipalities(
         muni_subset,
