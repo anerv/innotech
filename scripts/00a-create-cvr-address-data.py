@@ -101,7 +101,7 @@ addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
 # %%
 
-addresses_with_geoms.to_parquet(address_cvr_fp_all, index=False)
+addresses_with_geoms.to_parquet(addresses_fp_all, index=False)
 
 # filter addresses to only include those within the region
 administrative_boundaries = gpd.read_file(adm_boundaries_fp)
