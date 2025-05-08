@@ -484,6 +484,312 @@
 </table>
 
 
+
+<style type="text/css">
+#T_652f8 th {
+  font-weight: bold;
+}
+#T_652f8_row0_col0, #T_652f8_row0_col1, #T_652f8_row0_col2, #T_652f8_row0_col3, #T_652f8_row0_col4, #T_652f8_row0_col5, #T_652f8_row0_col6, #T_652f8_row0_col7, #T_652f8_row0_col8, #T_652f8_row0_col9, #T_652f8_row0_col10, #T_652f8_row1_col0, #T_652f8_row1_col1, #T_652f8_row1_col2, #T_652f8_row1_col3, #T_652f8_row1_col4, #T_652f8_row1_col5, #T_652f8_row1_col6, #T_652f8_row1_col7, #T_652f8_row1_col8, #T_652f8_row1_col9, #T_652f8_row1_col10, #T_652f8_row2_col0, #T_652f8_row2_col1, #T_652f8_row2_col2, #T_652f8_row2_col3, #T_652f8_row2_col4, #T_652f8_row2_col6, #T_652f8_row2_col7, #T_652f8_row2_col8, #T_652f8_row2_col9, #T_652f8_row2_col10, #T_652f8_row3_col0, #T_652f8_row3_col1, #T_652f8_row3_col2, #T_652f8_row3_col3, #T_652f8_row3_col4, #T_652f8_row3_col6, #T_652f8_row3_col7, #T_652f8_row3_col8, #T_652f8_row3_col9, #T_652f8_row3_col10, #T_652f8_row4_col0, #T_652f8_row4_col1, #T_652f8_row4_col2, #T_652f8_row4_col3, #T_652f8_row4_col4, #T_652f8_row4_col5, #T_652f8_row4_col6, #T_652f8_row4_col7, #T_652f8_row4_col8, #T_652f8_row4_col9, #T_652f8_row4_col10, #T_652f8_row5_col0, #T_652f8_row5_col1, #T_652f8_row5_col2, #T_652f8_row5_col3, #T_652f8_row5_col4, #T_652f8_row5_col5, #T_652f8_row5_col6, #T_652f8_row5_col7, #T_652f8_row5_col8, #T_652f8_row5_col9, #T_652f8_row5_col10, #T_652f8_row6_col0, #T_652f8_row6_col1, #T_652f8_row6_col2, #T_652f8_row6_col3, #T_652f8_row6_col4, #T_652f8_row6_col6, #T_652f8_row6_col7, #T_652f8_row6_col8, #T_652f8_row6_col9, #T_652f8_row6_col10, #T_652f8_row7_col0, #T_652f8_row7_col1, #T_652f8_row7_col2, #T_652f8_row7_col3, #T_652f8_row7_col4, #T_652f8_row7_col6, #T_652f8_row7_col7, #T_652f8_row7_col8, #T_652f8_row7_col9, #T_652f8_row7_col10, #T_652f8_row8_col0, #T_652f8_row8_col1, #T_652f8_row8_col2, #T_652f8_row8_col3, #T_652f8_row8_col4, #T_652f8_row8_col6, #T_652f8_row8_col7, #T_652f8_row8_col8, #T_652f8_row8_col9, #T_652f8_row8_col10, #T_652f8_row9_col0, #T_652f8_row9_col1, #T_652f8_row9_col2, #T_652f8_row9_col3, #T_652f8_row9_col4, #T_652f8_row9_col6, #T_652f8_row9_col7, #T_652f8_row9_col8, #T_652f8_row9_col9, #T_652f8_row9_col10, #T_652f8_row10_col0, #T_652f8_row10_col1, #T_652f8_row10_col2, #T_652f8_row10_col3, #T_652f8_row10_col4, #T_652f8_row10_col5, #T_652f8_row10_col6, #T_652f8_row10_col7, #T_652f8_row10_col8, #T_652f8_row10_col9, #T_652f8_row10_col10, #T_652f8_row11_col0, #T_652f8_row11_col1, #T_652f8_row11_col2, #T_652f8_row11_col3, #T_652f8_row11_col4, #T_652f8_row11_col5, #T_652f8_row11_col6, #T_652f8_row11_col7, #T_652f8_row11_col8, #T_652f8_row11_col9, #T_652f8_row11_col10, #T_652f8_row12_col0, #T_652f8_row12_col1, #T_652f8_row12_col2, #T_652f8_row12_col3, #T_652f8_row12_col4, #T_652f8_row12_col5, #T_652f8_row12_col6, #T_652f8_row12_col7, #T_652f8_row12_col8, #T_652f8_row12_col9, #T_652f8_row12_col10, #T_652f8_row13_col0, #T_652f8_row13_col1, #T_652f8_row13_col2, #T_652f8_row13_col3, #T_652f8_row13_col4, #T_652f8_row13_col5, #T_652f8_row13_col6, #T_652f8_row13_col7, #T_652f8_row13_col9, #T_652f8_row13_col10, #T_652f8_row14_col0, #T_652f8_row14_col1, #T_652f8_row14_col2, #T_652f8_row14_col3, #T_652f8_row14_col4, #T_652f8_row14_col5, #T_652f8_row14_col6, #T_652f8_row14_col7, #T_652f8_row14_col8, #T_652f8_row14_col9, #T_652f8_row14_col10, #T_652f8_row15_col0, #T_652f8_row15_col1, #T_652f8_row15_col2, #T_652f8_row15_col3, #T_652f8_row15_col4, #T_652f8_row15_col6, #T_652f8_row15_col7, #T_652f8_row15_col8, #T_652f8_row15_col9, #T_652f8_row15_col10, #T_652f8_row16_col0, #T_652f8_row16_col1, #T_652f8_row16_col2, #T_652f8_row16_col3, #T_652f8_row16_col4, #T_652f8_row16_col6, #T_652f8_row16_col7, #T_652f8_row16_col8, #T_652f8_row16_col9, #T_652f8_row16_col10, #T_652f8_row17_col0, #T_652f8_row17_col1, #T_652f8_row17_col2, #T_652f8_row17_col3, #T_652f8_row17_col4, #T_652f8_row17_col5, #T_652f8_row17_col6, #T_652f8_row17_col7, #T_652f8_row17_col8, #T_652f8_row17_col9, #T_652f8_row17_col10 {
+  text-align: right;
+  font-size: 12px;
+  width: 100px;
+}
+#T_652f8_row2_col5, #T_652f8_row3_col5, #T_652f8_row6_col5, #T_652f8_row7_col5, #T_652f8_row8_col5, #T_652f8_row9_col5, #T_652f8_row13_col8, #T_652f8_row15_col5, #T_652f8_row16_col5 {
+  color: red;
+  text-align: right;
+  font-size: 12px;
+  width: 100px;
+}
+</style>
+<table id="T_652f8" style="width: 50%; border-collapse: collapse;">
+  <caption>Municipal service counts</caption>
+  <thead>
+    <tr>
+      <th class="index_name level0" >service_type</th>
+      <th id="T_652f8_level0_col0" class="col_heading level0 col0" >dentist</th>
+      <th id="T_652f8_level0_col1" class="col_heading level0 col1" >discount_supermarket</th>
+      <th id="T_652f8_level0_col2" class="col_heading level0 col2" >doctor-gp</th>
+      <th id="T_652f8_level0_col3" class="col_heading level0 col3" >kindergarten</th>
+      <th id="T_652f8_level0_col4" class="col_heading level0 col4" >library</th>
+      <th id="T_652f8_level0_col5" class="col_heading level0 col5" >nursery</th>
+      <th id="T_652f8_level0_col6" class="col_heading level0 col6" >pharmacy</th>
+      <th id="T_652f8_level0_col7" class="col_heading level0 col7" >school</th>
+      <th id="T_652f8_level0_col8" class="col_heading level0 col8" >sports_facility</th>
+      <th id="T_652f8_level0_col9" class="col_heading level0 col9" >supermarket</th>
+      <th id="T_652f8_level0_col10" class="col_heading level0 col10" >train_station</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >navn</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+      <th class="blank col5" >&nbsp;</th>
+      <th class="blank col6" >&nbsp;</th>
+      <th class="blank col7" >&nbsp;</th>
+      <th class="blank col8" >&nbsp;</th>
+      <th class="blank col9" >&nbsp;</th>
+      <th class="blank col10" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_652f8_level0_row0" class="row_heading level0 row0" >Faxe</th>
+      <td id="T_652f8_row0_col0" class="data row0 col0" >8</td>
+      <td id="T_652f8_row0_col1" class="data row0 col1" >9</td>
+      <td id="T_652f8_row0_col2" class="data row0 col2" >21</td>
+      <td id="T_652f8_row0_col3" class="data row0 col3" >10</td>
+      <td id="T_652f8_row0_col4" class="data row0 col4" >3</td>
+      <td id="T_652f8_row0_col5" class="data row0 col5" >1</td>
+      <td id="T_652f8_row0_col6" class="data row0 col6" >5</td>
+      <td id="T_652f8_row0_col7" class="data row0 col7" >33</td>
+      <td id="T_652f8_row0_col8" class="data row0 col8" >2</td>
+      <td id="T_652f8_row0_col9" class="data row0 col9" >28</td>
+      <td id="T_652f8_row0_col10" class="data row0 col10" >4</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row1" class="row_heading level0 row1" >Greve</th>
+      <td id="T_652f8_row1_col0" class="data row1 col0" >24</td>
+      <td id="T_652f8_row1_col1" class="data row1 col1" >12</td>
+      <td id="T_652f8_row1_col2" class="data row1 col2" >30</td>
+      <td id="T_652f8_row1_col3" class="data row1 col3" >40</td>
+      <td id="T_652f8_row1_col4" class="data row1 col4" >6</td>
+      <td id="T_652f8_row1_col5" class="data row1 col5" >2</td>
+      <td id="T_652f8_row1_col6" class="data row1 col6" >8</td>
+      <td id="T_652f8_row1_col7" class="data row1 col7" >37</td>
+      <td id="T_652f8_row1_col8" class="data row1 col8" >6</td>
+      <td id="T_652f8_row1_col9" class="data row1 col9" >27</td>
+      <td id="T_652f8_row1_col10" class="data row1 col10" >2</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row2" class="row_heading level0 row2" >Guldborgsund</th>
+      <td id="T_652f8_row2_col0" class="data row2 col0" >24</td>
+      <td id="T_652f8_row2_col1" class="data row2 col1" >20</td>
+      <td id="T_652f8_row2_col2" class="data row2 col2" >33</td>
+      <td id="T_652f8_row2_col3" class="data row2 col3" >31</td>
+      <td id="T_652f8_row2_col4" class="data row2 col4" >12</td>
+      <td id="T_652f8_row2_col5" class="data row2 col5" >0</td>
+      <td id="T_652f8_row2_col6" class="data row2 col6" >16</td>
+      <td id="T_652f8_row2_col7" class="data row2 col7" >39</td>
+      <td id="T_652f8_row2_col8" class="data row2 col8" >14</td>
+      <td id="T_652f8_row2_col9" class="data row2 col9" >71</td>
+      <td id="T_652f8_row2_col10" class="data row2 col10" >6</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row3" class="row_heading level0 row3" >Holbæk</th>
+      <td id="T_652f8_row3_col0" class="data row3 col0" >42</td>
+      <td id="T_652f8_row3_col1" class="data row3 col1" >20</td>
+      <td id="T_652f8_row3_col2" class="data row3 col2" >31</td>
+      <td id="T_652f8_row3_col3" class="data row3 col3" >21</td>
+      <td id="T_652f8_row3_col4" class="data row3 col4" >10</td>
+      <td id="T_652f8_row3_col5" class="data row3 col5" >0</td>
+      <td id="T_652f8_row3_col6" class="data row3 col6" >17</td>
+      <td id="T_652f8_row3_col7" class="data row3 col7" >65</td>
+      <td id="T_652f8_row3_col8" class="data row3 col8" >8</td>
+      <td id="T_652f8_row3_col9" class="data row3 col9" >73</td>
+      <td id="T_652f8_row3_col10" class="data row3 col10" >10</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row4" class="row_heading level0 row4" >Kalundborg</th>
+      <td id="T_652f8_row4_col0" class="data row4 col0" >18</td>
+      <td id="T_652f8_row4_col1" class="data row4 col1" >12</td>
+      <td id="T_652f8_row4_col2" class="data row4 col2" >20</td>
+      <td id="T_652f8_row4_col3" class="data row4 col3" >32</td>
+      <td id="T_652f8_row4_col4" class="data row4 col4" >9</td>
+      <td id="T_652f8_row4_col5" class="data row4 col5" >4</td>
+      <td id="T_652f8_row4_col6" class="data row4 col6" >13</td>
+      <td id="T_652f8_row4_col7" class="data row4 col7" >59</td>
+      <td id="T_652f8_row4_col8" class="data row4 col8" >5</td>
+      <td id="T_652f8_row4_col9" class="data row4 col9" >48</td>
+      <td id="T_652f8_row4_col10" class="data row4 col10" >3</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row5" class="row_heading level0 row5" >Køge</th>
+      <td id="T_652f8_row5_col0" class="data row5 col0" >31</td>
+      <td id="T_652f8_row5_col1" class="data row5 col1" >24</td>
+      <td id="T_652f8_row5_col2" class="data row5 col2" >39</td>
+      <td id="T_652f8_row5_col3" class="data row5 col3" >28</td>
+      <td id="T_652f8_row5_col4" class="data row5 col4" >6</td>
+      <td id="T_652f8_row5_col5" class="data row5 col5" >2</td>
+      <td id="T_652f8_row5_col6" class="data row5 col6" >21</td>
+      <td id="T_652f8_row5_col7" class="data row5 col7" >43</td>
+      <td id="T_652f8_row5_col8" class="data row5 col8" >8</td>
+      <td id="T_652f8_row5_col9" class="data row5 col9" >42</td>
+      <td id="T_652f8_row5_col10" class="data row5 col10" >8</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row6" class="row_heading level0 row6" >Lejre</th>
+      <td id="T_652f8_row6_col0" class="data row6 col0" >6</td>
+      <td id="T_652f8_row6_col1" class="data row6 col1" >9</td>
+      <td id="T_652f8_row6_col2" class="data row6 col2" >11</td>
+      <td id="T_652f8_row6_col3" class="data row6 col3" >20</td>
+      <td id="T_652f8_row6_col4" class="data row6 col4" >5</td>
+      <td id="T_652f8_row6_col5" class="data row6 col5" >0</td>
+      <td id="T_652f8_row6_col6" class="data row6 col6" >2</td>
+      <td id="T_652f8_row6_col7" class="data row6 col7" >24</td>
+      <td id="T_652f8_row6_col8" class="data row6 col8" >5</td>
+      <td id="T_652f8_row6_col9" class="data row6 col9" >18</td>
+      <td id="T_652f8_row6_col10" class="data row6 col10" >2</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row7" class="row_heading level0 row7" >Lolland</th>
+      <td id="T_652f8_row7_col0" class="data row7 col0" >21</td>
+      <td id="T_652f8_row7_col1" class="data row7 col1" >11</td>
+      <td id="T_652f8_row7_col2" class="data row7 col2" >20</td>
+      <td id="T_652f8_row7_col3" class="data row7 col3" >13</td>
+      <td id="T_652f8_row7_col4" class="data row7 col4" >6</td>
+      <td id="T_652f8_row7_col5" class="data row7 col5" >0</td>
+      <td id="T_652f8_row7_col6" class="data row7 col6" >14</td>
+      <td id="T_652f8_row7_col7" class="data row7 col7" >34</td>
+      <td id="T_652f8_row7_col8" class="data row7 col8" >6</td>
+      <td id="T_652f8_row7_col9" class="data row7 col9" >49</td>
+      <td id="T_652f8_row7_col10" class="data row7 col10" >6</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row8" class="row_heading level0 row8" >Næstved</th>
+      <td id="T_652f8_row8_col0" class="data row8 col0" >39</td>
+      <td id="T_652f8_row8_col1" class="data row8 col1" >28</td>
+      <td id="T_652f8_row8_col2" class="data row8 col2" >39</td>
+      <td id="T_652f8_row8_col3" class="data row8 col3" >35</td>
+      <td id="T_652f8_row8_col4" class="data row8 col4" >9</td>
+      <td id="T_652f8_row8_col5" class="data row8 col5" >0</td>
+      <td id="T_652f8_row8_col6" class="data row8 col6" >14</td>
+      <td id="T_652f8_row8_col7" class="data row8 col7" >70</td>
+      <td id="T_652f8_row8_col8" class="data row8 col8" >2</td>
+      <td id="T_652f8_row8_col9" class="data row8 col9" >59</td>
+      <td id="T_652f8_row8_col10" class="data row8 col10" >3</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row9" class="row_heading level0 row9" >Odsherred</th>
+      <td id="T_652f8_row9_col0" class="data row9 col0" >15</td>
+      <td id="T_652f8_row9_col1" class="data row9 col1" >9</td>
+      <td id="T_652f8_row9_col2" class="data row9 col2" >16</td>
+      <td id="T_652f8_row9_col3" class="data row9 col3" >10</td>
+      <td id="T_652f8_row9_col4" class="data row9 col4" >6</td>
+      <td id="T_652f8_row9_col5" class="data row9 col5" >0</td>
+      <td id="T_652f8_row9_col6" class="data row9 col6" >7</td>
+      <td id="T_652f8_row9_col7" class="data row9 col7" >37</td>
+      <td id="T_652f8_row9_col8" class="data row9 col8" >4</td>
+      <td id="T_652f8_row9_col9" class="data row9 col9" >41</td>
+      <td id="T_652f8_row9_col10" class="data row9 col10" >8</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row10" class="row_heading level0 row10" >Ringsted</th>
+      <td id="T_652f8_row10_col0" class="data row10 col0" >18</td>
+      <td id="T_652f8_row10_col1" class="data row10 col1" >12</td>
+      <td id="T_652f8_row10_col2" class="data row10 col2" >11</td>
+      <td id="T_652f8_row10_col3" class="data row10 col3" >16</td>
+      <td id="T_652f8_row10_col4" class="data row10 col4" >3</td>
+      <td id="T_652f8_row10_col5" class="data row10 col5" >1</td>
+      <td id="T_652f8_row10_col6" class="data row10 col6" >7</td>
+      <td id="T_652f8_row10_col7" class="data row10 col7" >27</td>
+      <td id="T_652f8_row10_col8" class="data row10 col8" >2</td>
+      <td id="T_652f8_row10_col9" class="data row10 col9" >29</td>
+      <td id="T_652f8_row10_col10" class="data row10 col10" >1</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row11" class="row_heading level0 row11" >Roskilde</th>
+      <td id="T_652f8_row11_col0" class="data row11 col0" >66</td>
+      <td id="T_652f8_row11_col1" class="data row11 col1" >23</td>
+      <td id="T_652f8_row11_col2" class="data row11 col2" >72</td>
+      <td id="T_652f8_row11_col3" class="data row11 col3" >41</td>
+      <td id="T_652f8_row11_col4" class="data row11 col4" >12</td>
+      <td id="T_652f8_row11_col5" class="data row11 col5" >12</td>
+      <td id="T_652f8_row11_col6" class="data row11 col6" >21</td>
+      <td id="T_652f8_row11_col7" class="data row11 col7" >69</td>
+      <td id="T_652f8_row11_col8" class="data row11 col8" >11</td>
+      <td id="T_652f8_row11_col9" class="data row11 col9" >65</td>
+      <td id="T_652f8_row11_col10" class="data row11 col10" >4</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row12" class="row_heading level0 row12" >Slagelse</th>
+      <td id="T_652f8_row12_col0" class="data row12 col0" >37</td>
+      <td id="T_652f8_row12_col1" class="data row12 col1" >24</td>
+      <td id="T_652f8_row12_col2" class="data row12 col2" >41</td>
+      <td id="T_652f8_row12_col3" class="data row12 col3" >27</td>
+      <td id="T_652f8_row12_col4" class="data row12 col4" >7</td>
+      <td id="T_652f8_row12_col5" class="data row12 col5" >1</td>
+      <td id="T_652f8_row12_col6" class="data row12 col6" >13</td>
+      <td id="T_652f8_row12_col7" class="data row12 col7" >65</td>
+      <td id="T_652f8_row12_col8" class="data row12 col8" >6</td>
+      <td id="T_652f8_row12_col9" class="data row12 col9" >71</td>
+      <td id="T_652f8_row12_col10" class="data row12 col10" >2</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row13" class="row_heading level0 row13" >Solrød</th>
+      <td id="T_652f8_row13_col0" class="data row13 col0" >19</td>
+      <td id="T_652f8_row13_col1" class="data row13 col1" >4</td>
+      <td id="T_652f8_row13_col2" class="data row13 col2" >21</td>
+      <td id="T_652f8_row13_col3" class="data row13 col3" >16</td>
+      <td id="T_652f8_row13_col4" class="data row13 col4" >2</td>
+      <td id="T_652f8_row13_col5" class="data row13 col5" >6</td>
+      <td id="T_652f8_row13_col6" class="data row13 col6" >3</td>
+      <td id="T_652f8_row13_col7" class="data row13 col7" >11</td>
+      <td id="T_652f8_row13_col8" class="data row13 col8" >0</td>
+      <td id="T_652f8_row13_col9" class="data row13 col9" >13</td>
+      <td id="T_652f8_row13_col10" class="data row13 col10" >2</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row14" class="row_heading level0 row14" >Sorø</th>
+      <td id="T_652f8_row14_col0" class="data row14 col0" >16</td>
+      <td id="T_652f8_row14_col1" class="data row14 col1" >11</td>
+      <td id="T_652f8_row14_col2" class="data row14 col2" >16</td>
+      <td id="T_652f8_row14_col3" class="data row14 col3" >9</td>
+      <td id="T_652f8_row14_col4" class="data row14 col4" >4</td>
+      <td id="T_652f8_row14_col5" class="data row14 col5" >1</td>
+      <td id="T_652f8_row14_col6" class="data row14 col6" >9</td>
+      <td id="T_652f8_row14_col7" class="data row14 col7" >19</td>
+      <td id="T_652f8_row14_col8" class="data row14 col8" >2</td>
+      <td id="T_652f8_row14_col9" class="data row14 col9" >25</td>
+      <td id="T_652f8_row14_col10" class="data row14 col10" >5</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row15" class="row_heading level0 row15" >Stevns</th>
+      <td id="T_652f8_row15_col0" class="data row15 col0" >8</td>
+      <td id="T_652f8_row15_col1" class="data row15 col1" >4</td>
+      <td id="T_652f8_row15_col2" class="data row15 col2" >11</td>
+      <td id="T_652f8_row15_col3" class="data row15 col3" >7</td>
+      <td id="T_652f8_row15_col4" class="data row15 col4" >4</td>
+      <td id="T_652f8_row15_col5" class="data row15 col5" >0</td>
+      <td id="T_652f8_row15_col6" class="data row15 col6" >5</td>
+      <td id="T_652f8_row15_col7" class="data row15 col7" >12</td>
+      <td id="T_652f8_row15_col8" class="data row15 col8" >2</td>
+      <td id="T_652f8_row15_col9" class="data row15 col9" >19</td>
+      <td id="T_652f8_row15_col10" class="data row15 col10" >5</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row16" class="row_heading level0 row16" >Vordingborg</th>
+      <td id="T_652f8_row16_col0" class="data row16 col0" >25</td>
+      <td id="T_652f8_row16_col1" class="data row16 col1" >18</td>
+      <td id="T_652f8_row16_col2" class="data row16 col2" >28</td>
+      <td id="T_652f8_row16_col3" class="data row16 col3" >21</td>
+      <td id="T_652f8_row16_col4" class="data row16 col4" >8</td>
+      <td id="T_652f8_row16_col5" class="data row16 col5" >0</td>
+      <td id="T_652f8_row16_col6" class="data row16 col6" >12</td>
+      <td id="T_652f8_row16_col7" class="data row16 col7" >48</td>
+      <td id="T_652f8_row16_col8" class="data row16 col8" >6</td>
+      <td id="T_652f8_row16_col9" class="data row16 col9" >46</td>
+      <td id="T_652f8_row16_col10" class="data row16 col10" >2</td>
+    </tr>
+    <tr>
+      <th id="T_652f8_level0_row17" class="row_heading level0 row17" >Total</th>
+      <td id="T_652f8_row17_col0" class="data row17 col0" >417</td>
+      <td id="T_652f8_row17_col1" class="data row17 col1" >250</td>
+      <td id="T_652f8_row17_col2" class="data row17 col2" >460</td>
+      <td id="T_652f8_row17_col3" class="data row17 col3" >377</td>
+      <td id="T_652f8_row17_col4" class="data row17 col4" >112</td>
+      <td id="T_652f8_row17_col5" class="data row17 col5" >30</td>
+      <td id="T_652f8_row17_col6" class="data row17 col6" >187</td>
+      <td id="T_652f8_row17_col7" class="data row17 col7" >692</td>
+      <td id="T_652f8_row17_col8" class="data row17 col8" >89</td>
+      <td id="T_652f8_row17_col9" class="data row17 col9" >724</td>
+      <td id="T_652f8_row17_col10" class="data row17 col10" >73</td>
+    </tr>
+  </tbody>
+</table>
+
+
 ## Data consistency
 
 ### CVR

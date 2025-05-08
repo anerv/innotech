@@ -498,40 +498,35 @@ for i, service in enumerate(unique_destinations):
 
 # %%
 
-analyse_destionations_per_municipality = True
 
-if analyse_destionations_per_municipality:
+def highlight_zero(x):
+    return ["color: red" if v == 0 else "" for v in x]
 
-    # Load municipality data
-    muni_data = gpd.read_file(sub_adm_boundaries_fp)
 
-    # get munis that intersect with the study area # NOTE: requires high quality data with identical boundaries!
-    muni_subset = muni_data[muni_data.intersects(study_area.union_all())].copy()
-    muni_subset = muni_subset[["kommunekode", "navn", "geometry"]]
+def count_destinations_in_municipalities(
+    municipalities, muni_id_col, destinations, destination_col, csv_fp, html_fp
+):
 
-    muni_destinations = muni_subset.sjoin(
-        osm_cvr_combined, how="inner", predicate="intersects"
+    muni_destinations = municipalities.sjoin(
+        destinations, how="inner", predicate="intersects"
     )
 
     muni_service_counts = (
-        muni_destinations.groupby(["navn", "service_type_main"])
+        muni_destinations.groupby([muni_id_col, destination_col])
         .size()
         .reset_index(name="count")
     )
 
     muni_service_pivot = muni_service_counts.pivot(
-        index="navn", columns="service_type_main", values="count"
+        index="navn", columns=destination_col, values="count"
     ).fillna(0)
 
     muni_service_pivot.loc["Total"] = muni_service_pivot.sum()
 
-    muni_service_pivot.to_csv(
-        "../results/data/municipal-service-counts.csv", index=True
-    )
-
+    muni_service_pivot = muni_service_pivot.astype(int)
     df_styled = (
         muni_service_pivot.style.apply(
-            highlight_nan, subset=muni_service_pivot.columns, axis=1
+            highlight_zero, subset=muni_service_pivot.columns, axis=1
         )
         .set_table_styles(
             [
@@ -553,16 +548,54 @@ if analyse_destionations_per_municipality:
 
     # muni_subset_with_counts = muni_subset_with_counts.fillna(0)
 
+    muni_service_pivot.to_csv(csv_fp, index=True)
+
     df_styled.to_html(
-        "../results/data/municipal-service-counts.html",
+        html_fp,
     )
 
-    df_styled
+    return df_styled
+
+
+analyse_destionations_per_municipality = True
+
+if analyse_destionations_per_municipality:
+
+    # Load municipality data
+    muni_data = gpd.read_file(sub_adm_boundaries_fp)
+
+    # get munis that intersect with the study area # NOTE: requires high quality data with identical boundaries!
+    muni_subset = muni_data[muni_data.intersects(study_area.union_all())].copy()
+    muni_subset = muni_subset[["kommunekode", "navn", "geometry"]]
+
+    html_fp_main = "../results/data/municipal-service-counts-service-type-main.html"
+    html_fp_sub = "../results/data/municipal-service-counts-service-type-sub.html"
+    csv_fp_main = "../results/data/municipal-service-counts-service-type-main.csv"
+    csv_fp_sub = "../results/data/municipal-service-counts-service-type-sub.csv"
+
+    dest_count_main = count_destinations_in_municipalities(
+        muni_subset,
+        "navn",
+        osm_cvr_combined,
+        "service_type_main",
+        csv_fp_main,
+        html_fp_main,
+    )
+
+    dest_count_sub = count_destinations_in_municipalities(
+        muni_subset,
+        "navn",
+        osm_cvr_combined,
+        "service_type",
+        csv_fp_sub,
+        html_fp_sub,
+    )
+
+
+# %%
+dest_count_main
 
 # %%
 
-
-# %%
-
-
+dest_count_sub
 # %%
