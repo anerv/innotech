@@ -24,8 +24,8 @@ bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
 
 # RESULTS
-address_cvr_fp: "../data/results/data/all_addresses_cvr.parquet" 
-address_bbr_fp: "../data/results/data/all_addresses_bbr.parquet"
+address_cvr_fp: "../results/data/all_addresses_cvr.parquet" 
+address_bbr_fp: "../results/data/all_addresses_bbr.parquet"
 
 destinations_combined_agg_fp: "../results/data/osm-cvr-combined-aggregated.parquet"
 destinations_combined_fp: "../results/data/osm-cvr-combined.parquet"
