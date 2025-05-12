@@ -14,15 +14,18 @@ os.environ["GDAL_DATA"] = os.path.join(
     f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
 )
 
+# %%
+
+##### ILLUSTRATIONS OF SERVICES/DESTINATIONS #####
+
 
 # Plot services for each subcategory for each data set
-study_area = gpd.read_file("../data/processed/adm_boundaries/region.gpkg")
+study_area = gpd.read_file("../data/processed/adm_boundaries/study_area.gpkg")
 
 data = gpd.read_parquet(
     "../results/data/osm-cvr-combined-aggregated.parquet",
 )
 
-# %%
 
 figsize = (8, 6)
 
@@ -97,13 +100,14 @@ for destination, title in destination_dict.items():
     plt.show()
     plt.close()
 
-# %%
+
+### HOUSEHOLDS ###
 
 householddata = gpd.read_parquet(
-    "../data/processed/adresser/all_addresses_bbr.parquet",
+    "../results/data/all_addresses_bbr.parquet",
 )
 
-# %%
+
 attribution_text = "(C) KDS"
 
 color = "#AA3377"
@@ -154,5 +158,98 @@ plt.savefig(
 
 plt.show()
 plt.close()
+
+
+# %%
+
+##### RESULTS #####
+
+results = pd.read_parquet("supermarket_1_otp.parquet")
+study_area = gpd.read_file("../data/processed/adm_boundaries/study_area.gpkg")
+
+from shapely.geometry import Point
+
+results["geometry"] = results.apply(
+    lambda x: Point(x["from_lon"], x["from_lat"]), axis=1
+)
+
+
+results_gdf = gpd.GeoDataFrame(
+    results,
+    geometry="geometry",
+    crs="EPSG:4326",
+)
+
+results_gdf = results_gdf.to_crs("EPSG:25832")
+
+results_gdf["duration_min"] = results_gdf["duration"] / 60
+# %%
+
+attribution_text = "Data fra Klimadatastyrelsen og OpenStreetMap"
+font_size = 10
+fp = "illustration_travel_time_supermarket.png"
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+study_area.plot(ax=ax, color="none", edgecolor="black", linewidth=0.5)
+
+results_gdf.plot(
+    ax=ax,
+    column="duration_min",
+    cmap="viridis",
+    scheme="user_defined",
+    classification_kwds={"bins": [15, 30, 60, 120, 180]},
+    markersize=0.1,
+    figsize=(10, 10),
+    legend=True,
+    # missing_kwds={
+    #     "color": "none",
+    #     "label": "Ikke tilgængelig",
+    #     "edgecolor": "lightgrey",
+    #     "hatch": "//",
+    #     "linewidth": 0.2,
+    #     "alpha": 0.5,
+    # },
+    legend_kwds={
+        "title": "Rejsetid (minutter)",
+        # "bbox_to_anchor": (0.5, 1.05),
+        # "loc": "lower center",
+        "fontsize": font_size,
+        "frameon": False,
+    },
+)
+
+
+ax.set_axis_off()
+
+ax.add_artist(
+    ScaleBar(
+        dx=1,
+        units="m",
+        dimension="si-length",
+        length_fraction=0.15,
+        width_fraction=0.002,
+        location="lower left",
+        box_alpha=0,
+        font_properties={"size": font_size},
+    )
+)
+cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+txt = ax.texts[-1]
+txt.set_position([0.99, 0.001])
+txt.set_ha("right")
+txt.set_va("bottom")
+
+plt.tight_layout()
+
+plt.savefig(
+    fp,
+    dpi=300,
+    bbox_inches="tight",
+)
+
+plt.show()
+plt.close()
+
 
 # %%
