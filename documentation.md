@@ -37,7 +37,4 @@ Se config.yml for forventede filnavne og placeringer.
 
 Kør alle Python-scripts i mappen `scripts` i nummereret rækkefølge. Resultater eksporteres automatisk til mappen `results`.
 
-- Script 00a omdanner adressedata til brug med CVR og BBR data.
-- Script 
-
 
