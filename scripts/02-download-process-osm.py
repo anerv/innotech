@@ -31,6 +31,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
+    queries = parsed_yaml_file["osm_queries"]
+
 # %%
 
 region = gpd.read_file(study_area_fp)
@@ -39,30 +41,6 @@ bbox = region.to_crs("WGS84").total_bounds
 
 bbox_wgs84 = (bbox[1].item(), bbox[0].item(), bbox[3].item(), bbox[2].item())
 
-
-# %%
-
-queries = {
-    "doctor-gp": [
-        {"amenity": "doctors"},
-        {"amenity": "general_practitioner"},
-        {"amenity": "clinic"},
-        {"healthcare": "doctor"},
-    ],
-    "dentist": [
-        {"amenity": "dentist"},
-        {"healthcare": "dentist"},
-    ],
-    "pharmacy": [{"amenity": "pharmacy"}],
-    "kindergarten": [{"amenity": "kindergarten"}],
-    "nursery": [{"amenity": "nursery"}, {"amenity": "childcare"}],
-    "school": [{"amenity": "school"}],
-    "supermarket": [{"shop": "supermarket"}, {"shop": "grocery"}],
-    "discount_supermarket": [{"amenity": "convenience"}],
-    "library": [{"amenity": "library"}],
-    "sports_facility": [{"amenity": "sports_centre"}, {"club": "sport"}],
-    "train_station": [{"railway": "station"}],
-}
 
 # %%
 
@@ -197,7 +175,7 @@ all_osm_gdf.drop_duplicates(subset=["osm_id", "service_type"], inplace=True)
 addresses = gpd.read_parquet(address_fp_parquet)  # adresseIdentificerer
 # addresses.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
 
-join_threshold = 300  # meters
+join_threshold = 500  # meters
 assert all_osm_gdf.crs == addresses.crs, "CRS mismatch between all_osm and addresses"
 
 # joined = gpd.sjoin_nearest(

@@ -16,8 +16,6 @@ address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_cs
 housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
 
 
-#cvr_fp: "../data/input/cvr/Penhed_Region_sj.csv"
-
 bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
 # PROCESSED DATA
@@ -30,6 +28,7 @@ address_bbr_fp: "../results/data/all_addresses_bbr.parquet"
 destinations_combined_agg_fp: "../results/data/osm-cvr-combined-aggregated.parquet"
 destinations_combined_fp: "../results/data/osm-cvr-combined.parquet"
 
+# Define CVR codes for each service/destination type
 hb_codes_dict:
     doctor-gp: 862100
     dentist: 862300
@@ -40,8 +39,42 @@ hb_codes_dict:
     supermarket: 471120
     discount_supermarket: 471130
     library: 911100
-    train_station: 49
-    sports_facility: 93 #  931100,
+    train_station: 49 # This is not a CVR code, but used to identify train stations in the final data set
+    sports_facility: 93 #  This is not a CVR code, but used to identify sports facilities in the final data set
+
+
+# Define tags and values used to download destination data from OSM
+osm_queries:
+  doctor-gp:
+    - amenity: doctors
+    - amenity: general_practitioner
+    - amenity: clinic
+    - healthcare: doctor
+  dentist:
+    - amenity: dentist
+    - healthcare: dentist
+  pharmacy:
+    - amenity: pharmacy
+  kindergarten:
+    - amenity: kindergarten
+  nursery:
+    - amenity: nursery
+    - amenity: childcare
+  school:
+    - amenity: school
+  supermarket:
+    - shop: supermarket
+    - shop: grocery
+  discount_supermarket:
+    - amenity: convenience
+  library:
+    - amenity: library
+  sports_facility:
+    - amenity: sports_centre
+    - leisure: sports_centre
+    - club: sport
+  train_station:
+    - railway: station
 
 # Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
 # All service types will be included in the comparison of data sources
