@@ -5,7 +5,8 @@ results/*
 data/input/*
 data/processed/*
 
-illustrations/*
+illustrations/*.png
+illustrations/*.parquet
 
 todo.md
 data/repositories.lnk
