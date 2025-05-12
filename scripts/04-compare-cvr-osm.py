@@ -33,6 +33,11 @@ with open(r"../config.yml", encoding="utf-8") as file:
     sub_adm_boundaries_fp = parsed_yaml_file["sub_adm_boundaries_fp"]
     study_area_fp = parsed_yaml_file["study_area_fp"]
 
+    cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
+    cvr_destinations_all_fp = parsed_yaml_file["cvr_destinations_all_fp"]
+
+    osm_destinations_fp = parsed_yaml_file["osm_destinations_fp"]
+
 
 # %%
 # Mapping between service types and subcategories
@@ -60,10 +65,10 @@ study_area = gpd.read_file(study_area_fp)
 
 # %%
 # Load the data
-cvr_addresses = gpd.read_file("../data/processed/cvr/cvr-services-w-address.gpkg")
-cvr_all = gpd.read_file("../data/processed/cvr/cvr-services-all.gpkg")
+cvr_addresses = gpd.read_file(cvr_destinations_fp)
+cvr_all = gpd.read_file(cvr_destinations_all_fp)
 
-osm_destinations = gpd.read_file("../data/processed/osm/all_osm_services.gpkg")
+osm_destinations = gpd.read_file(osm_destinations_fp)
 
 cvr_addresses.sort_values("service_type", inplace=True)
 cvr_all.sort_values("service_type", inplace=True)

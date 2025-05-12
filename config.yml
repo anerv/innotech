@@ -1,25 +1,35 @@
 
-# Filepaths for input data
-
-adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" # Data set with administrative boundaries
-sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" # Data set with administrative boundaries
-study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
 study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
 
+# Filepaths for... 
+
 # INPUT DATA
+
+# administrative boundaries
+adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" # Data set with administrative boundaries
+sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" # Data set with administrative boundaries
+
+# CVR data
 cvr_address_input_fp: "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
 cvr_brancher_input_fp: "../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Current_8.csv"
 cvr_penhed_input_fp: "../data/input/cvr/CVR_V1_Produktionsenhed_TotalDownload_csv_Current_8.csv"
 
+# DAR data
 input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adresse.parquet"
 address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adressepunkt.parquet"
 housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
 
-
+# BBR data
 bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
 # PROCESSED DATA
 addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
+study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
+
+osm_destinations_fp: "../data/processed/osm/all_osm_services.gpkg"
+cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
+cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
+
 
 # RESULTS
 address_cvr_fp: "../results/data/all_addresses_cvr.parquet" 
@@ -27,6 +37,8 @@ address_bbr_fp: "../results/data/all_addresses_bbr.parquet"
 
 destinations_combined_agg_fp: "../results/data/osm-cvr-combined-aggregated.parquet"
 destinations_combined_fp: "../results/data/osm-cvr-combined.parquet"
+
+# Filepaths for exported maps, html, and csv files are defined in the py-scripts
 
 # Define CVR codes for each service/destination type
 hb_codes_dict:

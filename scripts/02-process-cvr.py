@@ -20,6 +20,9 @@ with open(r"../config.yml") as file:
 
     study_area_fp = parsed_yaml_file["study_area_fp"]
 
+    cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
+    cvr_destinations_all_fp = parsed_yaml_file["cvr_destinations_all_fp"]
+
 
 # %%
 
@@ -162,12 +165,10 @@ cvr_region["service_type"].value_counts()
 cvr_region = cvr_region[["service_type", "hb_kode", "Adr_id", "geometry"]]
 
 
-cvr_region.to_file(
-    "../data/processed/cvr/cvr-services-all.gpkg",
-)
+cvr_region.to_file(cvr_destinations_all_fp)
 
 cvr_region[(cvr_region.Adr_id.notnull()) & (cvr_region.geometry.notnull())].to_file(
-    "../data/processed/cvr/cvr-services-w-address.gpkg",
+    cvr_destinations_fp
 )
 
 

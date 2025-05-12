@@ -33,6 +33,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     queries = parsed_yaml_file["osm_queries"]
 
+    osm_destinations_fp = parsed_yaml_file["osm_destinations_fp"]
+
 # %%
 
 region = gpd.read_file(study_area_fp)
@@ -146,7 +148,7 @@ for category, query_list in queries.items():
 
     all_data["service_type"] = category
 
-    all_data.to_file(f"../data/processed/osm/{category}_osm.gpkg", driver="GPKG")
+    # all_data.to_file(f"../data/processed/osm/{category}_osm.gpkg", driver="GPKG")
 
     all_osm.append(all_data)
 
@@ -221,5 +223,5 @@ joined = joined[
 
 # %%
 
-joined.to_file("../data/processed/osm/all_osm_services.gpkg", driver="GPKG")
+joined.to_file(osm_destinations_fp, driver="GPKG")
 # %%
