@@ -2,7 +2,7 @@
 
 ## Installation
 
-Kræver en installation af Python, Jupyter, Conda og pip. For at installere det nødvendige Conda Python-environment køres nedenstående i terminalen:
+Projektet kræver en installation af Python, Jupyter, Conda og pip. For at installere det nødvendige Conda Python-environment køres nedenstående i et terminalvindue:
 
 **Klon GitHub repository**
 
@@ -24,10 +24,12 @@ pip install -e .
 
 ## Inputdata
 
-- Adresse-data (adresser, husnumre, og adganspunkter) for den ønskede region.
+- Adresse-data fra DAR (adresser, husnumre, og adganspunkter) for den ønskede region.
 - BBR-data (enheder) for den ønskede region.
-- CVR-data (Penheder) for den ønskede region.
-- Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml andet område end Region Sjælland ønskes.). 
+- CVR-data (produktionsenheder, CVR-enheder med brancher, og CVR-enheder med adresser) for den ønskede region.
+- Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml hvis et andet område end Region Sjælland ønskes.). 
+
+Alle data kan downloades fra Datafordeleren.
 
 Se config.yml for forventede filnavne og placeringer.
 
@@ -35,5 +37,7 @@ Se config.yml for forventede filnavne og placeringer.
 
 Kør alle Python-scripts i mappen `scripts` i nummereret rækkefølge. Resultater eksporteres automatisk til mappen `results`.
 
+- Script 00a omdanner adressedata til brug med CVR og BBR data.
+- Script 
 
 
