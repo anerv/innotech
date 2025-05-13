@@ -118,8 +118,11 @@ cvr_subset["service_type"] = cvr_subset["hb_kode"].map(
 # Join to address data -
 cvr_address_geoms = gpd.read_parquet(addresses_fp_all)  # prepared in 00-script
 
+# %%
 cvr_address_geoms = pd.merge(
-    cvr_address_geoms[["adresseIdentificerer", "geometry"]],
+    cvr_address_geoms[
+        ["adresseIdentificerer", "vej_pos_lat", "vej_pos_lon", "geometry"]
+    ],
     cvr_subset,
     right_on="Adr_id",
     left_on="adresseIdentificerer",
@@ -162,7 +165,9 @@ cvr_region["service_type"].value_counts()
 # %%
 
 # Export
-cvr_region = cvr_region[["service_type", "hb_kode", "Adr_id", "geometry"]]
+cvr_region = cvr_region[
+    ["service_type", "hb_kode", "Adr_id", "vej_pos_lat", "vej_pos_lon", "geometry"]
+]
 
 
 cvr_region.to_file(cvr_destinations_all_fp)

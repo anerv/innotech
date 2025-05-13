@@ -212,6 +212,8 @@ joined = joined[
         "service_type",
         "hb_kode",
         "Adr_id",
+        "vej_pos_lat",
+        "vej_pos_lon",
         # "enh023Boligtype",
         "geometry",
     ]

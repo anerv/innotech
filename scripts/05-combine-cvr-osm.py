@@ -59,6 +59,8 @@ osm_destinations["service_type_main"] = osm_destinations["service_type"].map(
 keep_cols = [
     "hb_kode",
     "Adr_id",
+    "vej_pos_lat",
+    "vej_pos_lon",
     "service_type",
     "service_type_main",
     "source",
@@ -108,11 +110,20 @@ osm_cvr_combined.drop(
 )
 
 osm_cvr_combined = osm_cvr_combined[
-    ["service_type", "hb_kode", "Adr_id", "source", "geometry"]
+    [
+        "service_type",
+        "hb_kode",
+        "Adr_id",
+        "vej_pos_lat",
+        "vej_pos_lon",
+        "source",
+        "geometry",
+    ]
 ]
 
-osm_cvr_combined.to_parquet(destinations_combined_fp)
+osm_cvr_combined.to_parquet(destinations_combined_fp, index=False)
 
+# %%
 
 #  Collapse points in same category within XXX distance if they have the same main service type
 
@@ -120,7 +131,12 @@ aggregated_gdf = aggregate_points_by_distance(
     osm_cvr_combined,
     distance_threshold=100,
     destination_type_column="service_type",
-    inherit_columns=["Adr_id", "hb_kode"],
+    inherit_columns=[
+        "Adr_id",
+        "hb_kode",
+        "vej_pos_lat",
+        "vej_pos_lon",
+    ],
 )
 
 
