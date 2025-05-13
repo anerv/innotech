@@ -15,7 +15,7 @@
 
 restrictions:
     - name: "municipality"
-      file_path: "muni2.parquet"
+      file_path: "../data/processed/adm_boundaries/sub_areas.parquet"
       id_attribute: kommunekode
 
 # The service array is used to define the services that are available in the model and how they are processed.
@@ -44,18 +44,19 @@ services:
       spatial_restriction_type: 
       mace_codes:
         - 477300
-    - service_type: kindergarten
+    - service_type: kindergarten-nursery
       n_neighbors: 1
       arival_time: "7:45"
       spatial_restriction_type: "municipality"
       mace_codes:
         - 889130
-    - service_type: nursery
-      n_neighbors: 1
-      arival_time: "7:45"
-      spatial_restriction_type: "municipality"
-      mace_codes:
         - 889120
+    # - service_type: nursery
+    #   n_neighbors: 1
+    #   arival_time: "7:45"
+    #   spatial_restriction_type: "municipality"
+    #   mace_codes:
+    #     - 889120
     - service_type: school
       n_neighbors: 1
       arival_time: "7:45"
@@ -108,18 +109,18 @@ travel_date : "2025-04-22"
 
 data_sources:
   dwellings:
-    path: "muni3.parquet"
+    path: "processed/bbr/adgangsadresser_beboelse.parquet" #"muni3.parquet" # relative to the data directory
     base_columns:
       address_id: "adresseIdentificerer"
       geometry: "geometry"  # EPSG:25832
       road_point_lat: "vej_pos_lat"
-      road_point_long: "vej_pos_long"
+      road_point_lon: "vej_pos_lon"
 
   services:
-    path: "cvr_osm_vejpos.parquet"
+    path: "processed/destinations/osm-cvr-combined.parquet" #"cvr_osm_vejpos.parquet" # relative to the data directory
     base_columns:
       address_id: "Adr_id"
       geometry: "geometry"
       road_point_lat: "vej_pos_lat"
-      road_point_long: "vej_pos_long"
+      road_point_lon: "vej_pos_lon"
       service_type: "hb_kode"  # The service type is used to identify the service in the data
