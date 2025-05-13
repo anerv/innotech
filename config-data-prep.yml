@@ -26,6 +26,7 @@ bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 # PROCESSED DATA
 addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
+sub_study_areas_fp: "../data/processed/adm_boundaries/sub_areas.parquet"
 
 osm_destinations_fp: "../data/processed/osm/all_osm_services.gpkg"
 cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
@@ -95,7 +96,7 @@ osm_export_types:
 - doctor
 - dentist
 - pharmacy
-- nursery/kindergarten
+- kindergarten-nursery
 -  #school
 - recreation
 - shop
@@ -105,7 +106,7 @@ cvr_export_types:
 - doctor
 - dentist
 - pharmacy
-- nursery/kindergarten
+- kindergarten-nursery
 - school
 - recreation
 - shop
@@ -120,13 +121,14 @@ sub_service_to_main:
         - dentist
     pharmacy: 
         - pharmacy
-    nursery/kindergarten:
+    kindergarten-nursery:
         - nursery
         - kindergarten
     school: 
         - school
-    recreation:
+    library: 
         - library
+    sports_facility: 
         - sports_facility
     shop: 
         - supermarket
