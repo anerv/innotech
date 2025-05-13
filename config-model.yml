@@ -1,0 +1,125 @@
+# This is a configuration file for the service location model.
+
+# The restriction array is used to define the spatial restrictions that are applied to the services.
+# Each restriction has a name, a file path, and an ID that is used to identify the restriction in the data.
+# The file path is the location of the data file that contains the spatial restriction information.
+# The file_path is relative to the data directory and should point to a parquet file
+# Note the CRS if the restrion files must be the same as the data files
+# and all files are assumed to be 2D i.e no z coordinate
+# Note that if the adresses or service data has a attribute with the same name as the restriction following 
+# by "_id" ie. municipality_id: this will be used otherwise a spatial join will be preformed.
+# restrictions:
+#    - name: "municipality" The name of the restriction that must match the name in the service array
+#      file_path: "muni2.parquet" The file path to the restriction data relative to the data directory
+#      id_attribute: kommunekode   The ID attribute that is used to identify the restriction.
+
+restrictions:
+    - name: "municipality"
+      file_path: "muni2.parquet"
+      id_attribute: kommunekode
+
+# The service array is used to define the services that are available in the model and how they are processed.
+#    - service_type: doctor-gp Usen to name the service
+#      spatial_restriction_type: Used to define the type of spatial restriction on the service emmpty or null means no restriction
+#      n_neighbors: 1  The number of neighbors to consider when calculating the service location
+#      arival_time: "11:00" The time of arrival at the service location
+#      mace_codes: The MACE codes used to identify the service location in the CVR data
+#       - 862100
+services:
+    - service_type: doctor_gp
+      spatial_restriction_type: 
+      n_neighbors: 1
+      arival_time: "11:00"
+      mace_codes:
+        - 862100
+    - service_type: dentist
+      spatial_restriction_type: 
+      n_neighbors: 1
+      arival_time: "11:00"
+      mace_codes:
+        - 862300
+    - service_type: pharmacy
+      n_neighbors: 1
+      arival_time: "15:00"
+      spatial_restriction_type: 
+      mace_codes:
+        - 477300
+    - service_type: kindergarten
+      n_neighbors: 1
+      arival_time: "7:45"
+      spatial_restriction_type: "municipality"
+      mace_codes:
+        - 889130
+    - service_type: nursery
+      n_neighbors: 1
+      arival_time: "7:45"
+      spatial_restriction_type: "municipality"
+      mace_codes:
+        - 889120
+    - service_type: school
+      n_neighbors: 1
+      arival_time: "7:45"
+      spatial_restriction_type: "municipality"
+      mace_codes:
+        - 852010
+    - service_type: supermarket
+      n_neighbors: 1
+      arival_time: "17:00"
+      spatial_restriction_type:
+      mace_codes:
+        - 471120 # Supermarked
+        - 471130 # Discount sopermarkedet
+    - service_type: library 
+      spatial_restriction_type: 
+      n_neighbors: 1
+      arival_time: "16:00"
+      mace_codes:
+        - 911100
+    - service_type: train_station
+      spatial_restriction_type: 
+      n_neighbors: 1
+      arival_time: "7:30"
+      mace_codes:
+        - 49
+    - service_type: sports_facility
+      spatial_restriction_type:
+      n_neighbors: 1
+      arival_time: "19:00"
+      mace_codes:
+        - 93
+
+
+# The following parameters are used when calling OTP
+
+sample_size : 0 # Munber of rows to sample from the data 0 = all
+chunk_size : 10000  # number of rows to load into memory
+parallelism : 10  # The number of parallel processes to use when calling OTP
+
+# Define the endpoint URL
+otp_url : "http://localhost:8080/otp/gtfs/v1"
+
+otp_results : "otp_results.db" # The peristant duckdb  where the OTP results are stored
+
+# Define date used for OTP query (the time is defined in the service array)
+travel_date : "2025-04-22"
+
+
+# Filepaths for input data when calculating the travel matrix in the nearest.py (to and from)
+
+data_sources:
+  dwellings:
+    path: "muni3.parquet"
+    base_columns:
+      address_id: "adresseIdentificerer"
+      geometry: "geometry"  # EPSG:25832
+      road_point_lat: "vej_pos_lat"
+      road_point_long: "vej_pos_long"
+
+  services:
+    path: "cvr_osm_vejpos.parquet"
+    base_columns:
+      address_id: "Adr_id"
+      geometry: "geometry"
+      road_point_lat: "vej_pos_lat"
+      road_point_long: "vej_pos_long"
+      service_type: "hb_kode"  # The service type is used to identify the service in the data
