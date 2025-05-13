@@ -22,6 +22,7 @@ from src.helper_functions import (
     plot_hex_summaries,
     highlight_next_max,
     replace_nan_with_dash,
+    count_destinations_in_municipalities,
 )
 
 with open(r"../config-data-prep.yml", encoding="utf-8") as file:
@@ -45,12 +46,13 @@ sub_service_to_main = {
     "doctor": ["doctor-gp"],
     "dentist": ["dentist"],
     "pharmacy": ["pharmacy"],
-    "nursery/kindergarten": ["nursery", "kindergarten"],
-    "school": ["school"],
-    "recreation": [
-        "library",
-        "sports_facility",
+    "kindergarten-nursery": [
+        "kindergarten",
+        "nursery",
     ],
+    "school": ["school"],
+    "library": ["library"],
+    "sports_facility": ["sports_facility"],
     "shop": ["supermarket", "discount_supermarket"],
     "train_station": ["train_station"],
 }
@@ -261,148 +263,6 @@ assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_addresses)
 
 # %%
 
-plot_sub_types = False
-
-if plot_sub_types:
-    for service_type in osm_destinations["service_type"].unique():
-
-        fp = f"../results/maps/{service_type}-osm.png"
-        attribution_text = "(C) OSM Contributors"
-        color = osm_color
-        dest_col = service_type
-        study_area = study_area
-        font_size = 10
-        title = f"OSM {service_type.replace('_', ' ').title()}"
-        destination_col = "service_type"
-
-        plot_destinations(
-            osm_destinations,
-            study_area,
-            destination_col,
-            service_type,
-            color,
-            font_size,
-            fp,
-            attribution_text,
-            title,
-        )
-
-    for service_type in cvr_addresses["service_type"].unique():
-
-        fp = f"../results/maps/{service_type}-cvr.png"
-        attribution_text = "(C) CVR"
-        color = cvr_color
-        dest_col = service_type
-        study_area = study_area
-        font_size = 10
-        title = f"CVR {service_type.replace('_', ' ').title()}"
-        destination_col = "service_type"
-
-        plot_destinations(
-            cvr_addresses,
-            study_area,
-            destination_col,
-            service_type,
-            color,
-            font_size,
-            fp,
-            attribution_text,
-            title,
-        )
-
-# %%
-
-plot_main_types = False
-if plot_main_types:
-    # Plot services for each main category for each data set
-    for service_type in osm_destinations["service_type_main"].unique():
-
-        fp_type = service_type.replace("/", "-")
-
-        fp = f"../results/maps/main-{fp_type}-osm.png"
-        attribution_text = "(C) OSM Contributors"
-        color = osm_color
-        dest_col = service_type
-        study_area = study_area
-        font_size = 10
-        title = f"OSM {service_type.replace('_', ' ').title()}"
-        destination_col = "service_type_main"
-
-        plot_destinations(
-            osm_destinations,
-            study_area,
-            destination_col,
-            service_type,
-            color,
-            font_size,
-            fp,
-            attribution_text,
-            title,
-        )
-
-    for service_type in cvr_addresses["service_type_main"].unique():
-
-        fp_type = service_type.replace("/", "-")
-
-        fp = f"../results/maps/main-{fp_type}-cvr.png"
-        attribution_text = "(C) CVR"
-        color = cvr_color
-        dest_col = service_type
-        study_area = study_area
-        font_size = 10
-        title = f"CVR {service_type.replace('_', ' ').title()}"
-        destination_col = "service_type_main"
-
-        plot_destinations(
-            cvr_addresses,
-            study_area,
-            destination_col,
-            service_type,
-            color,
-            font_size,
-            fp,
-            attribution_text,
-            title,
-        )
-
-# %%
-plot_combined_data = False
-
-if plot_combined_data:
-    # Make combined maps for each main category
-    for service_type in osm_cvr_combined["service_type_main"].unique():
-
-        fp_type = service_type.replace("/", "-")
-
-        fp = f"../results/maps/main-{fp_type}-osm-cvr.png"
-        attribution_text = "(C) OSM, CVR"
-        color1 = osm_color
-        color2 = cvr_color
-        dest_col = service_type
-        study_area = study_area
-        font_size = 10
-        title = f"{service_type.replace('_', ' ').title()}"
-        destination_col = "service_type_main"
-
-        plot_destinations_combined(
-            osm_destinations,
-            cvr_addresses,
-            "OSM",
-            "CVR",
-            study_area,
-            destination_col,
-            service_type,
-            color1,
-            color2,
-            font_size,
-            fp,
-            attribution_text,
-            title,
-        )
-
-
-# %%
-
 # Make one map with all main categories
 fp = f"../results/maps/main-all-osm-cvr.png"
 attribution_text = "(C) OSM, CVR"
@@ -412,6 +272,122 @@ dest_col = "service_type"
 study_area = study_area
 font_size = 10
 destination_col = "service_type_main"
+
+
+from matplotlib_scalebar.scalebar import ScaleBar
+import matplotlib.pyplot as plt
+import math
+import contextily as cx
+
+
+def plot_destinations_combined_subplot(
+    data1,
+    data2,
+    data1_label,
+    data2_label,
+    study_area,
+    destination_col,
+    color1,
+    color2,
+    font_size,
+    fp,
+    attribution_text,
+    figsize=(15, 10),
+    markersize=6,
+):
+
+    unique_destinations = set(data1[destination_col].unique()).union(
+        data2[destination_col].unique()
+    )
+
+    unique_destinations = sorted(unique_destinations)
+
+    _, axes = plt.subplots(
+        nrows=2, ncols=math.ceil(len(unique_destinations) / 2), figsize=figsize
+    )
+
+    axes = axes.flatten()
+
+    if len(axes) > len(unique_destinations):
+
+        axes[-1].axis("off")
+
+    for i, destination in enumerate(unique_destinations):
+
+        title = f"{destination.replace('_', ' ').title()}"
+
+        ax = axes[i]
+
+        study_area.plot(ax=ax, color="white", edgecolor="black", linewidth=0.5)
+
+        data1[data1[destination_col] == destination].plot(
+            ax=ax,
+            color=color1,
+            markersize=markersize,
+            label=data1_label,
+            legend=True,
+            alpha=0.5,
+        )
+
+        data2[data2[destination_col] == destination].plot(
+            ax=ax,
+            color=color2,
+            markersize=markersize,
+            label=data2_label,
+            legend=True,
+            alpha=0.5,
+        )
+
+        ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+        ax.set_axis_off()
+
+    # TODO: fix legend position so that it is aligned with scale bar and attribution text
+    middle_ax = axes[(len(axes) // 2) - 1]
+    middle_ax.legend(
+        loc="upper right",
+        fontsize=font_size,
+        # title_fontsize=10,
+        # title="OSM",
+        markerscale=3,
+        frameon=False,
+        bbox_to_anchor=(1, 1),
+    )
+
+    axes[len(axes) // 2].add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+
+    cx.add_attribution(
+        ax=axes[len(unique_destinations) - 1],
+        text=attribution_text,
+        font_size=font_size,
+    )
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        fp,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.show()
+
+    plt.close()
 
 
 plot_destinations_combined_subplot(
@@ -511,67 +487,9 @@ for i, service in enumerate(unique_destinations):
 # %%
 
 
-def highlight_zero(x):
-    return ["color: red" if v == 0 else "" for v in x]
+analyse_destinations_per_municipality = True
 
-
-def count_destinations_in_municipalities(
-    municipalities, muni_id_col, destinations, destination_col, csv_fp, html_fp
-):
-
-    muni_destinations = municipalities.sjoin(
-        destinations, how="inner", predicate="intersects"
-    )
-
-    muni_service_counts = (
-        muni_destinations.groupby([muni_id_col, destination_col])
-        .size()
-        .reset_index(name="count")
-    )
-
-    muni_service_pivot = muni_service_counts.pivot(
-        index="navn", columns=destination_col, values="count"
-    ).fillna(0)
-
-    muni_service_pivot.loc["Total"] = muni_service_pivot.sum()
-
-    muni_service_pivot = muni_service_pivot.astype(int)
-    df_styled = (
-        muni_service_pivot.style.apply(
-            highlight_zero, subset=muni_service_pivot.columns, axis=1
-        )
-        .set_table_styles(
-            [
-                {"selector": "th", "props": [("font-weight", "bold")]},
-            ]
-        )
-        .set_properties(
-            **{"text-align": "right", "font-size": "12px", "width": "100px"}
-        )
-        .set_caption("Municipal service counts")
-    )
-    df_styled = df_styled.set_table_attributes(
-        'style="width: 50%; border-collapse: collapse;"'
-    )
-
-    # muni_subset_with_counts = muni_subset.merge(
-    #     muni_service_pivot, left_on="navn", right_index=True, how="left"
-    # )
-
-    # muni_subset_with_counts = muni_subset_with_counts.fillna(0)
-
-    muni_service_pivot.to_csv(csv_fp, index=True)
-
-    df_styled.to_html(
-        html_fp,
-    )
-
-    return df_styled
-
-
-analyse_destionations_per_municipality = True
-
-if analyse_destionations_per_municipality:
+if analyse_destinations_per_municipality:
 
     # Load municipality data
     muni_data = gpd.read_file(sub_adm_boundaries_fp)

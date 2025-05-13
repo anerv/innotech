@@ -209,6 +209,10 @@ def highlight_nan(x):
     return ["color: grey" if pd.isna(v) else "" for v in x]
 
 
+def highlight_zero(x):
+    return ["color: red" if v == 0 else "" for v in x]
+
+
 # Define the styling function for max values in each row
 def highlight_max(x):
     is_max = x == x.max()
@@ -226,6 +230,60 @@ def highlight_next_max(row, color="lightyellow"):
         second_highest_value = sorted_values.iloc[1]
         return [attr if val == second_highest_value else "" for val in row]
     return [""] * len(row)
+
+
+def count_destinations_in_municipalities(
+    municipalities, muni_id_col, destinations, destination_col, csv_fp, html_fp
+):
+
+    muni_destinations = municipalities.sjoin(
+        destinations, how="inner", predicate="intersects"
+    )
+
+    muni_service_counts = (
+        muni_destinations.groupby([muni_id_col, destination_col])
+        .size()
+        .reset_index(name="count")
+    )
+
+    muni_service_pivot = muni_service_counts.pivot(
+        index="navn", columns=destination_col, values="count"
+    ).fillna(0)
+
+    muni_service_pivot.loc["Total"] = muni_service_pivot.sum()
+
+    muni_service_pivot = muni_service_pivot.astype(int)
+    df_styled = (
+        muni_service_pivot.style.apply(
+            highlight_zero, subset=muni_service_pivot.columns, axis=1
+        )
+        .set_table_styles(
+            [
+                {"selector": "th", "props": [("font-weight", "bold")]},
+            ]
+        )
+        .set_properties(
+            **{"text-align": "right", "font-size": "12px", "width": "100px"}
+        )
+        .set_caption("Municipal service counts")
+    )
+    df_styled = df_styled.set_table_attributes(
+        'style="width: 50%; border-collapse: collapse;"'
+    )
+
+    # muni_subset_with_counts = muni_subset.merge(
+    #     muni_service_pivot, left_on="navn", right_index=True, how="left"
+    # )
+
+    # muni_subset_with_counts = muni_subset_with_counts.fillna(0)
+
+    muni_service_pivot.to_csv(csv_fp, index=True)
+
+    df_styled.to_html(
+        html_fp,
+    )
+
+    return df_styled
 
 
 def plot_destinations(
@@ -388,7 +446,7 @@ def plot_destinations_combined_subplot(
     font_size,
     fp,
     attribution_text,
-    figsize=(15, 15),
+    figsize=(15, 10),
     markersize=6,
 ):
 
@@ -399,10 +457,14 @@ def plot_destinations_combined_subplot(
     unique_destinations = sorted(unique_destinations)
 
     _, axes = plt.subplots(
-        nrows=2, ncols=int(len(unique_destinations) / 2), figsize=figsize
+        nrows=2, ncols=math.ceil(len(unique_destinations) / 2), figsize=figsize
     )
 
     axes = axes.flatten()
+
+    if len(axes) > len(unique_destinations):
+
+        axes[-1].axis("off")
 
     for i, destination in enumerate(unique_destinations):
 
@@ -459,9 +521,13 @@ def plot_destinations_combined_subplot(
         )
     )
 
-    cx.add_attribution(ax=axes[-1], text=attribution_text, font_size=font_size)
+    cx.add_attribution(
+        ax=axes[len(unique_destinations) - 1],
+        text=attribution_text,
+        font_size=font_size,
+    )
     txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
+    txt.set_position([1, 0.01])
     txt.set_ha("right")
     txt.set_va("bottom")
 
