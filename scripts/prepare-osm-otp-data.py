@@ -6,8 +6,8 @@ import os
 from pathlib import Path
 import yaml
 import geopandas as gpd
-from shapely.ops import transform
 import subprocess
+from src.helper_functions import remove_z
 
 with open(r"../config-data-prep.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
@@ -24,12 +24,6 @@ clipfile = datafolder / f"processed/adm_boundaries/study_area.geojson"
 
 
 # %%
-# Function to remove Z-coordinate
-def remove_z(geometry):
-    if geometry.has_z:
-        return transform(lambda x, y, z=None: (x, y), geometry)
-    return geometry
-
 
 # make geojson of the study area
 study_area = gpd.read_file(study_area_fp)

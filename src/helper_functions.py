@@ -10,6 +10,13 @@ from matplotlib import colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import math
 import numpy as np
+from shapely.ops import transform
+
+
+def remove_z(geometry):
+    if geometry.has_z:
+        return transform(lambda x, y, z=None: (x, y), geometry)
+    return geometry
 
 
 def drop_duplicates_custom(gdf, subset_columns, value_column):
