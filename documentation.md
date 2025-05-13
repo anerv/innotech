@@ -22,6 +22,10 @@ pip install matplotlib-scalebar
 pip install -e .
 ````
 
+
+conda install conda-forge::osmium-tool
+
+
 ## Inputdata
 
 - Adresse-data fra DAR (adresser, husnumre, og adganspunkter) for den ønskede region.
