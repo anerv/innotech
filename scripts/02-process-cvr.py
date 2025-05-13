@@ -14,7 +14,7 @@ with open(r"../config.yml") as file:
     cvr_address_input_fp = parsed_yaml_file["cvr_address_input_fp"]
     cvr_brancher_input_fp = parsed_yaml_file["cvr_brancher_input_fp"]
     cvr_penhed_input_fp = parsed_yaml_file["cvr_penhed_input_fp"]
-    address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
+    # address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
@@ -115,7 +115,7 @@ cvr_subset["service_type"] = cvr_subset["hb_kode"].map(
 )
 
 # %%
-# Join to address data - just used to find entities in the region and for data quality analysis
+# Join to address data -
 cvr_address_geoms = gpd.read_parquet(addresses_fp_all)  # prepared in 00-script
 
 cvr_address_geoms = pd.merge(

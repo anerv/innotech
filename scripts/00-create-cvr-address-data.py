@@ -11,7 +11,7 @@ import yaml
 with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
-    address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
+    # address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
     address_bbr_fp = parsed_yaml_file["address_bbr_fp"]
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
@@ -99,27 +99,26 @@ addresses_with_geoms.rename(
 )
 addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
-# %%
 
 addresses_with_geoms.to_parquet(addresses_fp_all, index=False)
+# %%
+# # filter addresses to only include those within the region
+# administrative_boundaries = gpd.read_file(adm_boundaries_fp)
 
-# filter addresses to only include those within the region
-administrative_boundaries = gpd.read_file(adm_boundaries_fp)
+# region = administrative_boundaries[administrative_boundaries["navn"] == study_area_name]
 
-region = administrative_boundaries[administrative_boundaries["navn"] == study_area_name]
+# region = region[["navn", "geometry"]]
 
-region = region[["navn", "geometry"]]
+# region.to_file(study_area_fp)
 
-region.to_file(study_area_fp)
+# region.sindex
+# addresses_with_geoms.sindex
 
-region.sindex
-addresses_with_geoms.sindex
+# region_add = gpd.sjoin(region, addresses_with_geoms, predicate="intersects")
 
-region_add = gpd.sjoin(region, addresses_with_geoms, predicate="intersects")
+# addresses_region = addresses_with_geoms[
+#     addresses_with_geoms.index.isin(region_add.index_right)
+# ]
 
-addresses_region = addresses_with_geoms[
-    addresses_with_geoms.index.isin(region_add.index_right)
-]
-
-addresses_region.to_parquet(address_cvr_fp, index=False)
+# addresses_region.to_parquet(address_cvr_fp, index=False)
 # %%

@@ -27,7 +27,7 @@ with open(r"../config.yml", encoding="utf-8") as file:
     study_area_fp = parsed_yaml_file["study_area_fp"]
     study_area_name = parsed_yaml_file["study_area_name"]
 
-    address_fp_parquet = parsed_yaml_file["address_cvr_fp"]
+    addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
 
     hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
 
@@ -174,7 +174,7 @@ all_osm_gdf.drop_duplicates(subset=["osm_id", "service_type"], inplace=True)
 # %%
 
 #  match to closest addresses
-addresses = gpd.read_parquet(address_fp_parquet)  # adresseIdentificerer
+addresses = gpd.read_parquet(addresses_fp_all)  # adresseIdentificerer
 # addresses.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
 
 join_threshold = 500  # meters
