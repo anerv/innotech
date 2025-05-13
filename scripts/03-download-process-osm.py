@@ -20,7 +20,7 @@ from src.helper_functions import (
 
 # %%
 
-with open(r"../config.yml", encoding="utf-8") as file:
+with open(r"../config-data-prep.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]

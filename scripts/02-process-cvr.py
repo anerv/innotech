@@ -8,7 +8,7 @@ import yaml
 
 # %%
 
-with open(r"../config.yml") as file:
+with open(r"../config-data-prep.yml") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     cvr_address_input_fp = parsed_yaml_file["cvr_address_input_fp"]
