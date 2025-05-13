@@ -28,17 +28,18 @@ addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
 sub_study_areas_fp: "../data/processed/adm_boundaries/sub_areas.parquet"
 
+address_bbr_fp: "../data/processed/bbr/adgangsadresser_beboelse.parquet"
+
+destinations_combined_agg_fp: "../data/processed/destinations/osm-cvr-combined-aggregated.parquet"
+destinations_combined_fp: "../data/processed/destinations/osm-cvr-combined.parquet"
+
 osm_destinations_fp: "../data/processed/osm/all_osm_services.gpkg"
 cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
 cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
 
 
 # RESULTS
-#address_cvr_fp: "../results/data/all_addresses_cvr.parquet" 
-address_bbr_fp: "../results/data/adgangsadresser_beboelse.parquet"
 
-destinations_combined_agg_fp: "../results/data/osm-cvr-combined-aggregated.parquet"
-destinations_combined_fp: "../results/data/osm-cvr-combined.parquet"
 
 # NOTE: Filepaths for exported maps, html, and csv files are defined in the py-scripts
 
