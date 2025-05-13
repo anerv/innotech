@@ -7,7 +7,7 @@ Projektet kræver en installation af Python, Jupyter, Conda og pip. For at insta
 **Klon GitHub repository**
 
 ````bash
-git clone -b main --single-branch https://github.com/anerv/innotech-data-processing --depth 1
+git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
 ````
 
 **Skab Conda environment**
