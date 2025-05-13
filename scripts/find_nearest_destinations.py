@@ -2,9 +2,9 @@
 # # 🚀 Nearest Neighbor Search
 # This script identifyes the cearest sercive to a given adress using Scikit-Learn.
 # The script is designed so it can be run from the command line and takes a configuration file as input.
-# The output is a parquet file with the nearest neighbor for each dwelling. and a lat long coordinate designed for use with Open Trip Planner
+# The output is a parquet file with the nearest neighbor for each dwelling. and a lat lon coordinate designed for use with Open Trip Planner
 
-# %%%  Step 0 load libarins and configuation
+# %%%  Step 0 load libaries and configuation
 
 import yaml
 from pathlib import Path
@@ -19,6 +19,20 @@ con.execute("INSTALL spatial;")
 con.execute("LOAD spatial;")
 
 # %%
+# Define the path to the config.yml file
+script_path = Path(__file__).resolve()
+root_path = script_path.parent.parent
+data_path = root_path / "data"
+
+config_path = root_path / "config-model.yml"
+
+# Read and parse the YAML file
+with open(config_path, "r") as file:
+    config_data = yaml.safe_load(file)
+# %%
+
+# Helper functions
+
 # Define a function to validate the restriction configuration
 
 
@@ -80,21 +94,7 @@ def validate_restriction_config(config, duck_con):
     return {name: defined_restrictions[name] for name in used_restrictions}
 
 
-# %%
-# Define the path to the config.yml file
-script_path = Path(__file__).resolve()
-root_path = script_path.parent.parent
-data_path = root_path / "data"
-
-config_path = root_path / "config.yml"
-
-# Read and parse the YAML file
-with open(config_path, "r") as file:
-    config_data = yaml.safe_load(file)
-
-validated_restrictions = validate_restriction_config(config_data, con)
-
-# %% Inrich adresses with and service data with restriction id.
+# Enrich adresses with and service data with restriction id.
 
 
 def assign_restriction_to_table(con, restriction_config, table_name: str):
@@ -209,7 +209,7 @@ def load_table_with_restrictions(
     # Build filter clause based on expected base fields
     geom_col = base_columns.get("geometry", "geometry")
     lat_col = base_columns.get("road_point_lat", "vej_pos_lat")
-    lon_col = base_columns.get("road_point_long", "vej_pos_long")
+    lon_col = base_columns.get("road_point_lon", "vej_pos_lon")
 
     sql = f"""
         CREATE OR REPLACE TEMP TABLE {table_name} AS
@@ -235,9 +235,14 @@ def load_table_with_restrictions(
 
 
 # %%
+# --- Step 0: Load the configuration file and validate restrictions ---
+validated_restrictions = validate_restriction_config(config_data, con)
+
+# %%
 #  --- Step 1: Load the adresses of all dwellings  ---
 
 source_cfg = config_data["data_sources"]["dwellings"]
+
 load_table_with_restrictions(
     con,
     data_path / source_cfg["path"],
@@ -245,14 +250,18 @@ load_table_with_restrictions(
     validated_restrictions=validated_restrictions,
     table_name="dwellings",
 )
-# If anny restrictions are defined, apply them to the dwellings
+# If any restrictions are defined, apply them to the dwellings
 for name, restriction_config in validated_restrictions.items():
     assign_restriction_if_missing(con, restriction_config, "dwellings")
 
 dwellings_df = con.execute("SELECT * FROM dwellings").df()
+
+
 # %%
-# ---  step 2:  itterate over the services
+
+# ---  Step 2:  iterate over the services
 source_cfg = config_data["data_sources"]["services"]
+
 load_table_with_restrictions(
     con,
     data_path / source_cfg["path"],
@@ -261,16 +270,13 @@ load_table_with_restrictions(
     table_name="all_services",
 )
 # %%
-# If anny restrictions are defined, apply them to the dwellings
+# If any restrictions are defined, apply them to the dwellings
 for name, restriction_config in validated_restrictions.items():
     assign_restriction_if_missing(con, restriction_config, "all_services")
 
 # %%
 con.execute("SELECT * FROM all_services LIMIT 10").df()
 # %%
-service_df
-# %%
-
 
 services = config_data["services"]
 
@@ -311,7 +317,7 @@ for service in services:
         dwellings_df = con.execute(
             f"""
             SELECT 
-                address_id, x, y, road_point_lat, road_point_long
+                address_id, x, y, road_point_lat, road_point_lon
                 {f", {restriction_col}" if restriction_col else ""}
             FROM dwellings
             WHERE {restriction_filter}
@@ -321,7 +327,7 @@ for service in services:
         services_df = con.execute(
             f"""
             SELECT 
-                address_id, x, y, road_point_lat, road_point_long
+                address_id, x, y, road_point_lat, road_point_lon
                 {f", {restriction_col}" if restriction_col else ""}
             FROM all_services
             WHERE service_type IN ({nace_list_sql})
@@ -354,10 +360,10 @@ for service in services:
                 record = {
                     "source_adress_id": src.address_id,
                     "source_lat": src.road_point_lat,
-                    "source_long": src.road_point_long,
+                    "source_lon": src.road_point_lon,
                     "dest_adress_id": dst.address_id,
                     "dest_lat": dst.road_point_lat,
-                    "dest_long": dst.road_point_long,
+                    "dest_lon": dst.road_point_lon,
                     "dest_distance": dist,
                     "n": n,
                 }
@@ -373,7 +379,7 @@ for service in services:
             print(f"⚠️  No matches found for {service_type} at n={n}")
             continue
         df_out = pd.DataFrame(records)
-        output_path = data_path / f"{service_type}_{n}.parquet"
+        output_path = data_path / f"processed/destinations/{service_type}_{n}.parquet"
         df_out.to_parquet(output_path, index=False)
         print(f"✅ Saved {output_path} with {len(df_out)} rows.")
 
