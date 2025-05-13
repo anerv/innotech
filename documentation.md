@@ -20,10 +20,9 @@ conda create -n innotech --strict-channel-priority geopandas pyyaml pyarrow over
 conda activate innotech
 pip install matplotlib-scalebar
 pip install -e .
+conda install conda-forge::osmium-tool
 ````
 
-
-conda install conda-forge::osmium-tool
 
 
 ## Inputdata
