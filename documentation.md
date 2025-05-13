@@ -12,7 +12,7 @@ git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
 
 **Skab Conda environment**
 ```bash
-conda create -n innotech --strict-channel-priority geopandas pyyaml pyarrow overpy contextily h3-py ipykernel
+conda create -n innotech --strict-channel-priority geopandas pyyaml pyarrow overpy contextily sklearn h3-py ipykernel
 ```
 
 **Aktiver Conda environment og installer sidste elementer**
@@ -20,10 +20,13 @@ conda create -n innotech --strict-channel-priority geopandas pyyaml pyarrow over
 conda activate innotech
 pip install matplotlib-scalebar
 pip install -e .
+pip install duckdb
 conda install conda-forge::osmium-tool
 ````
 
-
+````bash
+winget install DuckDB.cli
+````
 
 ## Inputdata
 
