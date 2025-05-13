@@ -100,6 +100,8 @@ osm_export_types:
 - kindergarten-nursery
 -  #school
 - recreation
+- library
+- sports_facility
 - shop
 - train_station
 
@@ -109,7 +111,8 @@ cvr_export_types:
 - pharmacy
 - kindergarten-nursery
 - school
-- recreation
+- library
+- sports_facility
 - shop
 - train_station
 

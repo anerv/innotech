@@ -32,7 +32,7 @@ with open(r"../config-data-prep.yml", encoding="utf-8") as file:
 
 # %%
 
-# Load the data
+# Load the  data
 cvr_addresses = gpd.read_file("../data/processed/cvr/cvr-services-w-address.gpkg")
 
 osm_destinations = gpd.read_file("../data/processed/osm/all_osm_services.gpkg")
