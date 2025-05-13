@@ -10,12 +10,8 @@ import yaml
 from src.helper_functions import (
     create_nodes_gdf,
     create_ways_gdf,
-    # create_relations_gdf,
     linestring_to_polygon,
     drop_contained_polygons,
-    # drop_intersecting_nodes,
-    # combine_points_within_distance,
-    drop_duplicates_custom,
 )
 
 # %%
