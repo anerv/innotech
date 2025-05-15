@@ -23,70 +23,70 @@ restrictions:
 #      spatial_restriction_type: Used to define the type of spatial restriction on the service emmpty or null means no restriction
 #      n_neighbors: 1  The number of neighbors to consider when calculating the service location
 #      arival_time: "11:00" The time of arrival at the service location
-#      mace_codes: The MACE codes used to identify the service location in the CVR data
+#      nace_codes: The NACE codes used to identify the service location in the CVR data
 #       - 862100
 services:
     - service_type: doctor_gp
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "11:00"
-      mace_codes:
+      nace_codes:
         - 862100
     - service_type: dentist
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "11:00"
-      mace_codes:
+      nace_codes:
         - 862300
     - service_type: pharmacy
       n_neighbors: 1
       arival_time: "15:00"
       spatial_restriction_type: 
-      mace_codes:
+      nace_codes:
         - 477300
     - service_type: kindergarten-nursery
       n_neighbors: 1
       arival_time: "7:45"
       spatial_restriction_type: "municipality"
-      mace_codes:
+      nace_codes:
         - 889130
         - 889120
     # - service_type: nursery
     #   n_neighbors: 1
     #   arival_time: "7:45"
     #   spatial_restriction_type: "municipality"
-    #   mace_codes:
+    #   nace_codes:
     #     - 889120
     - service_type: school
       n_neighbors: 1
       arival_time: "7:45"
       spatial_restriction_type: "municipality"
-      mace_codes:
+      nace_codes:
         - 852010
     - service_type: supermarket
       n_neighbors: 1
       arival_time: "17:00"
       spatial_restriction_type:
-      mace_codes:
+      nace_codes:
         - 471120 # Supermarked
         - 471130 # Discount sopermarkedet
     - service_type: library 
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "16:00"
-      mace_codes:
+      nace_codes:
         - 911100
     - service_type: train_station
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "7:30"
-      mace_codes:
+      nace_codes:
         - 49
     - service_type: sports_facility
       spatial_restriction_type:
       n_neighbors: 1
       arival_time: "19:00"
-      mace_codes:
+      nace_codes:
         - 93
 
 
