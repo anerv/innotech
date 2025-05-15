@@ -250,6 +250,7 @@ load_table_with_restrictions(
     validated_restrictions=validated_restrictions,
     table_name="dwellings",
 )
+
 # If any restrictions are defined, apply them to the dwellings
 for name, restriction_config in validated_restrictions.items():
     assign_restriction_if_missing(con, restriction_config, "dwellings")
@@ -269,7 +270,7 @@ load_table_with_restrictions(
     validated_restrictions=validated_restrictions,
     table_name="all_services",
 )
-# %%
+
 # If any restrictions are defined, apply them to the dwellings
 for name, restriction_config in validated_restrictions.items():
     assign_restriction_if_missing(con, restriction_config, "all_services")
@@ -282,7 +283,7 @@ services = config_data["services"]
 
 for service in services:
     service_type = service["service_type"]
-    nace_codes = service["mace_codes"]
+    nace_codes = service["nace_codes"]
     n_neighbors = service["n_neighbors"]
     restriction_name = service.get("spatial_restriction_type")
     restriction_col = f"{restriction_name}_id" if restriction_name else None
