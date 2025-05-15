@@ -1,6 +1,13 @@
-src.egg-info/*
+
 
 *.pyc
+*.jar
+*.pbf
+*.zip
+
+src.egg-info/*
+*.egg-info/*
+
 results/*
 data/input/*
 data/processed/*
@@ -8,11 +15,12 @@ data/processed/*
 illustrations/*.png
 illustrations/*.parquet
 
-todo.md
-data/repositories.lnk
-data/non_overlap_addr.gpkg
-
-*.jar
-*.pbf
-*.zip
 otp/Rejseplanen+NeTEx/
+otp/report/
+otp/graph.obj
+
+
+todo.md
+
+
+
