@@ -28,7 +28,12 @@ conda install conda-forge::osmium-tool
 winget install DuckDB.cli
 ````
 
+
+MISSING: JAVA 21, OTP
+
 ## Inputdata
+
+### Destinationer og adresser
 
 - Adresse-data fra DAR (adresser, husnumre, og adganspunkter) for den ønskede region.
 - BBR-data (enheder) for den ønskede region.
@@ -37,12 +42,21 @@ winget install DuckDB.cli
 
 Alle data kan downloades fra Datafordeleren.
 
-- netex, osm
-
 Se config.yml for forventede filnavne og placeringer.
+
+### Inputdata til OTP
+
+- OpenStreetMap: XXXX
+- NeTEx: XXXX
+
 
 ## Anvendelse
 
-Kør alle Python-scripts i mappen `scripts` i nummereret rækkefølge. Resultater eksporteres automatisk til mappen `results`.
+### Generer inputdata
 
+
+### Kør OTP
+
+
+### Analyser resultater
 
