@@ -37,6 +37,8 @@ winget install DuckDB.cli
 
 Alle data kan downloades fra Datafordeleren.
 
+- netex, osm
+
 Se config.yml for forventede filnavne og placeringer.
 
 ## Anvendelse
