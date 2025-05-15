@@ -19,7 +19,7 @@ with open(r"../config-data-prep.yml", encoding="utf-8") as file:
 
 datafolder = Path("/Users/anerv/repositories/innotech/data")
 input_pbf = datafolder / "input/osm/denmark-latest.osm.pbf"
-output_pbf = datafolder / "processed/osm/osm_study_area.pbf"
+output_pbf = datafolder / "otp/osm_study_area.pbf"
 clipfile = datafolder / f"processed/adm_boundaries/study_area.geojson"
 
 

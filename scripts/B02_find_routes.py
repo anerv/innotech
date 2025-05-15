@@ -28,7 +28,7 @@ with open(config_path, "r") as file:
 
 sample_size = config_data[
     "sample_size"
-]  # Munber of rows to sample from the data 0 = all
+]  # Nunber of rows to sample from the data 0 = all
 chunk_size = config_data["chunk_size"]  # number of rows to load into memory
 parallelism = config_data["parallelism"]  # number of parallel processes to use
 url = config_data["otp_url"]  # Load the OTP endpoint URL
