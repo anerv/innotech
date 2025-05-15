@@ -21,8 +21,8 @@ for f in data_folders:
 input_base = "data/input"
 processed_base = "data/processed"
 
-input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit"]
-processed_subfolders = ["cvr", "adresser", "bbr", "adm_boundaries"]
+input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit", "osm"]
+processed_subfolders = ["cvr", "adresser", "bbr", "adm_boundaries", "destinations"]
 
 for f in input_subfolders:
     if not os.path.exists(os.path.join(input_base, f)):
@@ -48,5 +48,12 @@ for f in result_subfolders:
 # illustration folder
 if not os.path.exists("illustrations"):
     os.mkdir("illustrations")
+
+    print("Successfully created folder: illustrations")
+
+
+# Folder for OTP data and results
+if not os.path.exists("otp"):
+    os.mkdir("otp")
 
     print("Successfully created folder: illustrations")
