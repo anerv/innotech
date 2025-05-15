@@ -97,7 +97,7 @@ chunk_size : 10000  # number of rows to load into memory
 parallelism : 10  # The number of parallel processes to use when calling OTP
 
 # Define the endpoint URL
-otp_url : "http://localhost:8080/otp/gtfs/v1"
+otp_url : "http://localhost:8080/otp/gtfs/v1" # http://localhost:8080/
 
 otp_results : "otp_results.db" # The persistant duckdb  where the OTP results are stored
 
