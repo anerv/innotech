@@ -1,6 +1,6 @@
 # %%
 
-# PREPARE OSM DATA FOR OTP
+# PREPARE OSM DATA FOR OTP + BUILD OTP GRAPH
 
 import os
 from pathlib import Path
@@ -20,8 +20,9 @@ with open(r"../config-data-prep.yml", encoding="utf-8") as file:
 ### PREPATE OSM DATA FOR OTP
 
 datafolder = Path("/Users/anerv/repositories/innotech/data")
+otp_folder = Path("/Users/anerv/repositories/innotech/otp")
 input_pbf = datafolder / "input/osm/denmark-latest.osm.pbf"
-output_pbf = datafolder / "otp/osm_study_area.pbf"
+output_pbf = otp_folder / "osm_study_area.pbf"
 clipfile = datafolder / f"processed/adm_boundaries/study_area.geojson"
 
 
@@ -44,12 +45,21 @@ print(result.decode("utf-8"))
 
 # %%
 # extract osm data for the study area
-os.system(f"osmium extract -p {clipfile} -o {output_pbf} {input_pbf}")
 
+if output_pbf.exists():
+    print(f"Output file {output_pbf} already exists. Deleting it.")
+    output_pbf.unlink()
+
+osm_cmd = f"osmium extract -p {clipfile} -o {output_pbf} {input_pbf}"
+os.system(osm_cmd)
+
+assert (
+    output_pbf.exists()
+), f"Output file {output_pbf} does not exist,extraction failed!"
+
+print(f"OSM data extracted to {output_pbf} successfully.")
 # %%
 #### BUILD OTP GRAPH
-
-# TODO: test
 
 otp_folder = Path("/Users/anerv/repositories/innotech/otp")
 osm_pbf = otp_folder / "osm_study_area.pbf"
@@ -71,9 +81,13 @@ config_exists = any(
 
 os.chdir("c:\\Users\\anerv\\repositories\\innotech\\otp\\")
 
+cmd = "java -Xmx2G -jar otp-shaded-2.7.0.jar --build --save ."
+
 if netex_zip_exists and osm_pbf_exists and config_exists and otp_exists:
     print("All required files are in place, building OTP graph...")
-    os.system("java -Xmx2G -jar otp-shaded-2.7.0.jar --build --save .")
+    # os.system(cmd)
+    result = subprocess.check_output(cmd, shell=True)
+    print(result.decode("utf-8"))
 
 else:
     print("Missing input data: Netex zip file or osm pbf file not found in otp folder!")
