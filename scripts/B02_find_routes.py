@@ -1,4 +1,4 @@
-# %%%  Step 0 load libarins and configuation
+# %%%  Step 0 load libraries and configuration
 
 import yaml
 from pathlib import Path
@@ -12,42 +12,59 @@ from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # %%
-con = duckdb.connect()
 
-# %%
 # Define the path to the config.yml file
 script_path = Path(__file__).resolve()
 root_path = script_path.parent.parent
-data_path = root_path / "data"
-config_path = root_path / "config.yml"
+data_path = root_path / "data/processed/destinations"
+results_path = root_path / "results"
+config_path = root_path / "config-model.yml"
 
 # Read and parse the YAML file
 with open(config_path, "r") as file:
-    config_data = yaml.safe_load(file)
+    config_model = yaml.safe_load(file)
 
 
-sample_size = config_data[
+sample_size = config_model[
     "sample_size"
-]  # Nunber of rows to sample from the data 0 = all
-chunk_size = config_data["chunk_size"]  # number of rows to load into memory
-parallelism = config_data["parallelism"]  # number of parallel processes to use
-url = config_data["otp_url"]  # Load the OTP endpoint URL
-date = config_data["travel_date"]  # Load the date of the travel
+]  # Number of rows to sample from the data 0 = all
+chunk_size = config_model["chunk_size"]  # number of rows to load into memory
+parallelism = config_model["parallelism"]  # number of parallel processes to use
+url = config_model["otp_url"]  # Load the OTP endpoint URL
+date = config_model["travel_date"]  # Load the date of the travel
 otp_db_fp = (
-    data_path / config_data["otp_results"]
+    results_path / config_model["otp_results"]
 )  # Load the persistant OTP database file path
+
 # %%
 
-# Open a persistent DuckDB database file Data is stored temporay in Dockdb and the exportet to parquet
+# DubckDB connection
+con = duckdb.connect()
+
+# Open a persistent DuckDB database file Data is stored temporay in Dockdb and then exported to parquet
 otp_con = duckdb.connect(otp_db_fp)
 
 
-# %% Define heper functions
+# %% Define helper functions
+
+
+# def convert_otp_time(millis, tz="Europe/Copenhagen"):
+#     if isinstance(millis, (int, float)) and millis > 0:
+#         try:
+#             return datetime.fromtimestamp(millis / 1000, tz=ZoneInfo(tz)).strftime(
+#                 "%Y-%-m-%-d:%-H,%M"
+#             )
+#         except Exception as e:
+#             print(f"Failed to convert timestamp {millis}: {e}")
+#             return None
+#     return None
+
+
 def convert_otp_time(millis, tz="Europe/Copenhagen"):
     if isinstance(millis, (int, float)) and millis > 0:
         try:
             return datetime.fromtimestamp(millis / 1000, tz=ZoneInfo(tz)).strftime(
-                "%Y-%-m-%-d:%-H,%M"
+                "%Y-%m-%d %H:%M"
             )
         except Exception as e:
             print(f"Failed to convert timestamp {millis}: {e}")
@@ -79,15 +96,19 @@ def get_travel_info(from_lat, from_lon, to_lat, to_lon, date, time, walk_speed=1
     response = requests.post(url, json={"query": query})
     # print(f"Error: {response.status_code} - {response.text}")
 
+    # print(response.json())
+
     return response.json()
 
 
 # %% Process the individual service types
 
 
-def process_adresses(dataset, sampelsize, time, chunk_size=1000, max_workers=16):
-    filenme = dataset + ".parquet"
-    data = data_path / filenme
+def process_adresses(
+    dataset, sampelsize, time, chunk_size=1000, max_workers=16, otp_con=otp_con, con=con
+):
+    filename = dataset + ".parquet"
+    data = data_path / filename
     dataset = dataset.replace("-", "_")
 
     # Create target table
@@ -129,25 +150,29 @@ def process_adresses(dataset, sampelsize, time, chunk_size=1000, max_workers=16)
     def process_row(row, date, time):
         try:
             travel_info = get_travel_info(
-                row.source_lat, row.source_long, row.dest_lat, row.dest_long, date, time
+                row.source_lat, row.source_lon, row.dest_lat, row.dest_lon, date, time
             )
             itinerary = travel_info["data"]["plan"]["itineraries"][0]
             return (
                 row.source_adress_id,
                 row.dest_adress_id,
                 row.source_lat,
-                row.source_long,
+                row.source_lon,
                 convert_otp_time(itinerary["startTime"]),
                 itinerary["duration"],
                 itinerary["walkDistance"],
                 row.dest_distance,
             )
-        except Exception:
+        except Exception as e:
+            # Print the type and message of the exception
+            print(f"Exception type: {type(e).__name__}, Message: {str(e)}")
+            print(row.source_lat, row.source_lon, row.dest_lat, row.dest_lon)
+
             return (
                 row.source_adress_id,
                 row.dest_adress_id,
                 row.source_lat,
-                row.source_long,
+                row.source_lon,
                 np.nan,
                 np.nan,
                 np.nan,
@@ -185,9 +210,10 @@ def process_adresses(dataset, sampelsize, time, chunk_size=1000, max_workers=16)
         offset += chunk_size
 
 
-# #%%
-services = config_data["services"]
-for service in services:
+# %%
+services = config_model["services"]
+
+for service in services[0:1]:
     for i in range(1, int(service["n_neighbors"]) + 1):
         dataset = f"{service['service_type']}_{i}"
         # Process each dataset
@@ -201,6 +227,27 @@ for service in services:
         tabelname = dataset.replace("-", "_")
         otp_con.execute(
             f"""
-            COPY (SELECT * FROM {tabelname}) TO '{data_path}/{dataset}_otp.parquet' (FORMAT 'parquet')
+            COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_otp.parquet' (FORMAT 'parquet')
         """
         )
+
+# %%
+
+fp = f"{results_path}/{dataset}_otp.parquet"
+test = pd.read_parquet(fp)
+test.head()
+# %%
+
+time = "11:00"
+
+source_lat = 55.5787960692651555
+source_lon = 12.0655944459317
+dest_lat = 55.63996791544005
+dest_lon = 12.067092519876377
+
+travel_info = get_travel_info(source_lat, source_lon, dest_lat, dest_lon, date, time)
+
+# %%
+
+# source = 55.5787960692651555 12.0655944459317
+# dest = 55.63996791544005 12.067092519876377
