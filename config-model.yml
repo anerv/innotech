@@ -93,7 +93,7 @@ services:
 # The following parameters are used when calling OTP
 
 sample_size : 0 # Munber of rows to sample from the data 0 = all
-chunk_size : 10000  # number of rows to load into memory
+chunk_size : 5000  # number of rows to load into memory
 parallelism : 10  # The number of parallel processes to use when calling OTP
 
 # Define the endpoint URL
