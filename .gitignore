@@ -20,7 +20,9 @@ otp/report/
 otp/graph.obj
 
 
+data/otp_results.db
+data/otp_results.db.wal
+
+
+
 todo.md
-
-
-
