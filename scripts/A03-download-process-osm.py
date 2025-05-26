@@ -176,14 +176,6 @@ addresses = gpd.read_parquet(addresses_fp_all)  # adresseIdentificerer
 join_threshold = 500  # meters
 assert all_osm_gdf.crs == addresses.crs, "CRS mismatch between all_osm and addresses"
 
-# joined = gpd.sjoin_nearest(
-#     all_osm_gdf,
-#     addresses,
-#     how="left",
-#     max_distance=join_threshold,
-#     lsuffix="osm",
-#     rsuffix="addr",
-# )
 
 joined = gpd.sjoin_nearest(
     all_osm_gdf,
