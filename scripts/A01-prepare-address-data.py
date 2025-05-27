@@ -101,24 +101,5 @@ addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
 
 addresses_with_geoms.to_parquet(addresses_fp_all, index=False)
-# %%
-# # filter addresses to only include those within the region
-# administrative_boundaries = gpd.read_file(adm_boundaries_fp)
 
-# region = administrative_boundaries[administrative_boundaries["navn"] == study_area_name]
-
-# region = region[["navn", "geometry"]]
-
-# region.to_file(study_area_fp)
-
-# region.sindex
-# addresses_with_geoms.sindex
-
-# region_add = gpd.sjoin(region, addresses_with_geoms, predicate="intersects")
-
-# addresses_region = addresses_with_geoms[
-#     addresses_with_geoms.index.isin(region_add.index_right)
-# ]
-
-# addresses_region.to_parquet(address_cvr_fp, index=False)
 # %%

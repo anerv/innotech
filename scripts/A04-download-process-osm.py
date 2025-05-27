@@ -211,7 +211,5 @@ joined = joined[
     ]
 ]
 
-# %%
-
 joined.to_file(osm_destinations_fp, driver="GPKG")
 # %%

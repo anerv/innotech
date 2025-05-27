@@ -274,122 +274,6 @@ font_size = 10
 destination_col = "service_type_main"
 
 
-from matplotlib_scalebar.scalebar import ScaleBar
-import matplotlib.pyplot as plt
-import math
-import contextily as cx
-
-
-def plot_destinations_combined_subplot(
-    data1,
-    data2,
-    data1_label,
-    data2_label,
-    study_area,
-    destination_col,
-    color1,
-    color2,
-    font_size,
-    fp,
-    attribution_text,
-    figsize=(15, 10),
-    markersize=6,
-):
-
-    unique_destinations = set(data1[destination_col].unique()).union(
-        data2[destination_col].unique()
-    )
-
-    unique_destinations = sorted(unique_destinations)
-
-    _, axes = plt.subplots(
-        nrows=2, ncols=math.ceil(len(unique_destinations) / 2), figsize=figsize
-    )
-
-    axes = axes.flatten()
-
-    if len(axes) > len(unique_destinations):
-
-        axes[-1].axis("off")
-
-    for i, destination in enumerate(unique_destinations):
-
-        title = f"{destination.replace('_', ' ').title()}"
-
-        ax = axes[i]
-
-        study_area.plot(ax=ax, color="white", edgecolor="black", linewidth=0.5)
-
-        data1[data1[destination_col] == destination].plot(
-            ax=ax,
-            color=color1,
-            markersize=markersize,
-            label=data1_label,
-            legend=True,
-            alpha=0.5,
-        )
-
-        data2[data2[destination_col] == destination].plot(
-            ax=ax,
-            color=color2,
-            markersize=markersize,
-            label=data2_label,
-            legend=True,
-            alpha=0.5,
-        )
-
-        ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
-
-        ax.set_axis_off()
-
-    # TODO: fix legend position so that it is aligned with scale bar and attribution text
-    middle_ax = axes[(len(axes) // 2) - 1]
-    middle_ax.legend(
-        loc="upper right",
-        fontsize=font_size,
-        # title_fontsize=10,
-        # title="OSM",
-        markerscale=3,
-        frameon=False,
-        bbox_to_anchor=(1, 1),
-    )
-
-    axes[len(axes) // 2].add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower left",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-
-    cx.add_attribution(
-        ax=axes[len(unique_destinations) - 1],
-        text=attribution_text,
-        font_size=font_size,
-    )
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    plt.savefig(
-        fp,
-        dpi=300,
-        bbox_inches="tight",
-    )
-
-    plt.show()
-
-    plt.close()
-
-
 plot_destinations_combined_subplot(
     osm_destinations,
     cvr_addresses,
@@ -419,7 +303,7 @@ region_union = study_area.union_all()
 hex_grid = hex_grid[hex_grid.intersects(region_union)]
 
 # %%
-# Count number of services in each hexagon for OSM and CVR data sets
+# Count number of services in each hexagon for OSM and CVR data sets + combined
 hex_grid_osm = count_destinations_in_hex_grid(
     osm_destinations, hex_grid, "service_type_main"
 )
@@ -427,9 +311,10 @@ hex_grid_osm = count_destinations_in_hex_grid(
 hex_grid_cvr = count_destinations_in_hex_grid(
     cvr_addresses, hex_grid, "service_type_main"
 )
-# %%
+
 
 destination_col = "service_type_main"
+
 all_destinations = set(osm_destinations[destination_col].unique()).union(
     cvr_addresses[destination_col].unique()
 )
@@ -441,7 +326,7 @@ for service_type in all_destinations:
     if service_type not in cvr_addresses[destination_col].unique():
         hex_grid_cvr[service_type] = 0
 
-# %%
+
 combined_grid = hex_grid_osm.merge(
     hex_grid_cvr, on="grid_id", suffixes=("_osm", "_cvr")
 )
@@ -522,10 +407,4 @@ if analyse_destinations_per_municipality:
     )
 
 
-# %%
-dest_count_main
-
-# %%
-
-dest_count_sub
 # %%

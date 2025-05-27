@@ -527,7 +527,7 @@ def plot_destinations_combined_subplot(
         font_size=font_size,
     )
     txt = ax.texts[-1]
-    txt.set_position([1, 0.01])
+    txt.set_position([0.99, 0.01])
     txt.set_ha("right")
     txt.set_va("bottom")
 

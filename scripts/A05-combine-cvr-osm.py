@@ -18,6 +18,8 @@ from src.helper_functions import (
 with open(r"../config-data-prep.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
+    cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
+
     osm_export_types = parsed_yaml_file["osm_export_types"]
     cvr_export_types = parsed_yaml_file["cvr_export_types"]
 
@@ -33,15 +35,15 @@ with open(r"../config-data-prep.yml", encoding="utf-8") as file:
 # %%
 
 # Load the  data
-cvr_addresses = gpd.read_file("../data/processed/cvr/cvr-services-w-address.gpkg")
+cvr_destinations = gpd.read_file(cvr_destinations_fp)
 
 osm_destinations = gpd.read_file("../data/processed/osm/all_osm_services.gpkg")
 
-cvr_addresses.sort_values("service_type", inplace=True)
+cvr_destinations.sort_values("service_type", inplace=True)
 
 osm_destinations.sort_values("service_type", inplace=True)
 
-cvr_addresses["service_type_main"] = cvr_addresses["service_type"].map(
+cvr_destinations["service_type_main"] = cvr_destinations["service_type"].map(
     lambda x: next(
         (key for key, values in sub_service_to_main.items() if x in values), None
     )
@@ -67,19 +69,19 @@ keep_cols = [
     "geometry",
 ]
 osm_destinations["source"] = "osm"
-cvr_addresses["source"] = "cvr"
+cvr_destinations["source"] = "cvr"
 osm_cvr_combined = gpd.GeoDataFrame(
     pd.concat(
         [
             osm_destinations[keep_cols],
-            cvr_addresses[keep_cols],
+            cvr_destinations[keep_cols],
         ],
         ignore_index=True,
         sort=False,
     )
 )
 
-assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_addresses)
+assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_destinations)
 # %%
 
 # EXPORT

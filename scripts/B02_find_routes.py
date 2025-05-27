@@ -90,7 +90,7 @@ def get_travel_info(from_lat, from_lon, to_lat, to_lon, date, time, walk_speed=1
           walkDistance
         }}
       }}
-    }}
+    }} 
     """
     # print(f"Sending request to OTP API with query: {query}")
     response = requests.post(url, json={"query": query})
@@ -163,10 +163,11 @@ def process_adresses(
                 itinerary["walkDistance"],
                 row.dest_distance,
             )
-        except Exception as e:
+        except Exception:
+            # except Exception as e:
             # Print the type and message of the exception
-            print(f"Exception type: {type(e).__name__}, Message: {str(e)}")
-            print(row.source_lat, row.source_lon, row.dest_lat, row.dest_lon)
+            # print(f"Exception type: {type(e).__name__}, Message: {str(e)}")
+            # print(row.source_lat, row.source_lon, row.dest_lat, row.dest_lon)
 
             return (
                 row.source_adress_id,
@@ -251,3 +252,8 @@ travel_info = get_travel_info(source_lat, source_lon, dest_lat, dest_lon, date, 
 
 # source = 55.5787960692651555 12.0655944459317
 # dest = 55.63996791544005 12.067092519876377
+
+# %%
+
+# TODO: See if all source addresses are in the result data set
+# TODO: See what type of no results we have
