@@ -72,7 +72,9 @@ def convert_otp_time(millis, tz="Europe/Copenhagen"):
     return None
 
 
-def get_travel_info(from_lat, from_lon, to_lat, to_lon, date, time, walk_speed=1.3):
+def get_travel_info(
+    from_lat, from_lon, to_lat, to_lon, date, time, walk_speed=1.3, search_window=120
+):
     query = f"""
     {{
       plan(
@@ -82,6 +84,7 @@ def get_travel_info(from_lat, from_lon, to_lat, to_lon, date, time, walk_speed=1
         time: "{time}"
         walkSpeed: {walk_speed}
         arriveBy: true
+        searchWindow: {search_window}
         numItineraries: 1
       ) {{
         itineraries {{
@@ -112,9 +115,12 @@ def process_adresses(
     dataset = dataset.replace("-", "_")
 
     # Create target table
+
+    otp_con.execute(f"DROP TABLE IF EXISTS {dataset};")
+
     otp_con.execute(
         f"""
-        CREATE TABLE IF NOT EXISTS {dataset} (
+        CREATE TABLE {dataset} (
             source_id TEXT,
             target_id TEXT,
             from_lat DOUBLE,
@@ -150,17 +156,22 @@ def process_adresses(
     def process_row(row, date, time):
         try:
             travel_info = get_travel_info(
-                row.source_lat, row.source_lon, row.dest_lat, row.dest_lon, date, time
+                row.source_lat,
+                row.source_lon,
+                row.dest_lat,
+                row.dest_lon,
+                date,
+                time,
             )
-            itinerary = travel_info["data"]["plan"]["itineraries"][0]
+            itenerary = travel_info["data"]["plan"]["itineraries"][0]
             return (
                 row.source_adress_id,
                 row.dest_adress_id,
                 row.source_lat,
                 row.source_lon,
-                convert_otp_time(itinerary["startTime"]),
-                itinerary["duration"],
-                itinerary["walkDistance"],
+                convert_otp_time(itenerary["startTime"]),
+                itenerary["duration"],
+                itenerary["walkDistance"],
                 row.dest_distance,
             )
         except Exception:
@@ -246,8 +257,16 @@ source_lon = 12.0655944459317
 dest_lat = 55.63996791544005
 dest_lon = 12.067092519876377
 
-travel_info = get_travel_info(source_lat, source_lon, dest_lat, dest_lon, date, time)
+travel_info = get_travel_info(
+    source_lat, source_lon, dest_lat, dest_lon, date, time, search_window=120
+)
 
+# %%
+walk_speed = 1.3  # m/s
+from_lat = 55.5787960692651555
+from_lon = 12.0655944459317
+to_lat = 55.63996791544005
+to_lon = 12.067092519876377
 # %%
 
 # source = 55.5787960692651555 12.0655944459317
@@ -255,5 +274,38 @@ travel_info = get_travel_info(source_lat, source_lon, dest_lat, dest_lon, date, 
 
 # %%
 
-# TODO: See if all source addresses are in the result data set
-# TODO: See what type of no results we have
+
+# %%
+doctor1 = pd.read_parquet("../data/processed/destinations/doctor_gp_1.parquet")
+# %%
+# PROCESS
+
+# drop duplicates
+# convert duration to minutes
+
+# some NaN values are because source and target are the same
+# Some are because the result was empty!
+
+
+# %%
+src_id = "0a3f50af-db4f-32b8-e044-0003ba298018"
+# 54.927621	12.049552
+
+# 54.887798	12.040401
+
+# %%
+src_id = "0a3f50af-e19e-32b8-e044-0003ba298018"
+# 54.934067	12.004458
+
+# 54.887798	12.040401
+
+# Settings for allowed wait times? This example returns a result for departure after 8 which results in an arrival around 10.20 - but no result for arrival before 11?
+# %%
+
+
+# TODO:
+# rerun for doctor
+# check that table deletion and creation works
+# check if this fixes issue with duplicates
+# check if search window setting works
+# check if search window results in too late arrival times?
