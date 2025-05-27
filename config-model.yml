@@ -96,6 +96,9 @@ sample_size : 0 # Munber of rows to sample from the data 0 = all
 chunk_size : 5000  # number of rows to load into memory
 parallelism : 10  # The number of parallel processes to use when calling OTP
 
+walk_speed : 1.3 # The walking speed in m/s used when calculating the travel time to the service location
+search_window : 120 # The search window in minutes (?) when calculating the travel time to the service location
+
 # Define the endpoint URL
 otp_url : "http://localhost:8080/otp/gtfs/v1" # http://localhost:8080/
 
