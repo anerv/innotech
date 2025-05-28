@@ -162,7 +162,7 @@ services:
 # Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
 # All service types will be included in the comparison of data sources
 osm_export_types:
-- doctor
+- doctor_gp
 - dentist
 - pharmacy
 - kindergarten-nursery
@@ -170,18 +170,18 @@ osm_export_types:
 - recreation
 - library
 - sports_facility
-- shop
+- supermarket
 - train_station
 
 cvr_export_types:
-- doctor
+- doctor_gp
 - dentist
 - pharmacy
 - kindergarten-nursery
 - school
 - library
 - sports_facility
-- shop
+- supermarket
 - train_station
 
 
