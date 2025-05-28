@@ -16,7 +16,6 @@ with open(r"../config.yml") as file:
     cvr_address_input_fp = parsed_yaml_file["cvr_address_input_fp"]
     cvr_brancher_input_fp = parsed_yaml_file["cvr_brancher_input_fp"]
     cvr_penhed_input_fp = parsed_yaml_file["cvr_penhed_input_fp"]
-    # address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
 
     services = parsed_yaml_file["services"]
