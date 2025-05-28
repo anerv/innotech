@@ -230,5 +230,8 @@ joined = joined[
     ]
 ]
 
+joined.service_type.value_counts()
+# %%
+
 joined.to_file(osm_destinations_fp, driver="GPKG")
 # %%
