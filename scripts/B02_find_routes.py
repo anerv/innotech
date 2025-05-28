@@ -18,7 +18,7 @@ script_path = Path(__file__).resolve()
 root_path = script_path.parent.parent
 data_path = root_path / "data/processed/destinations"
 results_path = root_path / "results"
-config_path = root_path / "config-model.yml"
+config_path = root_path / "config.yml"
 
 # Read and parse the YAML file
 with open(config_path, "r") as file:
@@ -36,6 +36,8 @@ otp_db_fp = (
     results_path / config_model["otp_results"]
 )  # Load the persistant OTP database file path
 
+walk_speed = config_model["walk_speed"]  # Load the walk speed in m/s
+search_window = config_model["search_window"]  # Load the search window in seconds
 # %%
 
 # DubckDB connection
@@ -45,7 +47,8 @@ con = duckdb.connect()
 otp_con = duckdb.connect(otp_db_fp)
 
 
-# %% Define helper functions
+# %%
+# Define helper functions
 
 
 # def convert_otp_time(millis, tz="Europe/Copenhagen"):
@@ -73,7 +76,15 @@ def convert_otp_time(millis, tz="Europe/Copenhagen"):
 
 
 def get_travel_info(
-    from_lat, from_lon, to_lat, to_lon, date, time, walk_speed=1.3, search_window=120
+    from_lat,
+    from_lon,
+    to_lat,
+    to_lon,
+    date,
+    time,
+    walk_speed=1.3,
+    search_window=7200,  # 2 hours in seconds
+    arrive_by="true",
 ):
     query = f"""
     {{
@@ -83,12 +94,13 @@ def get_travel_info(
         date: "{date}"
         time: "{time}"
         walkSpeed: {walk_speed}
-        arriveBy: true
+        arriveBy: {arrive_by},
         searchWindow: {search_window}
         numItineraries: 1
       ) {{
         itineraries {{
           startTime
+          waitingTime
           duration
           walkDistance
         }}
@@ -104,9 +116,7 @@ def get_travel_info(
     return response.json()
 
 
-# %% Process the individual service types
-
-
+# Process the individual service types
 def process_adresses(
     dataset, sampelsize, time, chunk_size=1000, max_workers=16, otp_con=otp_con, con=con
 ):
@@ -126,6 +136,7 @@ def process_adresses(
             from_lat DOUBLE,
             from_lon DOUBLE,
             startTime TEXT,
+            waitingTime DOUBLE,
             duration DOUBLE,
             walkDistance DOUBLE,
             abs_dist DOUBLE
@@ -162,6 +173,9 @@ def process_adresses(
                 row.dest_lon,
                 date,
                 time,
+                walk_speed=1.3,
+                search_window=7200,  # 2 hours in seconds
+                arrive_by="true",
             )
             itenerary = travel_info["data"]["plan"]["itineraries"][0]
             return (
@@ -170,6 +184,7 @@ def process_adresses(
                 row.source_lat,
                 row.source_lon,
                 convert_otp_time(itenerary["startTime"]),
+                itenerary["waitingTime"],
                 itenerary["duration"],
                 itenerary["walkDistance"],
                 row.dest_distance,
@@ -185,6 +200,7 @@ def process_adresses(
                 row.dest_adress_id,
                 row.source_lat,
                 row.source_lon,
+                np.nan,
                 np.nan,
                 np.nan,
                 np.nan,
@@ -214,7 +230,7 @@ def process_adresses(
                 result = future.result()
                 otp_con.execute(
                     f"""
-                    INSERT INTO {dataset} VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO {dataset} VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
                 """,
                     result,
                 )
@@ -250,31 +266,7 @@ test = pd.read_parquet(fp)
 test.head()
 # %%
 
-time = "11:00"
-
-source_lat = 55.5787960692651555
-source_lon = 12.0655944459317
-dest_lat = 55.63996791544005
-dest_lon = 12.067092519876377
-
-travel_info = get_travel_info(
-    source_lat, source_lon, dest_lat, dest_lon, date, time, search_window=120
-)
-
-# %%
-walk_speed = 1.3  # m/s
-from_lat = 55.5787960692651555
-from_lon = 12.0655944459317
-to_lat = 55.63996791544005
-to_lon = 12.067092519876377
-# %%
-
-# source = 55.5787960692651555 12.0655944459317
-# dest = 55.63996791544005 12.067092519876377
-
-# %%
-
-
+test.source_id.unique()
 # %%
 doctor1 = pd.read_parquet("../data/processed/destinations/doctor_gp_1.parquet")
 # %%
@@ -288,22 +280,10 @@ doctor1 = pd.read_parquet("../data/processed/destinations/doctor_gp_1.parquet")
 
 
 # %%
-src_id = "0a3f50af-db4f-32b8-e044-0003ba298018"
-# 54.927621	12.049552
-
-# 54.887798	12.040401
-
 # %%
-src_id = "0a3f50af-e19e-32b8-e044-0003ba298018"
-# 54.934067	12.004458
-
-# 54.887798	12.040401
-
-# Settings for allowed wait times? This example returns a result for departure after 8 which results in an arrival around 10.20 - but no result for arrival before 11?
-# %%
-
 
 # TODO:
+# add wait time!
 # rerun for doctor
 # check that table deletion and creation works
 # check if this fixes issue with duplicates

@@ -25,7 +25,7 @@ from src.helper_functions import (
     count_destinations_in_municipalities,
 )
 
-with open(r"../config-data-prep.yml", encoding="utf-8") as file:
+with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     osm_export_types = parsed_yaml_file["osm_export_types"]

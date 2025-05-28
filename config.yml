@@ -1,5 +1,43 @@
 # This is a configuration file for the service location model.
 
+study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
+
+
+# Filepaths for... 
+
+# INPUT DATA
+
+# administrative boundaries
+adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" # Data set with administrative boundaries
+sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" # Data set with administrative boundaries
+
+# CVR data
+cvr_address_input_fp: "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
+cvr_brancher_input_fp: "../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Current_8.csv"
+cvr_penhed_input_fp: "../data/input/cvr/CVR_V1_Produktionsenhed_TotalDownload_csv_Current_8.csv"
+
+# DAR data
+input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adresse.parquet"
+address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adressepunkt.parquet"
+housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
+
+# BBR data
+bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
+
+# PROCESSED DATA
+addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
+study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
+sub_study_areas_fp: "../data/processed/adm_boundaries/sub_areas.parquet"
+
+address_bbr_fp: "../data/processed/bbr/adgangsadresser_beboelse.parquet"
+
+destinations_combined_agg_fp: "../data/processed/destinations/osm-cvr-combined-aggregated.parquet"
+destinations_combined_fp: "../data/processed/destinations/osm-cvr-combined.parquet"
+
+osm_destinations_fp: "../data/processed/osm/all_osm_services.gpkg"
+cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
+cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
+
 # The restriction array is used to define the spatial restrictions that are applied to the services.
 # Each restriction has a name, a file path, and an ID that is used to identify the restriction in the data.
 # The file path is the location of the data file that contains the spatial restriction information.
@@ -15,7 +53,7 @@
 
 restrictions:
     - name: "municipality"
-      file_path: "../data/processed/adm_boundaries/sub_areas.parquet"
+      file_path: "../data/processed/adm_boundaries/sub_areas.parquet" # should be the same as in the sub_study_areas_fp!
       id_attribute: kommunekode
 
 # The service array is used to define the services that are available in the model and how they are processed.
@@ -32,6 +70,11 @@ services:
       arival_time: "11:00"
       nace_codes:
         - 862100
+      osm_tags:
+        - amenity: doctors
+        - amenity: general_practitioner
+        - amenity: clinic
+        - healthcare: doctor
     - service_type: dentist
       spatial_restriction_type: 
       n_neighbors: 1
@@ -51,12 +94,6 @@ services:
       nace_codes:
         - 889130
         - 889120
-    # - service_type: nursery
-    #   n_neighbors: 1
-    #   arival_time: "7:45"
-    #   spatial_restriction_type: "municipality"
-    #   nace_codes:
-    #     - 889120
     - service_type: school
       n_neighbors: 1
       arival_time: "7:45"
@@ -90,8 +127,57 @@ services:
         - 93
 
 
-# The following parameters are used when calling OTP
 
+# Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
+# All service types will be included in the comparison of data sources
+osm_export_types:
+- doctor
+- dentist
+- pharmacy
+- kindergarten-nursery
+-  #school
+- recreation
+- library
+- sports_facility
+- shop
+- train_station
+
+cvr_export_types:
+- doctor
+- dentist
+- pharmacy
+- kindergarten-nursery
+- school
+- library
+- sports_facility
+- shop
+- train_station
+
+
+# Mapping between service types and subcategories
+sub_service_to_main: 
+    doctor: 
+        - doctor-gp
+    dentist: 
+        - dentist
+    pharmacy: 
+        - pharmacy
+    kindergarten-nursery:
+        - nursery
+        - kindergarten
+    school: 
+        - school
+    library: 
+        - library
+    sports_facility: 
+        - sports_facility
+    shop: 
+        - supermarket
+        - discount_supermarket
+    train_station: 
+        - train_station
+
+# The following parameters are used when calling OTP
 sample_size : 0 # Munber of rows to sample from the data 0 = all
 chunk_size : 5000  # number of rows to load into memory
 parallelism : 10  # The number of parallel processes to use when calling OTP
@@ -108,11 +194,13 @@ otp_results : "otp_results.db" # The persistant duckdb  where the OTP results ar
 travel_date : "2025-04-22"
 
 
+
+
 # Filepaths for input data when calculating the travel matrix in the nearest.py (to and from)
 
 data_sources:
   dwellings:
-    path: "processed/bbr/adgangsadresser_beboelse.parquet" #"muni3.parquet" # relative to the data directory
+    path: "processed/bbr/adgangsadresser_beboelse.parquet" # should be the same as address_bbr_fp but relative to the data directory
     base_columns:
       address_id: "adresseIdentificerer"
       geometry: "geometry"  # EPSG:25832
@@ -120,10 +208,15 @@ data_sources:
       road_point_lon: "vej_pos_lon"
 
   services:
-    path: "processed/destinations/osm-cvr-combined.parquet" #"cvr_osm_vejpos.parquet" # relative to the data directory
+    path: "processed/destinations/osm-cvr-combined.parquet" # should be the same as destinations_combined_fp but relative to the data directory
     base_columns:
       address_id: "Adr_id"
       geometry: "geometry"
       road_point_lat: "vej_pos_lat"
       road_point_lon: "vej_pos_lon"
       service_type: "hb_kode"  # The service type is used to identify the service in the data
+
+
+
+
+

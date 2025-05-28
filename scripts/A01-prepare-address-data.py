@@ -8,7 +8,7 @@ from shapely import wkt
 import yaml
 
 
-with open(r"../config-data-prep.yml", encoding="utf-8") as file:
+with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     # address_cvr_fp = parsed_yaml_file["address_cvr_fp"]

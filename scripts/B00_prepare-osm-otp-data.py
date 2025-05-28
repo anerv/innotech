@@ -9,7 +9,7 @@ import geopandas as gpd
 import subprocess
 from src.helper_functions import remove_z
 
-with open(r"../config-data-prep.yml", encoding="utf-8") as file:
+with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
     study_area_fp = parsed_yaml_file["study_area_fp"]

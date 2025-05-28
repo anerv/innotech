@@ -24,7 +24,7 @@ script_path = Path(__file__).resolve()
 root_path = script_path.parent.parent
 data_path = root_path / "data"
 
-config_path = root_path / "config-model.yml"
+config_path = root_path / "config.yml"
 
 # Read and parse the YAML file
 with open(config_path, "r") as file:
