@@ -14,7 +14,6 @@ with open(r"../config.yml", encoding="utf-8") as file:
     # address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
     address_bbr_fp = parsed_yaml_file["address_bbr_fp"]
-    hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
     input_address_fp = parsed_yaml_file["input_address_fp"]
     address_points_fp = parsed_yaml_file["address_points_fp"]
     housenumbers_fp = parsed_yaml_file["housenumbers_fp"]

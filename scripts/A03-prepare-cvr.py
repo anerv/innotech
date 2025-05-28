@@ -5,6 +5,8 @@
 import pandas as pd
 import geopandas as gpd
 import yaml
+from itertools import chain
+from src.helper_functions import get_service_type
 
 # %%
 
@@ -16,13 +18,20 @@ with open(r"../config.yml") as file:
     cvr_penhed_input_fp = parsed_yaml_file["cvr_penhed_input_fp"]
     # address_cvr_fp = parsed_yaml_file["address_cvr_fp"]
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
-    hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
+
+    services = parsed_yaml_file["services"]
 
     study_area_fp = parsed_yaml_file["study_area_fp"]
 
     cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
     cvr_destinations_all_fp = parsed_yaml_file["cvr_destinations_all_fp"]
 
+# %%
+nace_dict = {}
+
+for service in services:
+    if "nace_codes" in service:
+        nace_dict[service["service_type"]] = service["nace_codes"]
 
 # %%
 
@@ -75,7 +84,7 @@ if len(cvr_data_addresses["Adresse"].notnull()) > 0:
 # %%
 
 cvr_subset = cvr_data_addresses[
-    cvr_data_addresses["vaerdi"].isin(hb_codes_dict.values())
+    cvr_data_addresses["vaerdi"].isin(list(chain(*nace_dict.values())))
 ].copy()
 
 assert len(cvr_subset) > 0, "No matching CVR codes found."
@@ -104,15 +113,18 @@ cvr_subset = cvr_subset[["vaerdi", "Adresse"]]
 
 cvr_subset.rename(
     columns={
-        "vaerdi": "hb_kode",
+        "vaerdi": "nace_code",
         "Adresse": "Adr_id",
     },
     inplace=True,
 )
 
-cvr_subset["service_type"] = cvr_subset["hb_kode"].map(
-    {v: k for k, v in hb_codes_dict.items()}
+
+cvr_subset["service_type"] = cvr_subset["nace_code"].apply(
+    lambda nace_code: get_service_type(nace_code=nace_code, nace_dict=nace_dict)
 )
+
+assert cvr_subset["service_type"].notnull().all(), "Not all rows have a service type."
 
 # %%
 # Join to address data -
@@ -146,10 +158,10 @@ cvr_region = gpd.clip(cvr_address_geoms, region)
 
 # %%
 print(
-    f"{len(cvr_region[cvr_region.adresseIdentificerer.notnull()])} CVR locations matched to addresses."
+    f"{len(cvr_region[cvr_region.adresseIdentificerer.notnull()])} CVR locations in the study area matched to addresses."
 )
 print(
-    f"{len(cvr_region[cvr_region.adresseIdentificerer.isnull()])} CVR locations not matched to addresses."
+    f"{len(cvr_region[cvr_region.adresseIdentificerer.isnull()])} CVR locations in the study area not matched to addresses."
 )
 
 if len(cvr_region[cvr_region.adresseIdentificerer.isnull()]) > 0:
@@ -166,7 +178,7 @@ cvr_region["service_type"].value_counts()
 
 # Export
 cvr_region = cvr_region[
-    ["service_type", "hb_kode", "Adr_id", "vej_pos_lat", "vej_pos_lon", "geometry"]
+    ["service_type", "nace_code", "Adr_id", "vej_pos_lat", "vej_pos_lon", "geometry"]
 ]
 
 

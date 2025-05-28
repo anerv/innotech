@@ -42,20 +42,20 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
 # %%
 # Mapping between service types and subcategories
-sub_service_to_main = {
-    "doctor": ["doctor-gp"],
-    "dentist": ["dentist"],
-    "pharmacy": ["pharmacy"],
-    "kindergarten-nursery": [
-        "kindergarten",
-        "nursery",
-    ],
-    "school": ["school"],
-    "library": ["library"],
-    "sports_facility": ["sports_facility"],
-    "shop": ["supermarket", "discount_supermarket"],
-    "train_station": ["train_station"],
-}
+# sub_service_to_main = {
+#     "doctor": ["doctor-gp"],
+#     "dentist": ["dentist"],
+#     "pharmacy": ["pharmacy"],
+#     "kindergarten-nursery": [
+#         "kindergarten",
+#         "nursery",
+#     ],
+#     "school": ["school"],
+#     "library": ["library"],
+#     "sports_facility": ["sports_facility"],
+#     "shop": ["supermarket", "discount_supermarket"],
+#     "train_station": ["train_station"],
+# }
 
 osm_color = "#EE7733"
 cvr_color = "#009988"
@@ -146,102 +146,101 @@ with open(html_file, "w") as f:
 
 
 # %%
-# Compare number of services in each main category
-cvr_addresses["service_type_main"] = cvr_addresses["service_type"].map(
-    lambda x: next(
-        (key for key, values in sub_service_to_main.items() if x in values), None
-    )
-)
+# # Compare number of services in each main category
+# cvr_addresses["service_type_main"] = cvr_addresses["service_type"].map(
+#     lambda x: next(
+#         (key for key, values in sub_service_to_main.items() if x in values), None
+#     )
+# )
 
-cvr_all["service_type_main"] = cvr_all["service_type"].map(
-    lambda x: next(
-        (key for key, values in sub_service_to_main.items() if x in values), None
-    )
-)
+# cvr_all["service_type_main"] = cvr_all["service_type"].map(
+#     lambda x: next(
+#         (key for key, values in sub_service_to_main.items() if x in values), None
+#     )
+# )
 
-osm_destinations["service_type_main"] = osm_destinations["service_type"].map(
-    lambda x: next(
-        (key for key, values in sub_service_to_main.items() if x in values), None
-    )
-)
+# osm_destinations["service_type_main"] = osm_destinations["service_type"].map(
+#     lambda x: next(
+#         (key for key, values in sub_service_to_main.items() if x in values), None
+#     )
+# )
 
-osm_destinations.sort_values("service_type_main", inplace=True)
-cvr_all.sort_values("service_type_main", inplace=True)
-cvr_addresses.sort_values("service_type_main", inplace=True)
+# osm_destinations.sort_values("service_type_main", inplace=True)
+# cvr_all.sort_values("service_type_main", inplace=True)
+# cvr_addresses.sort_values("service_type_main", inplace=True)
 
-destinations_compare_main = pd.DataFrame(
-    {
-        "cvr_addresses": cvr_addresses["service_type_main"].value_counts(),
-        "cvr_all": cvr_all["service_type_main"].value_counts(),
-        "osm": osm_destinations["service_type_main"].value_counts(),
-    }
-)
+# destinations_compare_main = pd.DataFrame(
+#     {
+#         "cvr_addresses": cvr_addresses["service_type_main"].value_counts(),
+#         "cvr_all": cvr_all["service_type_main"].value_counts(),
+#         "osm": osm_destinations["service_type_main"].value_counts(),
+#     }
+# )
 
-# Set the name of the index
-destinations_compare_main.index.name = "service_type_main"
+# # Set the name of the index
+# destinations_compare_main.index.name = "service_type_main"
 
-# Reset the index to move the index into columns
-destinations_compare_main_reset = destinations_compare_main.reset_index()
+# # Reset the index to move the index into columns
+# destinations_compare_main_reset = destinations_compare_main.reset_index()
 
-# Rename the columns to include the index name
-destinations_compare_main_reset.columns = [destinations_compare_main.index.name] + list(
-    destinations_compare_main.columns
-)
+# # Rename the columns to include the index name
+# destinations_compare_main_reset.columns = [destinations_compare_main.index.name] + list(
+#     destinations_compare_main.columns
+# )
 
-destinations_compare_main_reset.to_csv(
-    "../results/destination_data_evaluation/cvr-osm-comparison-main-category.csv",
-    index=False,
-)
+# destinations_compare_main_reset.to_csv(
+#     "../results/destination_data_evaluation/cvr-osm-comparison-main-category.csv",
+#     index=False,
+# )
 
-styled_table_main = (
-    destinations_compare_main_reset.style.apply(
-        highlight_nan, subset=["cvr_addresses", "cvr_all", "osm"], axis=1
-    )
-    .apply(highlight_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
-    .apply(highlight_next_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
-    .format(replace_nan_with_dash)  # Replace NaN with '-'
-    .hide(axis="index")  # Hide the index column
-    .set_table_styles(
-        [
-            {"selector": "th", "props": [("font-weight", "bold")]},
-            {
-                "selector": ".col0",
-                "props": [("font-weight", "bold")],
-            },  # Bold header for 'service_type'
-            {
-                "selector": ".col0",
-                "props": [("font-weight", "bold")],
-            },  # Bold values for 'service_type'
-        ]
-    )
-    .set_properties(**{"text-align": "left", "font-size": "12px", "width": "100px"})
-    .set_caption(
-        "Comparison of service types between CVR (w. addresses), CVR (all) and OSM data sets"
-    )
-    .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
-)
+# styled_table_main = (
+#     destinations_compare_main_reset.style.apply(
+#         highlight_nan, subset=["cvr_addresses", "cvr_all", "osm"], axis=1
+#     )
+#     .apply(highlight_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
+#     .apply(highlight_next_max, subset=["cvr_addresses", "cvr_all", "osm"], axis=1)
+#     .format(replace_nan_with_dash)  # Replace NaN with '-'
+#     .hide(axis="index")  # Hide the index column
+#     .set_table_styles(
+#         [
+#             {"selector": "th", "props": [("font-weight", "bold")]},
+#             {
+#                 "selector": ".col0",
+#                 "props": [("font-weight", "bold")],
+#             },  # Bold header for 'service_type'
+#             {
+#                 "selector": ".col0",
+#                 "props": [("font-weight", "bold")],
+#             },  # Bold values for 'service_type'
+#         ]
+#     )
+#     .set_properties(**{"text-align": "left", "font-size": "12px", "width": "100px"})
+#     .set_caption(
+#         "Comparison of service types between CVR (w. addresses), CVR (all) and OSM data sets"
+#     )
+#     .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
+# )
 
-styled_table_main
+# styled_table_main
 
 # %%
 
-# Export to HTML
-html = styled_table_main.to_html()
+# # Export to HTML
+# html = styled_table_main.to_html()
 
-html_file = (
-    "../results/destination_data_evaluation/cvr-osm-comparison-maincategory.html"
-)
-with open(html_file, "w") as f:
-    f.write(html)
-    f.close()
+# html_file = (
+#     "../results/destination_data_evaluation/cvr-osm-comparison-maincategory.html"
+# )
+# with open(html_file, "w") as f:
+#     f.write(html)
+#     f.close()
 
 # %%
 # Make combined spatial data set
 keep_cols = [
-    "hb_kode",
+    "nace_code",
     "Adr_id",
     "service_type",
-    "service_type_main",
     "source",
     "geometry",
 ]
@@ -268,10 +267,9 @@ fp = f"../results/maps/main-all-osm-cvr.png"
 attribution_text = "(C) OSM, CVR"
 color1 = osm_color
 color2 = cvr_color
-dest_col = "service_type"
+destination_col = "service_type"
 study_area = study_area
 font_size = 10
-destination_col = "service_type_main"
 
 
 plot_destinations_combined_subplot(
@@ -305,15 +303,13 @@ hex_grid = hex_grid[hex_grid.intersects(region_union)]
 # %%
 # Count number of services in each hexagon for OSM and CVR data sets + combined
 hex_grid_osm = count_destinations_in_hex_grid(
-    osm_destinations, hex_grid, "service_type_main"
+    osm_destinations, hex_grid, "service_type"
 )
 
-hex_grid_cvr = count_destinations_in_hex_grid(
-    cvr_addresses, hex_grid, "service_type_main"
-)
+hex_grid_cvr = count_destinations_in_hex_grid(cvr_addresses, hex_grid, "service_type")
 
 
-destination_col = "service_type_main"
+destination_col = "service_type"
 
 all_destinations = set(osm_destinations[destination_col].unique()).union(
     cvr_addresses[destination_col].unique()
@@ -351,9 +347,7 @@ combined_grid.to_file(
 
 # %%
 
-unique_destinations = sub_service_to_main.keys()
-
-for i, service in enumerate(unique_destinations):
+for i, service in enumerate(all_destinations):
 
     fp_destination = service.replace("/", "-")
 
@@ -371,7 +365,6 @@ for i, service in enumerate(unique_destinations):
 
 # %%
 
-
 analyse_destinations_per_municipality = True
 
 if analyse_destinations_per_municipality:
@@ -383,27 +376,16 @@ if analyse_destinations_per_municipality:
     muni_subset = muni_data[muni_data.intersects(study_area.union_all())].copy()
     muni_subset = muni_subset[["kommunekode", "navn", "geometry"]]
 
-    html_fp_main = "../results/destination_data_evaluation/municipal-service-counts-service-type-main.html"
-    html_fp_sub = "../results/destination_data_evaluation/municipal-service-counts-service-type-sub.html"
-    csv_fp_main = "../results/destination_data_evaluation/municipal-service-counts-service-type-main.csv"
-    csv_fp_sub = "../results/destination_data_evaluation/municipal-service-counts-service-type-sub.csv"
+    html_fp = "../results/destination_data_evaluation/municipal-service-counts-service-type.html"
+    csv_fp = "../results/destination_data_evaluation/municipal-service-counts-service-type.csv"
 
     dest_count_main = count_destinations_in_municipalities(
         muni_subset,
         "navn",
         osm_cvr_combined,
-        "service_type_main",
-        csv_fp_main,
-        html_fp_main,
-    )
-
-    dest_count_sub = count_destinations_in_municipalities(
-        muni_subset,
-        "navn",
-        osm_cvr_combined,
         "service_type",
-        csv_fp_sub,
-        html_fp_sub,
+        csv_fp,
+        html_fp,
     )
 
 

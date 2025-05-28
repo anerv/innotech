@@ -13,6 +13,20 @@ import numpy as np
 from shapely.ops import transform
 
 
+def get_service_type(nace_code, nace_dict):
+    for service_type, codes in nace_dict.items():
+        if nace_code in codes:
+            return service_type
+    return None
+
+
+def get_nace_code(service_type, nace_dict):
+    for type, codes in nace_dict.items():
+        if service_type == type:
+            return codes[0]  # return the first code in the list
+    return None
+
+
 def remove_z(geometry):
     if geometry.has_z:
         return transform(lambda x, y, z=None: (x, y), geometry)

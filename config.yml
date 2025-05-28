@@ -75,18 +75,26 @@ services:
         - amenity: general_practitioner
         - amenity: clinic
         - healthcare: doctor
+
     - service_type: dentist
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "11:00"
       nace_codes:
         - 862300
+      osm_tags:
+        - amenity: dentist
+        - healthcare: dentist
+
     - service_type: pharmacy
       n_neighbors: 1
       arival_time: "15:00"
       spatial_restriction_type: 
       nace_codes:
         - 477300
+      osm_tags:
+        - amenity: pharmacy
+
     - service_type: kindergarten-nursery
       n_neighbors: 1
       arival_time: "7:45"
@@ -94,12 +102,20 @@ services:
       nace_codes:
         - 889130
         - 889120
+      osm_tags:
+        - amenity: kindergarten
+        - amenity: nursery
+        - amenity: childcare
+
     - service_type: school
       n_neighbors: 1
       arival_time: "7:45"
       spatial_restriction_type: "municipality"
       nace_codes:
         - 852010
+      osm_tags:
+        - amenity: school
+
     - service_type: supermarket
       n_neighbors: 1
       arival_time: "17:00"
@@ -107,24 +123,39 @@ services:
       nace_codes:
         - 471120 # Supermarked
         - 471130 # Discount sopermarkedet
+      osm_tags:
+        - shop: supermarket
+        - shop: grocery
+        - amenity: convenience
+
     - service_type: library 
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "16:00"
       nace_codes:
         - 911100
+      osm_tags:
+        - amenity: library
+
     - service_type: train_station
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "7:30"
       nace_codes:
         - 49
+      osm_tags:
+        - railway: station
+
     - service_type: sports_facility
       spatial_restriction_type:
       n_neighbors: 1
       arival_time: "19:00"
       nace_codes:
         - 93
+      osm_tags:
+        - amenity: sports_centre
+        - leisure: sports_centre
+        - club: sport
 
 
 
@@ -153,29 +184,6 @@ cvr_export_types:
 - shop
 - train_station
 
-
-# Mapping between service types and subcategories
-sub_service_to_main: 
-    doctor: 
-        - doctor-gp
-    dentist: 
-        - dentist
-    pharmacy: 
-        - pharmacy
-    kindergarten-nursery:
-        - nursery
-        - kindergarten
-    school: 
-        - school
-    library: 
-        - library
-    sports_facility: 
-        - sports_facility
-    shop: 
-        - supermarket
-        - discount_supermarket
-    train_station: 
-        - train_station
 
 # The following parameters are used when calling OTP
 sample_size : 0 # Munber of rows to sample from the data 0 = all
@@ -214,7 +222,7 @@ data_sources:
       geometry: "geometry"
       road_point_lat: "vej_pos_lat"
       road_point_lon: "vej_pos_lon"
-      service_type: "hb_kode"  # The service type is used to identify the service in the data
+      service_type: "nace_code"  # The service type is used to identify the service in the data
 
 
 

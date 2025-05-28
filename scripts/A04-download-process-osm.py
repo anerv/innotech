@@ -2,7 +2,6 @@
 
 # Download and process OSM data
 
-
 import geopandas as gpd
 import pandas as pd
 import overpy
@@ -12,6 +11,7 @@ from src.helper_functions import (
     create_ways_gdf,
     linestring_to_polygon,
     drop_contained_polygons,
+    get_nace_code,
 )
 
 # %%
@@ -25,14 +25,31 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
 
-    hb_codes_dict = parsed_yaml_file["hb_codes_dict"]
-
-    queries = parsed_yaml_file["osm_queries"]
+    services = parsed_yaml_file["services"]
 
     osm_destinations_fp = parsed_yaml_file["osm_destinations_fp"]
 
 # %%
 
+nace_dict = {}
+
+for service in services:
+    if "nace_codes" in service:
+        nace_dict[service["service_type"]] = service["nace_codes"]
+
+queries = {}
+
+for service in services:
+    if "osm_tags" in service:
+        queries[service["service_type"]] = service["osm_tags"]
+
+# %%
+# with open(r"../config-data-prep.yml", encoding="utf-8") as file:
+#     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+
+#     queries_org = parsed_yaml_file["osm_queries"]
+
+# %%
 region = gpd.read_file(study_area_fp)
 
 bbox = region.to_crs("WGS84").total_bounds
@@ -156,13 +173,15 @@ all_osm_gdf.rename(columns={"id": "osm_id"}, inplace=True)
 
 
 # %%
-# fill out hb codes
-all_osm_gdf["hb_kode"] = all_osm_gdf["service_type"].map(
-    {k: v for k, v in hb_codes_dict.items()}
+# fill out nace codes
+
+all_osm_gdf["nace_code"] = all_osm_gdf["service_type"].apply(
+    lambda x: get_nace_code(x, nace_dict)
 )
 
+
 assert (
-    all_osm_gdf["hb_kode"].notnull().all()
+    all_osm_gdf["nace_code"].notnull().all()
 ), "Some service types are not in the hb_codes_dict"
 
 all_osm_gdf.drop_duplicates(subset=["osm_id", "service_type"], inplace=True)
@@ -202,7 +221,7 @@ joined = joined[
     [
         "osm_id",
         "service_type",
-        "hb_kode",
+        "nace_code",
         "Adr_id",
         "vej_pos_lat",
         "vej_pos_lon",
