@@ -47,7 +47,7 @@ cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
 #      nace_codes: The NACE codes used to identify the service location in the CVR data
 #       - 862100
 services:
-    - service_type: doctor_gp
+    - service_type: doctor
       spatial_restriction_type: 
       n_neighbors: 1
       arival_time: "11:00"
@@ -145,7 +145,7 @@ services:
 # # Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
 # # All service types will be included in the comparison of data sources
 # osm_export_types:
-# - doctor_gp
+# - doctor
 # - dentist
 # - pharmacy
 # - kindergarten-nursery
@@ -157,7 +157,7 @@ services:
 # - train_station
 
 # cvr_export_types:
-# - doctor_gp
+# - doctor
 # - dentist
 # - pharmacy
 # - kindergarten-nursery
