@@ -20,9 +20,6 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
 
-    osm_export_types = parsed_yaml_file["osm_export_types"]
-    cvr_export_types = parsed_yaml_file["cvr_export_types"]
-
     sub_adm_boundaries_fp = parsed_yaml_file["sub_adm_boundaries_fp"]
     study_area_fp = parsed_yaml_file["study_area_fp"]
 
@@ -71,26 +68,6 @@ assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_destinations)
 # %%
 
 # EXPORT
-
-# only keep services with this main type
-
-# Drop subtypes and keep only main types in exported data set
-osm_cvr_combined.drop(
-    osm_cvr_combined[
-        (osm_cvr_combined["source"] == "osm")
-        & (~osm_cvr_combined["service_type"].isin(osm_export_types))
-    ].index,
-    inplace=True,
-)
-
-
-osm_cvr_combined.drop(
-    osm_cvr_combined[
-        (osm_cvr_combined["source"] == "cvr")
-        & (~osm_cvr_combined["service_type"].isin(cvr_export_types))
-    ].index,
-    inplace=True,
-)
 
 osm_cvr_combined = osm_cvr_combined[
     [

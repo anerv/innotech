@@ -38,23 +38,6 @@ osm_destinations_fp: "../data/processed/osm/all_osm_services.gpkg"
 cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
 cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
 
-# The restriction array is used to define the spatial restrictions that are applied to the services.
-# Each restriction has a name, a file path, and an ID that is used to identify the restriction in the data.
-# The file path is the location of the data file that contains the spatial restriction information.
-# The file_path is relative to the data directory and should point to a parquet file
-# Note the CRS if the restrion files must be the same as the data files
-# and all files are assumed to be 2D i.e no z coordinate
-# Note that if the adresses or service data has a attribute with the same name as the restriction following 
-# by "_id" ie. municipality_id: this will be used otherwise a spatial join will be preformed.
-# restrictions:
-#    - name: "municipality" The name of the restriction that must match the name in the service array
-#      file_path: "muni2.parquet" The file path to the restriction data relative to the data directory
-#      id_attribute: kommunekode   The ID attribute that is used to identify the restriction.
-
-restrictions:
-    - name: "municipality"
-      file_path: "../data/processed/adm_boundaries/sub_areas.parquet" # should be the same as in the sub_study_areas_fp!
-      id_attribute: kommunekode
 
 # The service array is used to define the services that are available in the model and how they are processed.
 #    - service_type: doctor-gp Usen to name the service
@@ -113,8 +96,8 @@ services:
       spatial_restriction_type: "municipality"
       nace_codes:
         - 852010
-      osm_tags:
-        - amenity: school
+      #osm_tags:
+        # - amenity: school
 
     - service_type: supermarket
       n_neighbors: 1
@@ -159,31 +142,49 @@ services:
 
 
 
-# Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
-# All service types will be included in the comparison of data sources
-osm_export_types:
-- doctor_gp
-- dentist
-- pharmacy
-- kindergarten-nursery
--  #school
-- recreation
-- library
-- sports_facility
-- supermarket
-- train_station
+# # Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
+# # All service types will be included in the comparison of data sources
+# osm_export_types:
+# - doctor_gp
+# - dentist
+# - pharmacy
+# - kindergarten-nursery
+# -  #school
+# - recreation
+# - library
+# - sports_facility
+# - supermarket
+# - train_station
 
-cvr_export_types:
-- doctor_gp
-- dentist
-- pharmacy
-- kindergarten-nursery
-- school
-- library
-- sports_facility
-- supermarket
-- train_station
+# cvr_export_types:
+# - doctor_gp
+# - dentist
+# - pharmacy
+# - kindergarten-nursery
+# - school
+# - library
+# - sports_facility
+# - supermarket
+# - train_station
 
+
+# The restriction array is used to define the spatial restrictions that are applied to the services.
+# Each restriction has a name, a file path, and an ID that is used to identify the restriction in the data.
+# The file path is the location of the data file that contains the spatial restriction information.
+# The file_path is relative to the data directory and should point to a parquet file
+# Note the CRS if the restrion files must be the same as the data files
+# and all files are assumed to be 2D i.e no z coordinate
+# Note that if the adresses or service data has a attribute with the same name as the restriction following 
+# by "_id" ie. municipality_id: this will be used otherwise a spatial join will be preformed.
+# restrictions:
+#    - name: "municipality" The name of the restriction that must match the name in the service array
+#      file_path: "muni2.parquet" The file path to the restriction data relative to the data directory
+#      id_attribute: kommunekode   The ID attribute that is used to identify the restriction.
+
+restrictions:
+    - name: "municipality"
+      file_path: "../data/processed/adm_boundaries/sub_areas.parquet" # should be the same as in the sub_study_areas_fp!
+      id_attribute: kommunekode
 
 # The following parameters are used when calling OTP
 sample_size : 0 # Munber of rows to sample from the data 0 = all
@@ -202,13 +203,10 @@ otp_results : "otp_results.db" # The persistant duckdb  where the OTP results ar
 travel_date : "2025-04-22"
 
 
-
-
 # Filepaths for input data when calculating the travel matrix in the nearest.py (to and from)
-
 data_sources:
   dwellings:
-    path: "processed/bbr/adgangsadresser_beboelse.parquet" # should be the same as address_bbr_fp but relative to the data directory
+    path: "processed/bbr/adgangsadresser_beboelse.parquet" # should be the same as address_bbr_fp defined above but relative to the data directory
     base_columns:
       address_id: "adresseIdentificerer"
       geometry: "geometry"  # EPSG:25832
@@ -216,7 +214,7 @@ data_sources:
       road_point_lon: "vej_pos_lon"
 
   services:
-    path: "processed/destinations/osm-cvr-combined.parquet" # should be the same as destinations_combined_fp but relative to the data directory
+    path: "processed/destinations/osm-cvr-combined.parquet" # should be the same as destinations_combined_fp defined above but relative to the data directory
     base_columns:
       address_id: "Adr_id"
       geometry: "geometry"

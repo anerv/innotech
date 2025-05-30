@@ -28,9 +28,6 @@ from src.helper_functions import (
 with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
-    osm_export_types = parsed_yaml_file["osm_export_types"]
-    cvr_export_types = parsed_yaml_file["cvr_export_types"]
-
     sub_adm_boundaries_fp = parsed_yaml_file["sub_adm_boundaries_fp"]
     study_area_fp = parsed_yaml_file["study_area_fp"]
 
@@ -41,21 +38,6 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
 
 # %%
-# Mapping between service types and subcategories
-# sub_service_to_main = {
-#     "doctor": ["doctor-gp"],
-#     "dentist": ["dentist"],
-#     "pharmacy": ["pharmacy"],
-#     "kindergarten-nursery": [
-#         "kindergarten",
-#         "nursery",
-#     ],
-#     "school": ["school"],
-#     "library": ["library"],
-#     "sports_facility": ["sports_facility"],
-#     "shop": ["supermarket", "discount_supermarket"],
-#     "train_station": ["train_station"],
-# }
 
 osm_color = "#EE7733"
 cvr_color = "#009988"
@@ -387,6 +369,8 @@ if analyse_destinations_per_municipality:
         csv_fp,
         html_fp,
     )
+
+dest_count_main
 
 
 # %%
