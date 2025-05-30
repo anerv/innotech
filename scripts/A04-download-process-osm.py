@@ -43,11 +43,6 @@ for service in services:
     if "osm_tags" in service:
         queries[service["service_type"]] = service["osm_tags"]
 
-# %%
-# with open(r"../config-data-prep.yml", encoding="utf-8") as file:
-#     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
-
-#     queries_org = parsed_yaml_file["osm_queries"]
 
 # %%
 region = gpd.read_file(study_area_fp)
