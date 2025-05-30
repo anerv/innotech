@@ -6,7 +6,6 @@ import os
 import requests
 import numpy as np
 import duckdb
-import pandas as pd
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -49,18 +48,6 @@ otp_con = duckdb.connect(otp_db_fp)
 
 # %%
 # Define helper functions
-
-
-# def convert_otp_time(millis, tz="Europe/Copenhagen"):
-#     if isinstance(millis, (int, float)) and millis > 0:
-#         try:
-#             return datetime.fromtimestamp(millis / 1000, tz=ZoneInfo(tz)).strftime(
-#                 "%Y-%-m-%-d:%-H,%M"
-#             )
-#         except Exception as e:
-#             print(f"Failed to convert timestamp {millis}: {e}")
-#             return None
-#     return None
 
 
 def convert_otp_time(millis, tz="Europe/Copenhagen"):
@@ -241,7 +228,7 @@ def process_adresses(
 # %%
 services = config_model["services"]
 
-for service in services[0:1]:
+for service in services:
     for i in range(1, int(service["n_neighbors"]) + 1):
         dataset = f"{service['service_type']}_{i}"
         # Process each dataset
