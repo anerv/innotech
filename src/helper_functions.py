@@ -110,18 +110,6 @@ def create_relations_gdf(overpass_result, relations):
     return gpd.GeoDataFrame(data, crs="EPSG:4326")
 
 
-# def drop_intersecting_nodes(nodes_gdf, ways_gdf):
-
-#     # Function to check if a node intersects with any linestring
-#     def node_intersects(node):
-#         return ways_gdf.intersects(node).any()
-
-#     # Filter nodes that do not intersect with any linestring
-#     filtered_nodes_gdf = nodes_gdf[~nodes_gdf.geometry.apply(node_intersects)].copy()
-
-#     return filtered_nodes_gdf
-
-
 def combine_points_within_distance(points_gdf, distance=200, inherit_columns=None):
     """
     Combines all point geometries within a specified distance into one point.
@@ -284,12 +272,6 @@ def count_destinations_in_municipalities(
     df_styled = df_styled.set_table_attributes(
         'style="width: 50%; border-collapse: collapse;"'
     )
-
-    # muni_subset_with_counts = muni_subset.merge(
-    #     muni_service_pivot, left_on="navn", right_index=True, how="left"
-    # )
-
-    # muni_subset_with_counts = muni_subset_with_counts.fillna(0)
 
     muni_service_pivot.to_csv(csv_fp, index=True)
 
@@ -784,3 +766,135 @@ def drop_contained_polygons(gdf, drop=True):
         return gdf.drop(index=contained_indices)
     else:
         return list(contained_indices)
+
+
+def plot_no_connection(df, study_area, attribution_text, font_size, title, fp=None):
+    """
+    Plot the results on a map.
+    """
+
+    # Convert DataFrame to GeoDataFrame
+    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
+    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+    gdf.to_crs("EPSG:25832", inplace=True)
+
+    assert study_area.crs == gdf.crs, "CRS mismatch between study area and GeoDataFrame"
+
+    _, ax = plt.subplots(figsize=(10, 10))
+
+    study_area.plot(
+        ax=ax,
+        color="none",
+        edgecolor="black",
+        alpha=0.5,
+    )
+
+    gdf.plot(
+        ax=ax,
+        legend=True,
+        markersize=5,
+        color="orange",
+        edgecolor="orange",
+        alpha=0.5,
+        legend_kwds={"label": "No connection"},
+    )
+
+    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+    ax.set_axis_off()
+
+    ax.add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    if fp:
+
+        plt.savefig(
+            fp,
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+    plt.show()
+    plt.close()
+
+
+def plot_traveltime_results(df, plot_col, attribution_text, font_size, title, fp=None):
+    """
+    Plot the results on a map.
+    """
+
+    # Convert DataFrame to GeoDataFrame
+    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
+    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+    gdf.to_crs("EPSG:25832", inplace=True)
+
+    _, ax = plt.subplots(figsize=(10, 10))
+
+    divider = make_axes_locatable(ax)
+
+    cax = divider.append_axes("right", size="3.5%", pad="1%")
+    cax.tick_params(labelsize=font_size)
+
+    gdf.plot(
+        ax=ax,
+        cax=cax,
+        column=plot_col,
+        cmap="viridis",
+        legend=True,
+        markersize=5,
+    )
+
+    for spine in cax.spines.values():
+        spine.set_visible(False)
+
+    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+    ax.set_axis_off()
+
+    ax.add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    if fp:
+
+        plt.savefig(
+            fp,
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+    plt.show()
+    plt.close()

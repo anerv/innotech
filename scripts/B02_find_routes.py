@@ -274,7 +274,8 @@ doctor1 = pd.read_parquet("../data/processed/destinations/doctor_gp_1.parquet")
 
 # %%
 
-assert test.source_id.unique() == True, "Source IDs are not unique in the dataset."
+assert test.source_id.is_unique == True, "Source IDs are not unique in the dataset."
+# %%
 assert len(test) == len(
     doctor1
 ), "The number of rows in the test dataset does not match the original dataset."

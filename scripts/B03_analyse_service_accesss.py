@@ -6,12 +6,9 @@ import pandas as pd
 import geopandas as gpd
 import yaml
 from pathlib import Path
-import matplotlib.pyplot as plt
-import contextily as cx
-from matplotlib_scalebar.scalebar import ScaleBar
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import os
 import sys
+from src.helper_functions import plot_traveltime_results, plot_no_connection
 
 os.environ["GDAL_DATA"] = os.path.join(
     f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
@@ -29,79 +26,6 @@ config_path = root_path / "config.yml"
 # Read and parse the YAML file
 with open(config_path, "r") as file:
     config_model = yaml.safe_load(file)
-
-
-# %%
-
-
-def plot_traveltime_results(df, plot_col, attribution_text, font_size, title, fp=None):
-    """
-    Plot the results on a map.
-    """
-    import matplotlib.pyplot as plt
-    import geopandas as gpd
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-    from matplotlib_scalebar.scalebar import ScaleBar
-    import contextily as cx
-
-    # Convert DataFrame to GeoDataFrame
-    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-    gdf.to_crs("EPSG:25832", inplace=True)
-
-    _, ax = plt.subplots(figsize=(10, 10))
-
-    divider = make_axes_locatable(ax)
-
-    cax = divider.append_axes("right", size="3.5%", pad="1%")
-    cax.tick_params(labelsize=font_size)
-
-    gdf.plot(
-        ax=ax,
-        cax=cax,
-        column=plot_col,
-        cmap="viridis",
-        legend=True,
-        markersize=5,
-    )
-
-    for spine in cax.spines.values():
-        spine.set_visible(False)
-
-    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
-
-    ax.set_axis_off()
-
-    ax.add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower left",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    if fp:
-
-        plt.savefig(
-            fp,
-            dpi=300,
-            bbox_inches="tight",
-        )
-
-    plt.show()
-    plt.close()
 
 
 # %%
@@ -223,7 +147,7 @@ for service in services[0:1]:
                 fp,
             )
 
-        no_results = df[df["duration"].isna()]
+        no_results = df[df["duration"].isna()].copy()
         if not no_results.empty:
             fp_no_results = results_path / f"maps/{dataset}_no_results.png"
             title_no_results = f"Locations with no results for {dataset.split('_')[-1]} nearest {dataset.split('_')[0]} by public transport"
@@ -245,93 +169,8 @@ summary_df.T
 
 # TODO: Style
 # For each row, highlight the min values in blue and the max values in orange
-
-
+# %%
 summary_df.to_csv(
     results_path / "data/service_access_summary.csv", index=True, float_format="%.2f"
 )
-# %%
-
-
-# TODO
-
-# Make maps of the results:
-# Travel times for each service
-
-
-# %%
-# TODO: make maps of sources with no results
-
-
-def plot_no_connection(df, study_area, attribution_text, font_size, title, fp=None):
-    """
-    Plot the results on a map.
-    """
-    import matplotlib.pyplot as plt
-    import geopandas as gpd
-    from matplotlib_scalebar.scalebar import ScaleBar
-    import contextily as cx
-
-    # Convert DataFrame to GeoDataFrame
-    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-    gdf.to_crs("EPSG:25832", inplace=True)
-
-    assert study_area.crs == gdf.crs, "CRS mismatch between study area and GeoDataFrame"
-
-    _, ax = plt.subplots(figsize=(10, 10))
-
-    study_area.plot(
-        ax=ax,
-        color=None,
-        edgecolor="black",
-        alpha=0.5,
-    )
-
-    gdf.plot(
-        ax=ax,
-        legend=True,
-        markersize=5,
-        color="orange",
-        edgecolor="orange",
-        alpha=0.5,
-        legend_kwds={"label": "No connection"},
-    )
-
-    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
-
-    ax.set_axis_off()
-
-    ax.add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower left",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    if fp:
-
-        plt.savefig(
-            fp,
-            dpi=300,
-            bbox_inches="tight",
-        )
-
-    plt.show()
-    plt.close()
-
-
 # %%
