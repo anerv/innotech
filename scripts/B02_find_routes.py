@@ -260,39 +260,3 @@ for service in services[0:1]:
         )
 
 # %%
-
-# TODO:
-# rerun for doctor
-# check if this fixes issue with duplicates
-# check if search window setting works
-# check if search window results in too late arrival times?
-
-
-fp = f"{results_path}/{dataset}_otp.parquet"
-test = pd.read_parquet(fp)
-doctor1 = pd.read_parquet("../data/processed/destinations/doctor_gp_1.parquet")
-
-# %%
-
-assert test.source_id.is_unique == True, "Source IDs are not unique in the dataset."
-# %%
-assert len(test) == len(
-    doctor1
-), "The number of rows in the test dataset does not match the original dataset."
-# %%
-test["duration_minutes"] = test.duration / 60
-test["arrival_time"] = test.startTime + pd.to_timedelta(test.duration_minutes, unit="m")
-
-date = config_model["travel_date"]
-time = "11:00"
-# combine date and time into a single datetime object
-arrival_deadline = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M").replace(
-    tzinfo=ZoneInfo("Europe/Copenhagen")
-)
-
-# check that arrival time is not after time of arrival
-assert all(
-    arrival_deadline <= test.arrival_time
-), "Some arrival times are after the expected time of arrival."
-
-# %%
