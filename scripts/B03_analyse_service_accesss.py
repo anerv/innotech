@@ -8,7 +8,13 @@ import yaml
 from pathlib import Path
 import os
 import sys
-from src.helper_functions import plot_traveltime_results, plot_no_connection
+from src.helper_functions import (
+    plot_traveltime_results,
+    plot_no_connection,
+    highlight_max_traveltime,
+    highlight_min_traveltime,
+)
+
 
 os.environ["GDAL_DATA"] = os.path.join(
     f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
@@ -39,7 +45,7 @@ services = config_model["services"]
 
 summaries = []
 
-for service in services[0:1]:
+for service in services:
 
     for i in range(1, int(service["n_neighbors"]) + 1):
         dataset = f"{service['service_type']}_{i}"
@@ -78,7 +84,7 @@ for service in services[0:1]:
             )
 
         result_count = df[df["duration"].notna()].shape[0]
-        print(f"{result_count} solutions found in {dataset} with{len(df)} rows.")
+        print(f"{result_count} solutions found in {dataset} with {len(df)} rows.")
 
         print(
             f"{len(df[df["source_id"] == df["target_id"]])} rows where source and target are the same."
@@ -168,7 +174,51 @@ summary_df.set_index("dataset", inplace=True)
 summary_df.T
 
 # TODO: Style
+
 # For each row, highlight the min values in blue and the max values in orange
+
+# %%
+
+rows_to_style = [
+    "mean_duration",
+    "max_duration",
+    "median_duration",
+    "mean_wait_time",
+    "max_wait_time",
+    "median_wait_time",
+]  # or any list of index values you want
+
+
+styled_table = (
+    summary_df.T.style.apply(
+        highlight_max_traveltime,
+        axis=1,
+        subset=(
+            rows_to_style,
+            summary_df.T.columns,
+        ),  # style only these rows for all columns
+    )
+    .apply(
+        highlight_min_traveltime,
+        axis=1,
+        subset=(
+            rows_to_style,
+            summary_df.T.columns,
+        ),  # style only these rows for all columns
+    )
+    .set_table_styles(
+        [
+            {"selector": "th", "props": [("font-weight", "bold")]},
+        ]
+    )
+    .set_properties(**{"text-align": "left", "font-size": "12px", "width": "100px"})
+    .set_caption("Travel times and wait times for public transport to nearest services")
+    .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
+)
+
+styled_table
+
+
 # %%
 summary_df.to_csv(
     results_path / "data/service_access_summary.csv", index=True, float_format="%.2f"

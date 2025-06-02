@@ -13,6 +13,22 @@ import numpy as np
 from shapely.ops import transform
 
 
+def highlight_max_traveltime(s):
+    """
+    Highlight the maximum travel time in each row.
+    """
+    is_max = s == s.max()
+    return ["color: red" if v else "" for v in is_max]
+
+
+def highlight_min_traveltime(s):
+    """
+    Highlight the minimum travel time in each row.
+    """
+    is_min = s == s.min()
+    return ["color: blue" if v else "" for v in is_min]
+
+
 def get_service_type(nace_code, nace_dict):
     for service_type, codes in nace_dict.items():
         if nace_code in codes:
