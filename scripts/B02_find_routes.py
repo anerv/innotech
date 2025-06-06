@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 script_path = Path(__file__).resolve()
 root_path = script_path.parent.parent
 data_path = root_path / "data/processed/destinations"
-results_path = root_path / "results"
+results_path = root_path / "results/data"
 config_path = root_path / "config.yml"
 
 # Read and parse the YAML file
