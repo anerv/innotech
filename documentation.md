@@ -2,6 +2,9 @@
 
 ## Installation
 
+MISSING: JAVA 21, OTP, osmium
+
+
 Projektet kræver en installation af Python, Jupyter, Conda og pip. For at installere det nødvendige Conda Python-environment køres nedenstående i et terminalvindue:
 
 **Klon GitHub repository**
@@ -29,7 +32,6 @@ winget install DuckDB.cli
 ````
 
 
-MISSING: JAVA 21, OTP
 
 ## Inputdata
 
@@ -60,3 +62,5 @@ Se config.yml for forventede filnavne og placeringer.
 
 ### Analyser resultater
 
+
+- forklar kolonne navne og indhold
