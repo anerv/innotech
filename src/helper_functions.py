@@ -13,6 +13,14 @@ import numpy as np
 from shapely.ops import transform
 
 
+def identify_only_walking(row, walkspeed_min):
+
+    row.walk_duration_min = row["walkDistance"] / walkspeed_min
+    if abs((row.walkDistance / walkspeed_min) - row.duration_min) < 1:
+        return True
+    return False
+
+
 def highlight_max_traveltime(s):
     """
     Highlight the maximum travel time in each row.

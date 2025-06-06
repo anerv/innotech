@@ -13,6 +13,7 @@ from src.helper_functions import (
     plot_no_connection,
     highlight_max_traveltime,
     highlight_min_traveltime,
+    identify_only_walking,
 )
 
 
@@ -36,11 +37,13 @@ with open(config_path, "r") as file:
 
 # %%
 
+walkspeed_min = config_model["walk_speed"] * 60  # convert to minutes
+
+
 # load study area for plotting
 study_area = gpd.read_file(config_model["study_area_fp"])
 
 # Load results
-
 services = config_model["services"]
 
 summaries = []
@@ -65,12 +68,12 @@ for service in services:
             df = df.drop_duplicates(subset=["source_id", "target_id"])
 
         # Convert duration to minutes
-        df["duration_minutes"] = df["duration"] / 60
+        df["duration_min"] = df["duration"] / 60
 
         df["startTime"] = pd.to_datetime(df["startTime"]).dt.strftime("%Y-%m-%d %H:%M")
 
         df["arrival_time"] = pd.to_datetime(df["startTime"]) + pd.to_timedelta(
-            df["duration_minutes"], unit="m"
+            df["duration_min"], unit="m"
         )
 
         arrival_deadline = pd.to_datetime(
@@ -99,39 +102,42 @@ for service in services:
                 f"{no_results_count} sources have no results in {dataset}. This may indicate that the search window was too small or that no transit solution is available."
             )
 
-        ave_duration = df["duration_minutes"].mean()
+        ave_duration = df["duration_min"].mean()
         print(f"Average trip duration for {dataset}: {ave_duration:.2f} minutes")
 
-        df["wait_time"] = arrival_deadline - df["arrival_time"]
-        df["wait_time_minutes"] = df["wait_time"].dt.total_seconds() / 60
-        ave_wait_time = df["wait_time_minutes"].mean()
+        df["wait_time_dest"] = arrival_deadline - df["arrival_time"]
+        df["wait_time_dest_min"] = df["wait_time_dest"].dt.total_seconds() / 60
+        ave_wait_time = df["wait_time_dest_min"].mean()
         print(
             f"Average wait time at destination for {dataset}: {ave_wait_time:.2f} minutes"
         )
 
-        df["duration_wait_time_minutes"] = (
-            df["duration_minutes"] + df["wait_time_minutes"]
+        df["total_time_min"] = df["duration_min"] + df["wait_time_dest_min"]
+
+        # use walkspeed and duration to determine if the trip is only walking
+        df["only_walking"] = df.apply(
+            identify_only_walking, axis=1, walkspeed_min=walkspeed_min
         )
 
         # Export min, mean, max, and median duration and wait time
         summary = {
             "dataset": dataset,
-            "min_duration": float(f"{df['duration_minutes'].min():.2f}"),
-            "mean_duration": float(f"{df['duration_minutes'].mean():.2f}"),
-            "max_duration": float(f"{df['duration_minutes'].max():.2f}"),
-            "median_duration": float(f"{df['duration_minutes'].median():.2f}"),
-            "min_wait_time": float(f"{df['wait_time_minutes'].min():.2f}"),
-            "mean_wait_time": float(f"{df['wait_time_minutes'].mean():.2f}"),
-            "max_wait_time": float(f"{df['wait_time_minutes'].max():.2f}"),
-            "median_wait_time": float(f"{df['wait_time_minutes'].median():.2f}"),
+            "min_duration": float(f"{df['duration_min'].min():.2f}"),
+            "mean_duration": float(f"{df['duration_min'].mean():.2f}"),
+            "max_duration": float(f"{df['duration_min'].max():.2f}"),
+            "median_duration": float(f"{df['duration_min'].median():.2f}"),
+            "min_wait_time": float(f"{df['wait_time_dest_min'].min():.2f}"),
+            "mean_wait_time": float(f"{df['wait_time_dest_min'].mean():.2f}"),
+            "max_wait_time": float(f"{df['wait_time_dest_min'].max():.2f}"),
+            "median_wait_time": float(f"{df['wait_time_dest_min'].median():.2f}"),
         }
 
         summaries.append(summary)
 
         plot_columns = [
-            "duration_minutes",
-            "wait_time_minutes",
-            "duration_wait_time_minutes",
+            "duration_min",
+            "wait_time_dest_min",
+            "total_time_min",
         ]
 
         labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
@@ -166,18 +172,37 @@ for service in services:
                 title_no_results,
                 fp_no_results,
             )
+
+        # export to geoparquet
+        df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
+        gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+        gdf.to_crs("EPSG:25832", inplace=True)
+        gdf[
+            [
+                "source_id",
+                "target_id",
+                "startTime",
+                "arrival_time",
+                "waitingTime",
+                "walkDistance",
+                "abs_dist",
+                "duration_min",
+                "wait_time_dest_min",
+                "total_time_min",
+                "only_walking",
+                "geometry",
+            ]
+        ].to_parquet(
+            results_path / f"data/{dataset}_otp.gpkg",
+            index=False,
+            engine="pyarrow",
+        )
+
 # %%
 # Convert summaries to DataFrame
 summary_df = pd.DataFrame(summaries)
 summary_df.set_index("dataset", inplace=True)
 
-summary_df.T
-
-# TODO: Style
-
-# For each row, highlight the min values in blue and the max values in orange
-
-# %%
 
 rows_to_style = [
     "mean_duration",
@@ -224,3 +249,13 @@ summary_df.to_csv(
     results_path / "data/service_access_summary.csv", index=True, float_format="%.2f"
 )
 # %%
+styled_table.to_html(
+    results_path / "data/service_access_summary.html",
+    table_attributes='style="width: 50%; border-collapse: collapse;"',
+)
+
+
+# %%
+# TODO: identify sources where only walking is used based on walkdistance and duration
+df["only_walking"] = df["walkDistance"] <= walkspeed_min
+df["only_walking"] = None
