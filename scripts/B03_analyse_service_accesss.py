@@ -55,7 +55,7 @@ for service in services:
         # Process each dataset
 
         print(f"Processing result dataset: {dataset}")
-        fp = results_path / f"{dataset}_otp.parquet"
+        fp = results_path / f"data/{dataset}_otp.parquet"
         if not fp.exists():
             print(f"File {fp} does not exist. Skipping.")
             continue
@@ -193,7 +193,7 @@ for service in services:
                 "geometry",
             ]
         ].to_parquet(
-            results_path / f"data/{dataset}_otp.gpkg",
+            results_path / f"data/{dataset}_otp_geo.parquet",
             index=False,
             engine="pyarrow",
         )
@@ -245,17 +245,14 @@ styled_table
 
 
 # %%
+
 summary_df.to_csv(
     results_path / "data/service_access_summary.csv", index=True, float_format="%.2f"
 )
-# %%
+
 styled_table.to_html(
     results_path / "data/service_access_summary.html",
     table_attributes='style="width: 50%; border-collapse: collapse;"',
 )
 
-
 # %%
-# TODO: identify sources where only walking is used based on walkdistance and duration
-df["only_walking"] = df["walkDistance"] <= walkspeed_min
-df["only_walking"] = None
