@@ -151,7 +151,7 @@ def process_adresses(
         )
 
     # Function to process a single row
-    def process_row(row, date, time):
+    def process_row(row, date, time, search_window=7200):
         try:
             travel_info = get_travel_info(
                 row.source_lat,
@@ -161,7 +161,7 @@ def process_adresses(
                 date,
                 time,
                 walk_speed=1.3,
-                search_window=7200,  # 2 hours in seconds
+                search_window=search_window,
                 arrive_by="true",
             )
             itenerary = travel_info["data"]["plan"]["itineraries"][0]
@@ -209,7 +209,7 @@ def process_adresses(
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
-                executor.submit(process_row, row, date, time)
+                executor.submit(process_row, row, date, time, search_window)
                 for row in chunk.itertuples(index=False)
             ]
 
