@@ -245,7 +245,7 @@ assert len(osm_cvr_combined) == len(osm_destinations) + len(cvr_addresses)
 # %%
 
 # Make one map with all main categories
-fp = f"../results/maps/main-all-osm-cvr.png"
+fp = f"../results/destination_data_evaluation/main-all-osm-cvr.png"
 attribution_text = "(C) OSM, CVR"
 color1 = osm_color
 color2 = cvr_color
@@ -333,7 +333,7 @@ for i, service in enumerate(all_destinations):
 
     fp_destination = service.replace("/", "-")
 
-    fp = f"../results/maps/hex-grid-comparison-{fp_destination}.png"
+    fp = f"../results/destination_data_evaluation/hex-grid-comparison-{fp_destination}.png"
 
     plot_hex_summaries(
         combined_grid,
