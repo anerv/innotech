@@ -99,7 +99,7 @@ For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen
 
 ### Opdater config.yml
 
-For at køre XX-modellen køres alle py-scripts i mappen ``scripts`` i alfanumerisk rækkefølge.
+For at køre XX-modellen køres alle python-scripts i mappen ``run`` i alfabetisk rækkefølge.
 
 ### Generer inputdata
 
