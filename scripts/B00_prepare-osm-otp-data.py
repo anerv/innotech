@@ -15,13 +15,15 @@ with open(r"../config.yml", encoding="utf-8") as file:
     study_area_fp = parsed_yaml_file["study_area_fp"]
     study_area_name = parsed_yaml_file["study_area_name"]
 
+    osm_input_pbf = parsed_yaml_file["osm_input_pbf"]
+
 # %%
 
 ### PREPATE OSM DATA FOR OTP
 
 datafolder = Path("/Users/anerv/repositories/innotech/data")
 otp_folder = Path("/Users/anerv/repositories/innotech/otp")
-input_pbf = datafolder / "input/osm/denmark-latest.osm.pbf"
+input_pbf = datafolder / osm_input_pbf
 output_pbf = otp_folder / "osm_study_area.pbf"
 clipfile = datafolder / f"processed/adm_boundaries/study_area.geojson"
 
