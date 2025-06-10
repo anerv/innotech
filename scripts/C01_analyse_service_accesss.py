@@ -203,8 +203,6 @@ for service in services:
 summary_df = pd.DataFrame(summaries)
 summary_df.set_index("dataset", inplace=True)
 
-summary_df.round(0)
-  # Round to 0 decimal places for integer values
 rows_to_style = [
     "mean_duration",
     "max_duration",
@@ -232,6 +230,7 @@ styled_table = (
             summary_df.T.columns,
         ),  # style only these rows for all columns
     )
+    .format("{:.2f}")
     .set_table_styles(
         [
             {"selector": "th", "props": [("font-weight", "bold")]},
