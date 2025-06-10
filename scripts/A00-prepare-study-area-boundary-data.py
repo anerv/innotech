@@ -4,7 +4,6 @@ import geopandas as gpd
 import yaml
 from src.helper_functions import remove_z
 
-
 with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
