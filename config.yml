@@ -24,6 +24,10 @@ housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Cur
 # BBR data
 bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
+# OSM Road network
+osm_input_pbf: "input/osm/denmark-latest.osm.pbf" # filepath is relative to the data directory
+
+
 # PROCESSED DATA
 addresses_fp_all: "../data/processed/adresser/addresses-full.parquet"
 study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
@@ -37,7 +41,6 @@ destinations_combined_fp: "../data/processed/destinations/osm-cvr-combined.parqu
 osm_destinations_fp: "../data/processed/osm/all_osm_services.gpkg"
 cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
 cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
-
 
 # The service array is used to define the services that are available in the model and how they are processed.
 #    - service_type: doctor-gp Usen to name the service
