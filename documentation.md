@@ -106,8 +106,11 @@ For at køre XX-modellen køres alle python-scripts i mappen ``run`` i alfabetis
 ### Kør OTP
 
 - graf, localhost, etc (se todo)
+- advar om langsom process
 
 ### Analyser resultater
 
 
 - forklar kolonne navne og indhold
+
+### Optional - sammenlign datakilder
