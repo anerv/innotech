@@ -1,12 +1,15 @@
 # Vejledning
 
-Guiden indeholder en vejledning til at installere og downloade alle nødvendige programmer og datasæt, samt en kort vejledning til at køre analysen.
+Guiden indeholder en vejledning til at installere og downloade alle nødvendige programmer og datasæt, samt en kort vejledning til at køre analysen. 
 
 Se [LINK TIL RAPPORT] for baggrund for projektet og en detaljeret oversigt over datakilder og databehandling.
 
 ## Installation :computer:
 
 XX-modellen kan *enten* installeres manuelt (metode A) eller ved hjælp af Docker (metode B).
+
+XX-modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(TM) Ultra 5 125U.
+
 
 ### A. Manuel installation
 
@@ -75,11 +78,11 @@ python setup_folders.py
 
 ***MANGLER***
 
-## Inputdata :globe_with_meridians:
+## Inputdata :file_folder:
 
 Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og destinationer samt data på vejnetværket og offentlig transport.
 
-### Destinationer og adresser
+### Destinationer og adresser :house:
 
 - Adresse-data fra DAR (adresser, husnumre, og adressepunkter) for den ønskede region.
 - BBR-data (enheder) for den ønskede region: 
@@ -94,7 +97,7 @@ For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen
 
 ***Inkluder input-data i Docker???***
 
-### Inputdata til OTP
+### Inputdata til OTP :globe_with_meridians:
 
 - OpenStreetMap: A pbf-file for det pågældende land, downloadet fra eksempelvis https://download.geofabrik.de/.
 
@@ -103,27 +106,27 @@ For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen
 
 ## Anvendelse
 
-### 1. Opdater config.yml
+### 1. Opdater config.yml :pencil2:
 
 MANGLER
 
-### 2. Generer inputdata
+### 2. Generer inputdata :arrows_counterclockwise:
 
 MANGLER
 
 nævn graf
 
-### 3. Beregn rejsetider.
+### 3. Beregn rejsetider :bus:
 
 MANGLER
 
 - localhost, etc (se todo)
 - advar om langsom process
 
-### 4. Analyser resultater
+### 4. Analyser resultater :bar_chart:
 
 MANGLER
 
 - forklar kolonne navne og indhold
-
-### Sammenlign datakilder [valgfri]
+ 
+### Sammenlign datakilder [valgfri] :arrow_right::arrow_left:
