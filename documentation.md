@@ -157,10 +157,10 @@ Dette script kører en række sub-scripts der klargør input-data og bygger en `
 | startTime | Afgangstid |
 | from_lat | Koordinat på startpunktet (latitude) |
 | from_lon | Koordinat på slutpunktet (longitude) |
-| waitingTime | Ventetid i løbet af turen |
-| duration | Rejsetid i minutter |
-| walkDistance | Gåafstand (målt i afstand langs med vejnettet) |
-| abs_dist | Afstand mellem start og slutpunkter (målt i fugleflugtafstand) |
+| waitingTime | Ventetid i løbet af turen (sekunder) |
+| duration | Rejsetid i sekunder |
+| walkDistance | Gåafstand (meter), målt i afstand langs med vejnettet |
+| abs_dist | Afstand mellem start og slutpunkter (meter), målt i fugleflugtafstand |
 
 ### [destination]_[nummer]_otp_geo.parquet
 
@@ -172,8 +172,8 @@ Dette script kører en række sub-scripts der klargør input-data og bygger en `
 | startTime | Afgangstid |
 | arrival_time | Ankomsttid |
 | waitingTime | Ventetid i løbet af turen |
-| walkDistance | Gåafstand (målt i afstand langs med vejnettet) |
-| abs_dist | Afstand mellem start og slutpunkter (målt i fugleflugtafstand) |
+| walkDistance | Gåafstand (meter), målt i afstand langs med vejnettet |
+| abs_dist | Afstand mellem start og slutpunkter (meter), målt i fugleflugtafstand |
 | duration_min | Rejsetid i minutter |
 | wait_time_dest_min | Ventetid på destinationen i minutter |
 | total_time_min | Samlet tid (rejse + ventetid) i minutter |
