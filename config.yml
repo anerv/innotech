@@ -3,13 +3,14 @@
 study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
 
 
-# Filepaths for... 
+#### FILEPATHS #####
+# The filepaths are relative to the main directory for the repository and should point to the data files
 
 # INPUT DATA
 
 # administrative boundaries
-adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" # Data set with administrative boundaries
-sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" # Data set with administrative boundaries
+adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" 
+sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" 
 
 # CVR data
 cvr_address_input_fp: "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
@@ -17,15 +18,15 @@ cvr_brancher_input_fp: "../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Curre
 cvr_penhed_input_fp: "../data/input/cvr/CVR_V1_Produktionsenhed_TotalDownload_csv_Current_8.csv"
 
 # DAR data
-input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adresse.parquet"
-address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Adressepunkt.parquet"
-housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" #"../data/input/adresser/Husnummer.parquet"
+input_address_fp: "../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv" 
+address_points_fp:  "../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv" 
+housenumbers_fp:  "../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv" 
 
 # BBR data
 bbr_fp:  "../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"
 
 # OSM Road network
-osm_input_pbf: "input/osm/denmark-latest.osm.pbf" # filepath is relative to the data directory
+osm_input_pbf: "input/osm/denmark-latest.osm.pbf" # this filepath is relative to the data directory
 
 
 # PROCESSED DATA
@@ -43,12 +44,13 @@ cvr_destinations_fp:  "../data/processed/cvr/cvr-services-w-address.gpkg"
 cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
 
 # The service array is used to define the services that are available in the model and how they are processed.
-#    - service_type: doctor-gp Usen to name the service
+#    - service_type: doctor-gp Used to name the service
 #      spatial_restriction_type: Used to define the type of spatial restriction on the service emmpty or null means no restriction
 #      n_neighbors: 1  The number of neighbors to consider when calculating the service location
 #      arival_time: "11:00" The time of arrival at the service location
 #      nace_codes: The NACE codes used to identify the service location in the CVR data
 #       - 862100
+#      osm_tags: The OSM tags used to identify the service location in the OSM data
 services:
     - service_type: doctor
       spatial_restriction_type: 
@@ -108,7 +110,7 @@ services:
       spatial_restriction_type:
       nace_codes:
         - 471120 # Supermarked
-        - 471130 # Discount sopermarkedet
+        - 471130 # Discount supermarket
       osm_tags:
         - shop: supermarket
         - shop: grocery
@@ -143,34 +145,6 @@ services:
         - leisure: sports_centre
         - club: sport
 
-
-
-# # Define here which service types to include from each source in the EXPORTED data set to be used for the analysis
-# # All service types will be included in the comparison of data sources
-# osm_export_types:
-# - doctor
-# - dentist
-# - pharmacy
-# - kindergarten-nursery
-# -  #school
-# - recreation
-# - library
-# - sports_facility
-# - supermarket
-# - train_station
-
-# cvr_export_types:
-# - doctor
-# - dentist
-# - pharmacy
-# - kindergarten-nursery
-# - school
-# - library
-# - sports_facility
-# - supermarket
-# - train_station
-
-
 # The restriction array is used to define the spatial restrictions that are applied to the services.
 # Each restriction has a name, a file path, and an ID that is used to identify the restriction in the data.
 # The file path is the location of the data file that contains the spatial restriction information.
@@ -190,15 +164,16 @@ restrictions:
       id_attribute: kommunekode
 
 # The following parameters are used when calling OTP
-sample_size : 0 # Munber of rows to sample from the data 0 = all
+sample_size : 0 # Munber of rows to sample from the data, 0 = all
 chunk_size : 5000  # number of rows to load into memory
 parallelism : 10  # The number of parallel processes to use when calling OTP
 
 walk_speed : 1.3 # The walking speed in m/s used when calculating the travel time to the service location
-search_window : 7200 # 2 hours in seconds # The search window in seconds when calculating the travel time to the service location
+search_window : 7200 # = 2 hours in seconds # The search window in seconds when calculating the travel time to the service location
 
 # Define the endpoint URL
-otp_url : "http://localhost:8080/otp/gtfs/v1" # http://localhost:8080/
+otp_url : "http://localhost:8080/otp/gtfs/v1" #
+
 
 otp_results : "otp_results.db" # The persistant duckdb  where the OTP results are stored
 
