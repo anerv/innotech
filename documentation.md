@@ -1,35 +1,39 @@
-# Dokumentation
+# Vejledning
 
-## Installation
+Guiden indeholder en vejledning til at installere og downloade alle nødvendige programmer og datasæt, samt en kort vejledning til at køre analysen.
 
-XX-modellen kan *enten* installeres manuelt eller ved hjælp af Docker.
+Se [LINK TIL RAPPORT] for baggrund for projektet og en detaljeret oversigt over datakilder og databehandling.
 
-### Manuel installation
+## Installation :computer:
+
+XX-modellen kan *enten* installeres manuelt (metode A) eller ved hjælp af Docker (metode B).
+
+### A. Manuel installation
 
 Projektet kræver at følgende programmer og værktøjer er installeret:
 
-- DuckDB
-- OpenTripPlanner
-- Osmium
-- Innotech Conda environment
-- Python*
-- Jupyter*
-- Conda*
-- pip*
-- git*
-- Java 21*
+- *DuckDB*
+- *OpenTripPlanner*
+- *Osmium*
+- *Innotech Conda environment*
+- *Python**
+- *Jupyter**
+- *Conda**
+- *pip**
+- *git**
+- *Java 21**
 
 *Guiden antager at værktøjer markeret med * allerede er installeret.
 
 For at installere de resterende værktøjer køres nedenstående i et terminalvindue:
 
-#### Klon GitHub repository
+#### A1. Klon GitHub repository
 
 ````bash
 git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
 ````
 
-### Skab Conda environment
+#### A2. Skab Conda environment
 ```bash
 conda create -n innotech geopandas pyyaml pyarrow overpy contextily scikit-learn h3-py python-duckdb ipykernel osmium-tool
 ```
@@ -37,27 +41,27 @@ conda create -n innotech geopandas pyyaml pyarrow overpy contextily scikit-learn
 *ELLER*
 
 ```bash
-conda env create -f environment.yaml
+conda env create -f environment.yml
 ```
 
 
-#### Aktiver Conda environment og installer sidste elementer
+#### A3. Aktiver Conda environment og installer sidste elementer
 ````bash
 conda activate innotech
 pip install matplotlib-scalebar
 pip install -e .
 ````
 
-### Installer DuckDB
+#### A4. Installer DuckDB
 ````bash
 winget install DuckDB.cli
 ````
 
-### Installer OpenTripPlanner
+#### A5. Installer OpenTripPlanner
 
 Følg instruktionerne for installation af OpenTripPlanner (OTP) her: https://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/.
 
-### Klargør mapper til data og resultater
+#### A6. Klargør mapper til data og resultater
 
 Naviger til hovedmappen (``innotech``) i en terminal og kør:
 
@@ -65,13 +69,15 @@ Naviger til hovedmappen (``innotech``) i en terminal og kør:
 python setup_folders.py
 ````
 
-## Installation med Docker
+***Should this be included/after docker option?***
+
+### B. Installation med Docker
 
 ***MANGLER***
 
-## Inputdata
+## Inputdata :globe_with_meridians:
 
-Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og destinationer, samt data på vejnetværket og offentlig transport, til brug i OTP.
+Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og destinationer samt data på vejnetværket og offentlig transport.
 
 ### Destinationer og adresser
 
@@ -82,7 +88,7 @@ Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og des
 
 Alle data kan downloades fra Datafordeler.dk.
 
-Se config.yml for forventede filnavne og placeringer.
+Se ``config.yml`` for forventede filnavne og placeringer.
 
 For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: LINK TIL RAPPORT.
 
@@ -97,20 +103,27 @@ For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen
 
 ## Anvendelse
 
-### Opdater config.yml
+### 1. Opdater config.yml
 
-For at køre XX-modellen køres alle python-scripts i mappen ``run`` i alfabetisk rækkefølge.
+MANGLER
 
-### Generer inputdata
+### 2. Generer inputdata
 
-### Kør OTP
+MANGLER
 
-- graf, localhost, etc (se todo)
+nævn graf
+
+### 3. Beregn rejsetider.
+
+MANGLER
+
+- localhost, etc (se todo)
 - advar om langsom process
 
-### Analyser resultater
+### 4. Analyser resultater
 
+MANGLER
 
 - forklar kolonne navne og indhold
 
-### Optional - sammenlign datakilder
+### Sammenlign datakilder [valgfri]
