@@ -24,9 +24,10 @@ data/otp_results.db
 data/otp_results.db.wal
 
 
-
 todo.md
+notes.md
 prelim-results-service-access.md
 comparison-cvr-osm-destination-data.md
-resultater_subset.qgz
+
 resultater.qgz
+
