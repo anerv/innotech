@@ -51,7 +51,7 @@ conda env create -f environment.yml
 ````bash
 conda activate innotech
 pip install matplotlib-scalebar
-pip install -e .
+pip install --use-pep517 -e .
 ````
 
 #### A4. Installer DuckDB
@@ -76,6 +76,10 @@ python setup_folders.py
 ### B. Installation med Docker
 
 ***MANGLER***
+
+#### B1. Installer Docker Desktop
+
+#### B2. 
 
 ## Inputdata :file_folder:
 
