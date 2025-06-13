@@ -149,3 +149,6 @@ For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen
 
 - NeTEx rejseplansdata: I Danmark kan rejseplansdata i NeTEx-formattet downloades fra det Nationale Access Point: https://du-portal-ui.dataudveksler.app.vd.dk/data/242/overview.
 
+
+Se [anvendelsesguiden](user_guide.md) for instruktioner til at køre analysen.
+
