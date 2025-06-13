@@ -99,15 +99,17 @@ docker pull your-dockerhub-username/otp-python-env:latest
 * Kør Docker containeren:
 
 ```bash
-docker run -it --rm -p 8888:8888 -p 8080:8080 -v "$(pwd)":/home/jovyan/work innotech-env:local
+docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work innotech-env:local
 ```
+
+***OPDATER TIL LATEST?***
 
 #### B4. Anvend Docker Python environment
 
 ##### Med JupyterLab:
 
 * Åben et browservindue og gå til http://localhost:8888
-* Brug den præ-indstillede Python kernel i Jupyter-lab vinduet til at køre analysen (se anvendelsesguiden ``analysis_guide.md``).
+* Kør analysen (se anvendelsesguiden ``analysis_guide.md``), brug ``Python Innotech`` som kernel.
 
 ##### Med Visual Studio Code
 
