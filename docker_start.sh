@@ -17,10 +17,6 @@ python --version
 echo "Running setup_folders.py..."
 python /home/jovyan/work/setup_folders.py
 
-# Start OpenTripPlanner in the background
-echo "Starting OpenTripPlanner..."
-java -Xmx2G -jar /usr/src/app/otp.jar &
-
 # Start Jupyter Notebook
 echo "Starting Jupyter Notebook..."
 jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token=''

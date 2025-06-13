@@ -9,6 +9,7 @@ Se ***[LINK TIL RAPPORT]*** for baggrund for projektet og en detaljeret oversigt
 Modellen kan *enten* installeres manuelt (metode A) eller ved hjælp af Docker (metode B).
 Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(TM) Ultra 5 125U.
 
+***
 
 ### A. Manuel installation
 
@@ -25,7 +26,7 @@ Projektet kræver at følgende programmer og værktøjer er installeret:
 - *git**
 - *Java 21**
 
-*Guiden antager at værktøjer markeret med * allerede er installeret.
+*Guiden til manuel installation antager at værktøjer markeret med * allerede er installeret.
 
 For at installere de resterende værktøjer køres nedenstående i et terminalvindue:
 
@@ -33,6 +34,7 @@ For at installere de resterende værktøjer køres nedenstående i et terminalvi
 
 ````bash
 git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
+cd innotech
 ````
 
 #### A2. Skab Conda environment
@@ -45,7 +47,6 @@ conda create -n innotech geopandas pyyaml pyarrow overpy contextily scikit-learn
 ```bash
 conda env create -f environment.yml
 ```
-
 
 #### A3. Aktiver Conda environment og installer sidste elementer
 ````bash
@@ -63,21 +64,65 @@ winget install DuckDB.cli
 
 Følg instruktionerne for installation af OpenTripPlanner (OTP) her: https://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/.
 
+OTP-programmet skal placeres i ``otp``-mappen, eksempelvis:
+``innotech/otp/otp-shaded-2.7.0.jar``.
+
 #### A6. Klargør mapper til data og resultater
 
-Naviger til hovedmappen (``innotech``) i en terminal og kør:
+Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det, og kør:
 
 ````bash
 python setup_folders.py
 ````
 
+***
+
 ### B. Installation med Docker
 
-***MANGLER***
+* Kræver en installation af [Git](https://git-scm.com/downloads) og (valgfrit) [Visual Studio Code](https://code.visualstudio.com/) med *Remote - Containers* udvidelsen.
 
 #### B1. Installer Docker Desktop
 
-#### B2. 
+* Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
+* Start Docker Desktop
+
+#### B2. Download Docker image
+
+* Download docker imaget fra Docker Hub:
+
+```bash
+docker pull your-dockerhub-username/otp-python-env:latest
+```
+
+#### B3. Kør Docker container
+
+* Kør Docker containeren:
+
+```bash
+docker run -it --rm -p 8888:8888 -p 8080:8080 -v "$(pwd)":/home/jovyan/work innotech-env:local
+```
+
+#### B4. Anvend Python environment
+
+##### Med JupyterLab:
+
+* Åben et browservindue og gå til http://localhost:8888
+* Brug den præ-indstillede Python kernel i Jupyter-lab vinduet til at køre analysen (se anvendelsesguiden nedenfor)
+
+##### Med Visual Studio Code
+
+* Åben Visual Studio Code
+
+* Installer *Remote - Containers*-udvidelsen.
+
+* Åben *Command Palette* (`Ctrl+Shift+P` eller `Cmd+Shift+P`) og vælg: ``Remote-Containers: Attach to Running Container...``
+
+* Vælg den aktive container `innotech-env`.
+
+* Inden i ``innotech-enc`` workspace, vælg Python interpreteren ``Python (innotech)``.
+
+* Herfra kan analysen køres (se anvendelsesguiden nedenfor).
+
 
 ## Inputdata :file_folder:
 
@@ -124,13 +169,34 @@ Dette script kører en række sub-scripts der klargør input-data og bygger en `
 
 ### 3. Beregn rejsetider :bus:
 
-**1.** Naviger til mappen ``/otp`` (ligger i hovedmappen for repository ``innotech``).
+**A.** Start OpenTripPlanner:
 
-**2.** Kør kommandoen ```java -Xmx2G -jar otp-shaded-2.7.0.jar --load .``` for at starte OpenTripPlanner.
+##### Hvis du har fulgt den manuelle installationsguide:
+
+* Naviger til undermappen ``otp``:
+
+```bash
+cd otp
+```
+
+* Kør kommandoen:
+```bash
+java -Xmx2G -jar otp-shaded-2.7.0.jar --load .
+```
+
+##### Hvis du bruger Docker-installation:
+
+* Naviger til hovedmappen ``innotech``
+
+* Kør kommandoen:
+
+```bash
+java -Xmx2G -jar /usr/src/app/otp-shaded-2.6.0.jar --load .
+```
 
 - Tjek eventuelt http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
 
-**3.** Kør script ``B_run_otp.py`` (i mappen ``/run``).
+**B.** Kør script ``B_run_otp.py`` (i mappen ``/run``).
 
 - For et område som Region Sjælland med standard-indstillinger vil det tage 8+ timer at køre analysen på en almindelig laptop (testet på  Windows 11, Intel(R) Core(TM) Ultra 5 125U, 32 GB ram)
 
