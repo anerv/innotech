@@ -28,10 +28,9 @@ Dette script kører en række sub-scripts der klargør input-data og bygger en `
 cd innotech/otp
 ```
 
-* Kør kommandoerne:
+* Kør kommandoen:
 ```bash
-docker exec -it innotech-container bash
-java -Xmx2G -jar [the name of your otp.jar file] --load .
+java -Xmx2G -jar "the name of your otp.jar file" --load .
 ```
 
 ##### Hvis du bruger Docker-installation:
@@ -44,9 +43,10 @@ java -Xmx2G -jar [the name of your otp.jar file] --load .
 cd innotech/otp
 ```
 
-* Kør kommandoen:
+* Kør kommandoerne:
 
 ```bash
+docker exec -it innotech-container bash
 java -Xmx2G -jar otp.jar --load .
 ```
 
