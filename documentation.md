@@ -71,8 +71,6 @@ Naviger til hovedmappen (``innotech``) i en terminal og kør:
 python setup_folders.py
 ````
 
-***TODO: Should this be included/after docker option?***
-
 ### B. Installation med Docker
 
 ***MANGLER***

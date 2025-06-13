@@ -1,0 +1,19 @@
+{
+    "name": "OTP Python Environment",
+    "image": "your-dockerhub-username/otp-python-env:latest",
+    "workspaceFolder": "/home/jovyan/work",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ],
+            "settings": {
+                "python.pythonPath": "/opt/conda/envs/innotech/bin/python",
+                "python.defaultInterpreterPath": "/opt/conda/envs/innotech/bin/python"
+            }
+        }
+    },
+    "remoteUser": "jovyan",
+    "postStartCommand": "pip install --use-pep517 -e . || true"
+}

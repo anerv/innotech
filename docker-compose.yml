@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  otp-jupyter:
+    build: .
+    container_name: otp-python-env
+    ports:
+      - "8888:8888" # Jupyter Notebook
+      - "8080:8080" # OpenTripPlanner
+    volumes:
+      - .:/home/jovyan/work # Optional: mount local project dir
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
