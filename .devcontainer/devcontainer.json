@@ -1,6 +1,6 @@
 {
     "name": "OTP Python Environment",
-    "image": "your-dockerhub-username/otp-python-env:latest",
+    "image": "anerv/innotech-env:latest",
     "workspaceFolder": "/home/jovyan/work",
     "customizations": {
         "vscode": {
