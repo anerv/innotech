@@ -37,7 +37,7 @@ RUN wget https://github.com/duckdb/duckdb/releases/download/v1.2.2/duckdb_cli-li
     rm duckdb_cli.zip
 
 # Install OpenTripPlanner
-RUN wget https://repo1.maven.org/maven2/org/opentripplanner/otp/2.6.0/otp-2.6.0-shaded.jar -O /usr/src/app/otp.jar
+#RUN wget https://repo1.maven.org/maven2/org/opentripplanner/otp/2.6.0/otp-2.6.0-shaded.jar -O /usr/src/app/otp.jar
 
 # Switch to Jupyter user and set working directory
 USER $NB_UID

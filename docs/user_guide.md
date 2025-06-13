@@ -25,22 +25,29 @@ Dette script kører en række sub-scripts der klargør input-data og bygger en `
 * Naviger til undermappen ``otp``:
 
 ```bash
-cd otp
+cd innotech/otp
 ```
 
-* Kør kommandoen:
+* Kør kommandoerne:
 ```bash
-java -Xmx2G -jar otp-shaded-2.7.0.jar --load .
+docker exec -it innotech-container bash
+java -Xmx2G -jar [the name of your otp.jar file] --load .
 ```
 
 ##### Hvis du bruger Docker-installation:
 
-* Naviger til hovedmappen ``innotech``
+* Åben en ny terminal
+
+* Naviger til undermappen ``otp``:
+
+```bash
+cd innotech/otp
+```
 
 * Kør kommandoen:
 
 ```bash
-java -Xmx2G -jar /usr/src/app/otp-shaded-2.6.0.jar --load .
+java -Xmx2G -jar otp.jar --load .
 ```
 
 - Tjek eventuelt http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
