@@ -67,9 +67,6 @@ USER root
 COPY docker_start.sh /usr/local/bin/docker_start.sh
 RUN chmod +x /usr/local/bin/docker_start.sh
 
-COPY start_otp.sh /usr/local/bin/docker_start_otp.sh
-RUN chmod +x /usr/local/bin/docker_start_otp.sh
-
 # Switch back to the default notebook user
 USER $NB_UID
 
