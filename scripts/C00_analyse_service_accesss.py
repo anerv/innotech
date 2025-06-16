@@ -13,7 +13,8 @@ from src.helper_functions import (
     plot_no_connection,
     highlight_max_traveltime,
     highlight_min_traveltime,
-    identify_only_walking,
+    unpack_modes_from_json,
+    transfers_from_json,
 )
 
 
@@ -36,7 +37,6 @@ with open(config_path, "r") as file:
 
 
 # %%
-
 walkspeed_min = config_model["walk_speed"] * 60  # convert to minutes
 
 
@@ -114,10 +114,10 @@ for service in services:
 
         df["total_time_min"] = df["duration_min"] + df["wait_time_dest_min"]
 
-        # use walkspeed and duration to determine if the trip is only walking
-        df["only_walking"] = df.apply(
-            identify_only_walking, axis=1, walkspeed_min=walkspeed_min
-        )
+        # extract modes
+        df = unpack_modes_from_json(df, "mode_durations_json")
+
+        df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
 
         # Export min, mean, max, and median duration and wait time
         summary = {
@@ -130,6 +130,8 @@ for service in services:
             "mean_wait_time": float(f"{df['wait_time_dest_min'].mean():.2f}"),
             "max_wait_time": float(f"{df['wait_time_dest_min'].max():.2f}"),
             "median_wait_time": float(f"{df['wait_time_dest_min'].median():.2f}"),
+            "median_transfers": int(df["transfers"].median()),
+            "max_transfers": int(df["transfers"].max()),
         }
 
         summaries.append(summary)
@@ -174,25 +176,26 @@ for service in services:
             )
 
         # export to geoparquet
+        all_columns = df.columns.tolist()
+        keep_cols = [
+            "source_id",
+            "target_id",
+            "startTime",
+            "arrival_time",
+            "waitingTime",
+            "walkDistance",
+            "abs_dist",
+            "duration_min",
+            "wait_time_dest_min",
+            "total_time_min",
+            "transfers",
+            "geometry",
+        ]
+        keep_cols.extend([col for col in all_columns if col.endswith("_duration")])
         df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
         gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
         gdf.to_crs("EPSG:25832", inplace=True)
-        gdf[
-            [
-                "source_id",
-                "target_id",
-                "startTime",
-                "arrival_time",
-                "waitingTime",
-                "walkDistance",
-                "abs_dist",
-                "duration_min",
-                "wait_time_dest_min",
-                "total_time_min",
-                "only_walking",
-                "geometry",
-            ]
-        ].to_parquet(
+        gdf[keep_cols].to_parquet(
             results_path / f"data/{dataset}_otp_geo.parquet",
             index=False,
             engine="pyarrow",
@@ -210,6 +213,8 @@ rows_to_style = [
     "mean_wait_time",
     "max_wait_time",
     "median_wait_time",
+    "median_transfers",
+    "max_transfers",
 ]  # or any list of index values you want
 
 
@@ -254,5 +259,9 @@ styled_table.to_html(
     results_path / "data/service_access_summary.html",
     table_attributes='style="width: 50%; border-collapse: collapse;"',
 )
+
+
+# %%
+
 
 # %%
