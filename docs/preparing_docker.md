@@ -1,0 +1,22 @@
+# Docker
+
+
+## Build docker image
+
+docker build -t innotech-env:local .  
+
+## Run local
+
+docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work innotech-env:local
+
+## Push to Docker Hub
+
+docker tag otp-python-env:local anerv/innotech-env:latest
+
+docker push anerv/innotech-env:latest
+
+## Pull and run from Docker Hub
+
+docker pull anerv/innotech-env:latest
+
+docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work innotech-env:latest

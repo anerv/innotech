@@ -91,7 +91,7 @@ python setup_folders.py
 * Download docker imaget fra Docker Hub:
 
 ```bash
-docker pull your-dockerhub-username/otp-python-env:latest
+docker pull anerv/innotech-env:latest
 ```
 
 #### B3. Kør Docker container
@@ -99,10 +99,8 @@ docker pull your-dockerhub-username/otp-python-env:latest
 * Kør Docker containeren:
 
 ```bash
-docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work innotech-env:local
+docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work innotech-env:latest
 ```
-
-***OPDATER TIL LATEST?***
 
 #### B4. Anvend Docker Python environment
 

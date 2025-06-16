@@ -37,16 +37,21 @@ java -Xmx2G -jar "the name of your otp.jar file" --load .
 
 * Åben en ny terminal
 
+* Kør kommandoen:
+
+```bash
+docker exec -it innotech-container bash
+```
+
 * Naviger til undermappen ``otp``:
 
 ```bash
 cd innotech/otp
 ```
 
-* Kør kommandoerne:
+* Kør kommandoen:
 
 ```bash
-docker exec -it innotech-container bash
 java -Xmx2G -jar otp.jar --load .
 ```
 
