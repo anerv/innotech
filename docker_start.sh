@@ -34,4 +34,7 @@ fi
 
 # Start Jupyter Notebook
 echo "Starting Jupyter Notebook..."
-jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token=''
+# jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token=''
+
+
+jupyter notebook --ip=0.0.0.0 --port=8888 --NotebookApp.token='' --NotebookApp.allow_origin='*' --no-browser
