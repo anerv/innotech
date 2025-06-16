@@ -18,4 +18,5 @@ dependencies:
   - pip
   - pip:
       - matplotlib-scalebar
+      - jupytext
 prefix: C:\Users\anerv\AppData\Local\miniconda3\envs\innotech
