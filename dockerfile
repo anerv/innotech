@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 # Switch to root to install system packages
 USER root
 
-# Install system dependencies (including osmium-tool and unzip for DuckDB)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     tar \
@@ -36,45 +36,40 @@ RUN wget https://github.com/duckdb/duckdb/releases/download/v1.2.2/duckdb_cli-li
     chmod +x /usr/local/bin/duckdb && \
     rm duckdb_cli.zip
 
-# Install OpenTripPlanner
-#RUN wget https://repo1.maven.org/maven2/org/opentripplanner/otp/2.6.0/otp-2.6.0-shaded.jar -O /usr/src/app/otp.jar
 
-# Switch to Jupyter user and set working directory
+# Switch to Jupyter user and working dir
 USER $NB_UID
 WORKDIR /home/jovyan/work
 
-# Copy source files into the container with correct ownership
+# Copy source files into the container
 COPY --chown=$NB_UID:$NB_GID . /home/jovyan/work
 
-RUN conda env create -f environment.yml
-RUN conda clean -afy
+# Create Conda env
+RUN conda env create -f environment.yml && conda clean -afy
 
-# Register the environment as a Jupyter kernel
+# Register the env as a Jupyter kernel
 RUN conda run -n innotech python -m ipykernel install --user --name=innotech --display-name "Python (innotech)"
 
-# Install additional Python dependencies into the conda environment
+# Install additional editable dependencies last
 RUN conda run -n innotech pip install --use-pep517 -e .
 
-RUN conda run -n innotech jupyter server extension enable jupytext
 
-# Set up Jupyter config with no token and enable Jupytext formats
+# Configure Jupyter
 RUN mkdir -p /home/jovyan/.jupyter && \
-    echo "c.NotebookApp.token = ''" > /home/jovyan/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.contents_manager_class = 'jupytext.TextFileContentsManager'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
-    echo "c.ContentsManager.default_jupytext_formats = 'ipynb,py:percent'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
+    echo "c.ServerApp.token = ''" > /home/jovyan/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.allow_origin = '*'" >> /home/jovyan/.jupyter/jupyter_server_config.py
 
 
 # Expose OTP and Jupyter ports
 EXPOSE 8080 8888
 
-# Add entrypoint script as root and make it executable
+# Add and set permissions on the start script
 USER root
 COPY docker_start.sh /usr/local/bin/docker_start.sh
 RUN chmod +x /usr/local/bin/docker_start.sh
 
-# Switch back to the default notebook user
+# Switch back to notebook user
 USER $NB_UID
 
-# Set entrypoint
+# Set the default command
 CMD ["/usr/local/bin/docker_start.sh"]
-
