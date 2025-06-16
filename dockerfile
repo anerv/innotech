@@ -52,12 +52,17 @@ RUN conda clean -afy
 # Register the environment as a Jupyter kernel
 RUN conda run -n innotech python -m ipykernel install --user --name=innotech --display-name "Python (innotech)"
 
-# Configure Jupyter to run without a token
-RUN mkdir -p /home/jovyan/.jupyter && \
-    echo "c.NotebookApp.token = ''" > /home/jovyan/.jupyter/jupyter_notebook_config.py
-
 # Install additional Python dependencies into the conda environment
 RUN conda run -n innotech pip install --use-pep517 -e .
+
+RUN conda run -n innotech jupyter server extension enable jupytext
+
+# Set up Jupyter config with no token and enable Jupytext formats
+RUN mkdir -p /home/jovyan/.jupyter && \
+    echo "c.NotebookApp.token = ''" > /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.contents_manager_class = 'jupytext.TextFileContentsManager'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.ContentsManager.default_jupytext_formats = 'ipynb,py:percent'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
+
 
 # Expose OTP and Jupyter ports
 EXPOSE 8080 8888
