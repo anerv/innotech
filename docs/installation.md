@@ -96,15 +96,17 @@ docker pull anerv/innotech-env:latest
 
 #### B3. Kør Docker container
 
+* Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det.
+
 * Kør Docker containeren:
 
 ```bash
-docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work innotech-env:latest
+docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work anerv/innotech-env:latest
 ```
 
 #### B4. Anvend Docker Python environment
 
-##### Med JupyterLab:
+##### Med Jupyter:
 
 * Åben et browservindue og gå til http://localhost:8888
 * Kør analysen (se anvendelsesguiden ``analysis_guide.md``), brug ``Python Innotech`` som kernel.
@@ -113,15 +115,17 @@ docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/ho
 
 * Åben Visual Studio Code
 
-* Installer *Remote - Containers*-udvidelsen.
+* Åben den første notebook (*.ipynb)
 
-* Åben *Command Palette* (`Ctrl+Shift+P` eller `Cmd+Shift+P`) og vælg: ``Remote-Containers: Attach to Running Container...``
+* Klik i øverste højre hjørne, hvor Python kernel vælges
 
-* Vælg den aktive container `innotech-env`.
+* Vælg ``Select Another Kernel`` eller ``Existing Jupyter Server``
 
-* Inden i ``innotech-enc`` workspace, vælg Python interpreteren ``Python (innotech)``.
+* Indtast htttp:localhost:8888
 
-* Herfra kan analysen køres (se anvendelsesguiden ``analysis_guide.md``).
+* Vælg ``Python (innotech)``
+
+* Herfra kan notebook'en køres (se anvendelsesguiden ``analysis_guide.md``). Det kan være nødvendigt eksplicit at vælge den korrekte Python-kernel for hver notebook.
 
 
 ## Inputdata :file_folder:
