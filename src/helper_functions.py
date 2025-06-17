@@ -12,6 +12,14 @@ import math
 import numpy as np
 from shapely.ops import transform
 import json
+import os
+import requests
+import numpy as np
+import duckdb
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def transfers_from_json(json_str):
@@ -983,3 +991,203 @@ def plot_traveltime_results(df, plot_col, attribution_text, font_size, title, fp
 
     plt.show()
     plt.close()
+
+
+def convert_otp_time(millis, tz="Europe/Copenhagen"):
+    if isinstance(millis, (int, float)) and millis > 0:
+        try:
+            return datetime.fromtimestamp(millis / 1000, tz=ZoneInfo(tz)).strftime(
+                "%Y-%m-%d %H:%M"
+            )
+        except Exception as e:
+            print(f"Failed to convert timestamp {millis}: {e}")
+            return None
+    return None
+
+
+def get_travel_info(
+    from_lat,
+    from_lon,
+    to_lat,
+    to_lon,
+    date,
+    time,
+    url,
+    walk_speed=1.3,
+    search_window=7200,  # 2 hours in seconds
+    arrive_by="true",
+):
+
+    query = f"""
+    {{
+    plan(
+        from: {{lat: {from_lat}, lon: {from_lon}}}
+        to: {{lat: {to_lat}, lon: {to_lon}}}
+        date: "{date}"
+        time: "{time}"
+        walkSpeed: {walk_speed}
+        arriveBy: {arrive_by},
+        searchWindow: {search_window}
+        numItineraries: 1
+    ) {{
+        itineraries {{
+        startTime
+        waitingTime
+        duration
+        walkDistance
+        legs {{
+            mode
+            duration
+        }}
+        }}
+    }}
+    }}
+    """
+
+    # print(f"Sending request to OTP API with query: {query}")
+    response = requests.post(url, json={"query": query})
+    # print(f"Error: {response.status_code} - {response.text}")
+
+    # print(response.json())
+
+    return response.json()
+
+
+# Process the individual service types
+def process_adresses(
+    dataset,
+    sampelsize,
+    time,
+    date,
+    search_window,
+    url,
+    data_path,
+    otp_con,
+    con,
+    chunk_size=1000,
+    max_workers=16,
+):
+    filename = dataset + ".parquet"
+    data = data_path / filename
+    dataset = dataset.replace("-", "_")
+
+    # Create target table
+
+    otp_con.execute(f"DROP TABLE IF EXISTS {dataset};")
+    otp_con.execute(
+        f"""
+        CREATE TABLE {dataset} (
+            source_id TEXT,
+            target_id TEXT,
+            from_lat DOUBLE,
+            from_lon DOUBLE,
+            startTime TEXT,
+            waitingTime DOUBLE,
+            duration DOUBLE,
+            walkDistance DOUBLE,
+            abs_dist DOUBLE,
+            mode_durations_json TEXT,
+        )
+    """
+    )
+
+    # Load data into a temporary table
+    if sampelsize == 0:
+        con.execute(
+            f"""
+            CREATE OR REPLACE TEMP TABLE data_pairs AS 
+            SELECT * 
+            FROM '{data}'
+        """
+        )
+    else:
+        con.execute(
+            f"""
+            CREATE OR REPLACE TEMP TABLE data_pairs AS 
+            SELECT * 
+            FROM '{data}'
+            USING SAMPLE {sampelsize} ROWS
+        """
+        )
+
+    # Function to process a single row
+    def process_row(row, date, time, search_window=7200):
+        try:
+            travel_info = get_travel_info(
+                row.source_lat,
+                row.source_lon,
+                row.dest_lat,
+                row.dest_lon,
+                date,
+                time,
+                url=url,
+                walk_speed=1.3,
+                search_window=search_window,
+                arrive_by="true",
+            )
+            itinerary = travel_info["data"]["plan"]["itineraries"][0]
+
+            # Duration per mode
+            mode_durations = {}
+            for leg in itinerary["legs"]:
+                mode = leg["mode"]
+                duration = leg["duration"]
+                mode_durations[mode] = mode_durations.get(mode, 0) + duration
+
+            mode_durations_json = json.dumps(mode_durations)
+
+            return (
+                row.source_adress_id,
+                row.dest_adress_id,
+                row.source_lat,
+                row.source_lon,
+                convert_otp_time(itinerary["startTime"]),
+                itinerary["waitingTime"],
+                itinerary["duration"],
+                itinerary["walkDistance"],
+                row.dest_distance,
+                mode_durations_json,
+            )
+        except Exception:
+            return (
+                row.source_adress_id,
+                row.dest_adress_id,
+                row.source_lat,
+                row.source_lon,
+                np.nan,
+                np.nan,
+                np.nan,
+                np.nan,
+                row.dest_distance,
+                json.dumps({}),  # Empty dict as JSON
+            )
+
+    # Process in chunks with parallel execution
+    offset = 0
+    while True:
+        chunk = con.execute(
+            f"""
+            SELECT * FROM data_pairs 
+            LIMIT {chunk_size} OFFSET {offset}
+        """
+        ).fetchdf()
+
+        if chunk.empty:
+            break
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(process_row, row, date, time, search_window)
+                for row in chunk.itertuples(index=False)
+            ]
+
+            for future in as_completed(futures):
+                result = future.result()
+                otp_con.execute(
+                    f"""
+                    INSERT INTO {dataset} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,)
+                """,
+                    result,
+                )
+
+        offset += chunk_size
