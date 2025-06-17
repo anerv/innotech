@@ -1,16 +1,11 @@
 # Temp remove itinerary filters
-# change "debug": "limit-to-search-window" to "debug": "debug"?
-
-
-# select origins in eastern area
-# Select destinations
+# change "debug": "limit-to-search-window" or "list-all"?
 
 # %%
 
 import yaml
 from pathlib import Path
-import requests
-import numpy as np
+import pandas as pd
 import duckdb
 from src.helper_functions import process_adresses
 
@@ -47,11 +42,18 @@ con = duckdb.connect()
 # Open a persistent DuckDB database file Data is stored temporay in Dockdb and then exported to parquet
 otp_con = duckdb.connect(otp_db_fp)
 
-# config_model["services"]
+service = "train_station"  # Choose which service to debug
+arrival_time = "07:30"  # Choose which arrival time to use
+address_data = pd.from_parquet(
+    data_path / f"{service}_1.parquet"
+)  # Load the address data
 
-service = None  # TODO: Choose which service to debug
-arrival_time = None  # TODO: Choose which arrival time to use
-dataset = None  # TODO: Choose which dataset to debug - load from parquet file AND choose a small subset
+source_ids = [
+    "0a3f50af-f5be-32b8-e044-0003ba298018"
+]  # Choose which starting points to use for debugging
+dataset = address_data[address_data.source_id.isin(source_ids)]
+
+assert len(dataset) == len(source_ids), "Source IDs do not match the dataset length"
 
 # Process each dataset
 print(
