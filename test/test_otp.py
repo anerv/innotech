@@ -88,5 +88,14 @@ otp_con.execute(
 """
 )
 # %%
+# Export test results
 results = pd.read_parquet(results_path / f"{dataset}_otp_TEST.parquet")
+
+results["geometry"] = results["geometry"] = gpd.points_from_xy(
+    results["from_lon"], results["from_lat"]
+)
+gdf = gpd.GeoDataFrame(results, geometry="geometry", crs="EPSG:4326")
+gdf.to_crs("EPSG:25832", inplace=True)
+gdf.to_file("results.gpkg", driver="GPKG")
+
 # %%
