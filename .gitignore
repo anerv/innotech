@@ -37,3 +37,5 @@ image.png
 scripts/.ipynb_checkpoints/*
 run/.ipynb_checkpoints/*
 test/no_train_connection.gpkg
+scripts/test_otp.py
+test/no_train_connection_all.gpkg
