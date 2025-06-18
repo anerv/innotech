@@ -36,3 +36,4 @@ resultater.qgz
 image.png
 scripts/.ipynb_checkpoints/*
 run/.ipynb_checkpoints/*
+test/no_train_connection.gpkg
