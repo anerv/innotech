@@ -359,10 +359,10 @@ for service in services:
                 dist = distances[i][n - 1]
 
                 record = {
-                    "source_adress_id": src.address_id,
+                    "source_address_id": src.address_id,
                     "source_lat": src.road_point_lat,
                     "source_lon": src.road_point_lon,
-                    "dest_adress_id": dst.address_id,
+                    "dest_address_id": dst.address_id,
                     "dest_lat": dst.road_point_lat,
                     "dest_lon": dst.road_point_lon,
                     "dest_distance": dist,

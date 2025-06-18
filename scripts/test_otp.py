@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 import duckdb
 from src.helper_functions import process_adresses
+import geopandas as gpd
 
 # Define the path to the config.yml file
 script_path = Path(__file__).resolve()
@@ -44,17 +45,21 @@ otp_con = duckdb.connect(otp_db_fp)
 
 service = "train_station"  # Choose which service to debug
 arrival_time = "07:30"  # Choose which arrival time to use
-address_data = pd.from_parquet(
+address_data = pd.read_parquet(
     data_path / f"{service}_1.parquet"
 )  # Load the address data
 
-source_ids = [
-    "0a3f50af-f5be-32b8-e044-0003ba298018"
-]  # Choose which starting points to use for debugging
-dataset = address_data[address_data.source_id.isin(source_ids)]
+# %%
+
+no_connection = gpd.read_file("../test/no_train_connection.gpkg")
+
+source_ids = no_connection.source_id.to_list()
+# %%
+# Choose which starting points to use for debugging
+dataset = address_data[address_data.source_address_id.isin(source_ids)]
 
 assert len(dataset) == len(source_ids), "Source IDs do not match the dataset length"
-
+# %%
 # Process each dataset
 print(
     f"Processing {dataset} with sample size {sample_size} and chunk size {chunk_size}"

@@ -1137,8 +1137,8 @@ def process_adresses(
             mode_durations_json = json.dumps(mode_durations)
 
             return (
-                row.source_adress_id,
-                row.dest_adress_id,
+                row.source_address_id,
+                row.dest_address_id,
                 row.source_lat,
                 row.source_lon,
                 convert_otp_time(itinerary["startTime"]),
@@ -1150,8 +1150,8 @@ def process_adresses(
             )
         except Exception:
             return (
-                row.source_adress_id,
-                row.dest_adress_id,
+                row.source_address_id,
+                row.dest_address_id,
                 row.source_lat,
                 row.source_lon,
                 np.nan,

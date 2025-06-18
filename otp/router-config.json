@@ -53,7 +53,7 @@
             "maxStopCount": 500,
             "penalty": {
                 "FLEXIBLE": {
-                    "timePenalty": "0m + 0.0h",
+                    "timePenalty": "0s + 0.00 t",
                     "costFactor": 0.0
                 }
             }
