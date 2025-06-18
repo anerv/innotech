@@ -43,22 +43,23 @@ con = duckdb.connect()
 # Open a persistent DuckDB database file Data is stored temporay in Dockdb and then exported to parquet
 otp_con = duckdb.connect(otp_db_fp)
 
+dataset = "test"
 service = "train_station"  # Choose which service to debug
 arrival_time = "07:30"  # Choose which arrival time to use
 address_data = pd.read_parquet(
     data_path / f"{service}_1.parquet"
 )  # Load the address data
 
-# %%
-
+address_data.rename(columns={"source_adress_id": "source_address_id"}, inplace=True)
 no_connection = gpd.read_file("../test/no_train_connection.gpkg")
-
 source_ids = no_connection.source_id.to_list()
-# %%
-# Choose which starting points to use for debugging
-dataset = address_data[address_data.source_address_id.isin(source_ids)]
 
-assert len(dataset) == len(source_ids), "Source IDs do not match the dataset length"
+# Choose which starting points to use for debugging
+test_data = address_data[address_data.source_address_id.isin(source_ids)]
+
+assert len(test_data) == len(source_ids), "Source IDs do not match the dataset length"
+
+test_data.to_parquet(data_path / f"test.parquet", index=False)
 # %%
 # Process each dataset
 print(
@@ -68,7 +69,7 @@ print(
 process_adresses(
     dataset,
     sample_size,
-    service["arival_time"],
+    arrival_time,
     date,
     search_window,
     url,
