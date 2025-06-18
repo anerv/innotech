@@ -34,7 +34,8 @@ otp_db_fp = (
 )  # Load the persistant OTP database file path
 
 walk_speed = config_model["walk_speed"]  # Load the walk speed in m/s
-search_window = config_model["search_window"]  # Load the search window in seconds
+# search_window = config_model["search_window"]  # Load the search window in seconds
+search_window = 7200 * 12
 # %%
 
 # DubckDB connection
@@ -51,7 +52,7 @@ address_data = pd.read_parquet(
 )  # Load the address data
 
 address_data.rename(columns={"source_adress_id": "source_address_id"}, inplace=True)
-no_connection = gpd.read_file("../test/no_train_connection.gpkg")
+no_connection = gpd.read_file("no_train_connection_all.gpkg")
 source_ids = no_connection.source_id.to_list()
 
 # Choose which starting points to use for debugging
@@ -86,4 +87,6 @@ otp_con.execute(
     COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_otp_TEST.parquet' (FORMAT 'parquet')
 """
 )
+# %%
+results = pd.read_parquet(results_path / f"{dataset}_otp_TEST.parquet")
 # %%
