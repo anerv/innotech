@@ -59,14 +59,16 @@
             }
         },
         "itineraryFilters": {
-            "transitGeneralizedCostLimit": {
-                "costLimitFunction": "15m + 1.5 x",
-                "intervalRelaxFactor": 0.4
-            },
-            "nonTransitGeneralizedCostLimit": "400 + 1.5x",
-            "removeTransitWithHigherCostThanBestOnStreetOnly": "60 + 1.3x",
-            "accessibilityScore": false,
-            "debug": "limit-to-search-window"
+            "itineraryFilters": {
+                "transitGeneralizedCostLimit": {
+                    "costLimitFunction": "15m + 1.5 x",
+                    "intervalRelaxFactor": 0.4
+                },
+                "nonTransitGeneralizedCostLimit": "400 + 1.5x",
+                "removeTransitWithHigherCostThanBestOnStreetOnly": "60 + 1.3x",
+                "accessibilityScore": false,
+                "debug": "list-all"
+            }
         },
         "ignoreRealtimeUpdates": true,
         "geoidElevation": false,
