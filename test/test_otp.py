@@ -36,7 +36,7 @@ otp_db_fp = (
 walk_speed = config_model["walk_speed"]  # Load the walk speed in m/s
 
 # search_window = config_model["search_window"]  # Load the search window in seconds
-search_window = 7200 * 12  # 24 hours
+search_window = 7200 * 11  # 24 hours
 # %%
 
 # DubckDB connection
@@ -112,17 +112,80 @@ from_lon = 12.426831686463684
 to_lat = 55.217142
 to_lon = 12.162233
 
+datetime = "2025-02-19T15:23:00.814+02:00"
+
 url = "http://localhost:8080/otp/gtfs/v1"
+
+url = "http://localhost:8080/otp/transmodel/v3"
+
+import json
+import os
+import requests
+
+
+def get_travel_info(
+    from_lat,
+    from_lon,
+    to_lat,
+    to_lon,
+    date_time,
+    url,
+    walk_speed=1.3,
+    search_window=7200,  # 2 hours in seconds
+    arrive_by="true",
+):
+    query = f"""
+    {{
+      trip(
+        from: {{
+          coordinates: {{
+            latitude: {from_lat}
+            longitude: {from_lon}
+          }}
+        }}
+        to: {{
+          coordinates: {{
+            latitude: {to_lat}
+            longitude: {to_lon}
+          }}
+        }}
+        dateTime: "{date_time}"
+        walkSpeed: {walk_speed}
+        arriveBy: {arrive_by}
+        searchWindow: {search_window}
+        numTripPatterns: 1
+      ) {{
+        tripPatterns {{
+          expectedStartTime
+          duration
+          walkDistance
+          legs {{
+            mode
+            duration
+          }}
+        }}
+      }}
+    }}
+    """
+
+    response = requests.post(url, json={"query": query})
+
+    if response.status_code != 200:
+        raise RuntimeError(f"Request failed: {response.status_code}\n{response.text}")
+
+    return response.json()
+
+
+# %%
 
 test = get_travel_info(
     from_lat=from_lat,
     from_lon=from_lon,
     to_lat=to_lat,
     to_lon=to_lon,
-    date=date,
-    time=arrival_time,
+    date_time=datetime,
     url=url,
     walk_speed=walk_speed,
-    search_window=search_window,
+    search_window=60,
 )
 # %%
