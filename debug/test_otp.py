@@ -36,7 +36,7 @@ otp_db_fp = (
 walk_speed = config_model["walk_speed"]  # Load the walk speed in m/s
 
 # search_window = config_model["search_window"]  # Load the search window in seconds
-search_window = 7200 * 11  # 24 hours
+search_window = 7200 * 12  # 24 hours
 # %%
 
 # DubckDB connection
