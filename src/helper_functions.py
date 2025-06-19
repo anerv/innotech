@@ -1059,6 +1059,7 @@ def process_adresses(
     sampelsize,
     time,
     date,
+    walk_speed,
     search_window,
     url,
     data_path,
@@ -1121,7 +1122,7 @@ def process_adresses(
                 date,
                 time,
                 url=url,
-                walk_speed=1.3,
+                walk_speed=walk_speed,
                 search_window=search_window,
                 arrive_by="true",
             )

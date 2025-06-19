@@ -55,6 +55,7 @@ for service in services:
             sample_size,
             service["arival_time"],
             date,
+            walk_speed,
             search_window,
             url,
             data_path,
