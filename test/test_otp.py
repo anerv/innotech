@@ -34,8 +34,9 @@ otp_db_fp = (
 )  # Load the persistant OTP database file path
 
 walk_speed = config_model["walk_speed"]  # Load the walk speed in m/s
+
 # search_window = config_model["search_window"]  # Load the search window in seconds
-search_window = 7200 * 12
+search_window = 7200 * 12  # 24 hours
 # %%
 
 # DubckDB connection
@@ -72,6 +73,7 @@ process_adresses(
     sample_size,
     arrival_time,
     date,
+    walk_speed,
     search_window,
     url,
     data_path,
@@ -90,7 +92,7 @@ otp_con.execute(
 # %%
 # Export test results
 results = pd.read_parquet(results_path / f"{dataset}_otp_TEST.parquet")
-
+# %%
 results["geometry"] = results["geometry"] = gpd.points_from_xy(
     results["from_lon"], results["from_lat"]
 )
@@ -98,4 +100,29 @@ gdf = gpd.GeoDataFrame(results, geometry="geometry", crs="EPSG:4326")
 gdf.to_crs("EPSG:25832", inplace=True)
 gdf.to_file("results.gpkg", driver="GPKG")
 
+# %%
+from src.helper_functions import get_travel_info
+
+# %%
+source_id = "0a3f50af-e5b2-32b8-e044-0003ba298018"
+target_id = "1c965415-e512-40ae-8ccb-00692d55c515"
+
+from_lat = 54.994538304026094
+from_lon = 12.426831686463684
+to_lat = 55.217142
+to_lon = 12.162233
+
+url = "http://localhost:8080/otp/gtfs/v1"
+
+test = get_travel_info(
+    from_lat=from_lat,
+    from_lon=from_lon,
+    to_lat=to_lat,
+    to_lon=to_lon,
+    date=date,
+    time=arrival_time,
+    url=url,
+    walk_speed=walk_speed,
+    search_window=search_window,
+)
 # %%
