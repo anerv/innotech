@@ -262,6 +262,5 @@ styled_table.to_html(
 
 
 # %%
-
-
-# %%
+# TODO: Implement weighted average travel time calculation
+# TODO: implement k-means classification
