@@ -144,7 +144,16 @@ def process_adresses(
         )
 
     # Function to process a single row
-    def process_row(row, date, time, search_window=7200):
+    def process_row(
+        row,
+        date,
+        time,
+        search_window=search_window,
+        walk_speed=walk_speed,
+        url=url,
+        arrive_by="true",
+    ):
+
         try:
             travel_info = get_travel_info(
                 row.source_lat,
@@ -156,7 +165,7 @@ def process_adresses(
                 url=url,
                 walk_speed=walk_speed,
                 search_window=search_window,
-                arrive_by="true",
+                arrive_by=arrive_by,
             )
             itinerary = travel_info["data"]["plan"]["itineraries"][0]
 
