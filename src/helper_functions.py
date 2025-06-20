@@ -22,6 +22,213 @@ import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
+######################## OTP FUNCTIONS ########################
+
+
+def convert_otp_time(millis, tz="Europe/Copenhagen"):
+    if isinstance(millis, (int, float)) and millis > 0:
+        try:
+            return datetime.fromtimestamp(millis / 1000, tz=ZoneInfo(tz)).strftime(
+                "%Y-%m-%d %H:%M"
+            )
+        except Exception as e:
+            print(f"Failed to convert timestamp {millis}: {e}")
+            return None
+    return None
+
+
+def get_travel_info(
+    from_lat,
+    from_lon,
+    to_lat,
+    to_lon,
+    date,
+    time,
+    url,
+    walk_speed=1.3,
+    search_window=7200,  # 2 hours in seconds
+    arrive_by="true",
+):
+
+    query = f"""
+    {{
+    plan(
+        from: {{lat: {from_lat}, lon: {from_lon}}}
+        to: {{lat: {to_lat}, lon: {to_lon}}}
+        date: "{date}"
+        time: "{time}"
+        walkSpeed: {walk_speed}
+        arriveBy: {arrive_by},
+        searchWindow: {search_window}
+        numItineraries: 1
+    ) {{
+        itineraries {{
+        startTime
+        waitingTime
+        duration
+        walkDistance
+        legs {{
+            mode
+            duration
+        }}
+        }}
+    }}
+    }}
+    """
+
+    # print(f"Sending request to OTP API with query: {query}")
+    response = requests.post(url, json={"query": query})
+    # print(f"Error: {response.status_code} - {response.text}")
+
+    # print(response.json())
+
+    return response.json()
+
+
+# Process the individual service types
+def process_adresses(
+    dataset,
+    sampelsize,
+    time,
+    date,
+    walk_speed,
+    search_window,
+    url,
+    data_path,
+    otp_con,
+    con,
+    chunk_size=1000,
+    max_workers=16,
+):
+    filename = dataset + ".parquet"
+    data = data_path / filename
+    dataset = dataset.replace("-", "_")
+
+    # Create target table
+
+    otp_con.execute(f"DROP TABLE IF EXISTS {dataset};")
+    otp_con.execute(
+        f"""
+        CREATE TABLE {dataset} (
+            source_id TEXT,
+            target_id TEXT,
+            from_lat DOUBLE,
+            from_lon DOUBLE,
+            startTime TEXT,
+            waitingTime DOUBLE,
+            duration DOUBLE,
+            walkDistance DOUBLE,
+            abs_dist DOUBLE,
+            mode_durations_json TEXT,
+        )
+    """
+    )
+
+    # Load data into a temporary table
+    if sampelsize == 0:
+        con.execute(
+            f"""
+            CREATE OR REPLACE TEMP TABLE data_pairs AS 
+            SELECT * 
+            FROM '{data}'
+        """
+        )
+    else:
+        con.execute(
+            f"""
+            CREATE OR REPLACE TEMP TABLE data_pairs AS 
+            SELECT * 
+            FROM '{data}'
+            USING SAMPLE {sampelsize} ROWS
+        """
+        )
+
+    # Function to process a single row
+    def process_row(row, date, time, search_window=7200):
+        try:
+            travel_info = get_travel_info(
+                row.source_lat,
+                row.source_lon,
+                row.dest_lat,
+                row.dest_lon,
+                date,
+                time,
+                url=url,
+                walk_speed=walk_speed,
+                search_window=search_window,
+                arrive_by="true",
+            )
+            itinerary = travel_info["data"]["plan"]["itineraries"][0]
+
+            # Duration per mode
+            mode_durations = {}
+            for leg in itinerary["legs"]:
+                mode = leg["mode"]
+                duration = leg["duration"]
+                mode_durations[mode] = mode_durations.get(mode, 0) + duration
+
+            mode_durations_json = json.dumps(mode_durations)
+
+            return (
+                row.source_address_id,
+                row.dest_address_id,
+                row.source_lat,
+                row.source_lon,
+                convert_otp_time(itinerary["startTime"]),
+                itinerary["waitingTime"],
+                itinerary["duration"],
+                itinerary["walkDistance"],
+                row.dest_distance,
+                mode_durations_json,
+            )
+        except Exception:
+            return (
+                row.source_address_id,
+                row.dest_address_id,
+                row.source_lat,
+                row.source_lon,
+                np.nan,
+                np.nan,
+                np.nan,
+                np.nan,
+                row.dest_distance,
+                json.dumps({}),  # Empty dict as JSON
+            )
+
+    # Process in chunks with parallel execution
+    offset = 0
+    while True:
+        chunk = con.execute(
+            f"""
+            SELECT * FROM data_pairs 
+            LIMIT {chunk_size} OFFSET {offset}
+        """
+        ).fetchdf()
+
+        if chunk.empty:
+            break
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(process_row, row, date, time, search_window)
+                for row in chunk.itertuples(index=False)
+            ]
+
+            for future in as_completed(futures):
+                result = future.result()
+                otp_con.execute(
+                    f"""
+                    INSERT INTO {dataset} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,)
+                """,
+                    result,
+                )
+
+        offset += chunk_size
+
+
+############################ RANDOM HELPER FUNCTIONS ############################
+
+
 def transfers_from_json(json_str):
     if pd.isna(json_str) or json_str == "":
         return pd.NA
@@ -82,30 +289,6 @@ def unpack_modes_from_json(df, json_column="mode_durations_json"):
     return df
 
 
-# def identify_only_walking(row, walkspeed_min):
-
-#     row.walk_duration_min = row["walkDistance"] / walkspeed_min
-#     if abs((row.walkDistance / walkspeed_min) - row.duration_min) < 1:
-#         return True
-#     return False
-
-
-def highlight_max_traveltime(s):
-    """
-    Highlight the maximum travel time in each row.
-    """
-    is_max = s == s.max()
-    return ["color: red" if v else "" for v in is_max]
-
-
-def highlight_min_traveltime(s):
-    """
-    Highlight the minimum travel time in each row.
-    """
-    is_min = s == s.min()
-    return ["color: blue" if v else "" for v in is_min]
-
-
 def get_service_type(nace_code, nace_dict):
     for service_type, codes in nace_dict.items():
         if nace_code in codes:
@@ -124,31 +307,6 @@ def remove_z(geometry):
     if geometry.has_z:
         return transform(lambda x, y, z=None: (x, y), geometry)
     return geometry
-
-
-def drop_duplicates_custom(gdf, subset_columns, value_column):
-    """
-    Drop duplicates in a GeoDataFrame based on a subset of columns and custom criteria.
-
-    Parameters:
-    - gdf: GeoDataFrame
-      The input GeoDataFrame.
-    - subset_columns: list of str
-      The columns to consider for identifying duplicates.
-    - value_column: str
-      The column to use for determining which duplicate row to keep.
-
-    Returns:
-    - GeoDataFrame
-      The GeoDataFrame with duplicates dropped according to the specified criteria.
-    """
-    # Sort the GeoDataFrame by the value_column to prioritize rows with 'E', then '2', then the lowest value
-    gdf = gdf.sort_values(by=value_column, key=lambda x: x.map({"E": 1, "2": 2}.get))
-
-    # Drop duplicates based on the subset_columns, keeping the first occurrence
-    gdf = gdf.drop_duplicates(subset=subset_columns, keep="first")
-
-    return gdf
 
 
 # Function to create a GeoDataFrame from nodes
@@ -180,27 +338,27 @@ def create_ways_gdf(ways):
     return gpd.GeoDataFrame(data, crs="EPSG:4326")
 
 
-# Function to create a GeoDataFrame from relations
-def create_relations_gdf(overpass_result, relations):
-    if not relations:
-        return gpd.GeoDataFrame(columns=["geometry"], crs="EPSG:4326")
+# # Function to create a GeoDataFrame from relations
+# def create_relations_gdf(overpass_result, relations):
+#     if not relations:
+#         return gpd.GeoDataFrame(columns=["geometry"], crs="EPSG:4326")
 
-    data = []
-    for relation in relations:
-        coords = []
-        for member in relation.members:
-            if isinstance(member, overpy.RelationWay):
-                way = overpass_result.get_way(member.ref)
-                coords.extend([(node.lon, node.lat) for node in way.nodes])
-            elif isinstance(member, overpy.RelationNode):
-                node = overpass_result.get_node(member.ref)
-                coords.append((node.lon, node.lat))
-        if len(coords) > 2:
-            poly = Polygon(coords)
-            tags = relation.tags
-            tags["id"] = relation.id
-            data.append({"geometry": poly, **tags})
-    return gpd.GeoDataFrame(data, crs="EPSG:4326")
+#     data = []
+#     for relation in relations:
+#         coords = []
+#         for member in relation.members:
+#             if isinstance(member, overpy.RelationWay):
+#                 way = overpass_result.get_way(member.ref)
+#                 coords.extend([(node.lon, node.lat) for node in way.nodes])
+#             elif isinstance(member, overpy.RelationNode):
+#                 node = overpass_result.get_node(member.ref)
+#                 coords.append((node.lon, node.lat))
+#         if len(coords) > 2:
+#             poly = Polygon(coords)
+#             tags = relation.tags
+#             tags["id"] = relation.id
+#             data.append({"geometry": poly, **tags})
+#     return gpd.GeoDataFrame(data, crs="EPSG:4326")
 
 
 def combine_points_within_distance(points_gdf, distance=200, inherit_columns=None):
@@ -299,6 +457,249 @@ def aggregate_points_by_distance(
     return aggregated_gdf
 
 
+def create_hex_grid(polygon_gdf, hex_resolution, crs, buffer_dist):
+
+    # Inspired by https://stackoverflow.com/questions/51159241/how-to-generate-shapefiles-for-h3-hexagons-in-a-particular-area
+
+    poly_bounds = polygon_gdf.buffer(buffer_dist).to_crs("EPSG:4326").total_bounds
+
+    latlng_poly = h3.LatLngPoly(
+        [
+            (poly_bounds[0], poly_bounds[1]),
+            (poly_bounds[0], poly_bounds[3]),
+            (poly_bounds[2], poly_bounds[3]),
+            (poly_bounds[2], poly_bounds[1]),
+        ]
+    )
+
+    hex_list = []
+    hex_list.extend(h3.polygon_to_cells(latlng_poly, res=hex_resolution))
+
+    # Create hexagon data frame
+    hex_pd = pd.DataFrame(hex_list, columns=["hex_id"])
+
+    # Create hexagon geometry and GeoDataFrame
+    hex_pd["latlng_geometry"] = [
+        h3.cells_to_h3shape([x], tight=True) for x in hex_pd["hex_id"]
+    ]
+
+    hex_pd["geometry"] = hex_pd["latlng_geometry"].apply(lambda x: Polygon(x.outer))
+
+    grid = gpd.GeoDataFrame(hex_pd)
+
+    grid.set_crs("4326", inplace=True).to_crs(crs, inplace=True)
+
+    grid["grid_id"] = grid.hex_id
+
+    grid = grid[["grid_id", "geometry"]]
+
+    return grid
+
+
+def count_destinations_in_hex_grid(gdf, hex_grid, destination_col):
+
+    joined = gpd.sjoin(hex_grid, gdf, how="left", predicate="intersects")
+
+    counts = (
+        joined.groupby(["grid_id", destination_col])[destination_col]
+        .count()
+        .reset_index(name="count")
+    )
+
+    # Pivot the counts DataFrame to create a column for each destination type
+    counts_pivot = counts.pivot(
+        index="grid_id", columns=destination_col, values="count"
+    ).fillna(0)
+
+    # Merge the pivoted counts back into the hex grid
+    hex_grid = hex_grid.merge(
+        counts_pivot, left_on="grid_id", right_index=True, how="left"
+    )
+
+    # Fill NaN values with 0 for missing destination counts
+    hex_grid = hex_grid.fillna(0)
+
+    return hex_grid
+
+
+def linestring_to_polygon(geom):
+    # Only convert if LineString is closed
+    if geom.is_ring:
+        return Polygon(geom)
+    else:
+        return None  # or raise a warning / try to close it manually
+
+
+def drop_contained_polygons(gdf, drop=True):
+    """
+    Find polygons that are fully contained by another polygon in the same GeoDataFrame.
+    """
+    contained_indices = set()
+
+    for idx, geom in gdf.geometry.items():
+        others = gdf.drop(idx)
+        for other_idx, other_geom in others.geometry.items():
+            if geom.within(other_geom):
+                contained_indices.add(idx)
+                break
+
+    if drop:
+        return gdf.drop(index=contained_indices)
+    else:
+        return list(contained_indices)
+
+
+######################## PLOTTING FUNCTIONS ########################
+
+
+def highlight_max_traveltime(s):
+    """
+    Highlight the maximum travel time in each row.
+    """
+    is_max = s == s.max()
+    return ["color: red" if v else "" for v in is_max]
+
+
+def highlight_min_traveltime(s):
+    """
+    Highlight the minimum travel time in each row.
+    """
+    is_min = s == s.min()
+    return ["color: blue" if v else "" for v in is_min]
+
+
+def plot_no_connection(df, study_area, attribution_text, font_size, title, fp=None):
+    """
+    Plot the results on a map.
+    """
+
+    # Convert DataFrame to GeoDataFrame
+    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
+    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+    gdf.to_crs("EPSG:25832", inplace=True)
+
+    assert study_area.crs == gdf.crs, "CRS mismatch between study area and GeoDataFrame"
+
+    _, ax = plt.subplots(figsize=(10, 10))
+
+    study_area.plot(
+        ax=ax,
+        color="none",
+        edgecolor="black",
+        alpha=0.5,
+    )
+
+    gdf.plot(
+        ax=ax,
+        legend=True,
+        markersize=5,
+        color="orange",
+        edgecolor="orange",
+        alpha=0.5,
+        legend_kwds={"label": "No connection"},
+    )
+
+    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+    ax.set_axis_off()
+
+    ax.add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    if fp:
+
+        plt.savefig(
+            fp,
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+    plt.show()
+    plt.close()
+
+
+def plot_traveltime_results(df, plot_col, attribution_text, font_size, title, fp=None):
+    """
+    Plot the results on a map.
+    """
+
+    # Convert DataFrame to GeoDataFrame
+    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
+    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+    gdf.to_crs("EPSG:25832", inplace=True)
+
+    _, ax = plt.subplots(figsize=(10, 10))
+
+    divider = make_axes_locatable(ax)
+
+    cax = divider.append_axes("right", size="3.5%", pad="1%")
+    cax.tick_params(labelsize=font_size)
+
+    gdf.plot(
+        ax=ax,
+        cax=cax,
+        column=plot_col,
+        cmap="viridis",
+        legend=True,
+        markersize=5,
+    )
+
+    for spine in cax.spines.values():
+        spine.set_visible(False)
+
+    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
+
+    ax.set_axis_off()
+
+    ax.add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    if fp:
+
+        plt.savefig(
+            fp,
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+    plt.show()
+    plt.close()
+
+
 # Define the styling function for NaN values
 def highlight_nan(x):
     return ["color: grey" if pd.isna(v) else "" for v in x]
@@ -325,6 +726,142 @@ def highlight_next_max(row, color="lightyellow"):
         second_highest_value = sorted_values.iloc[1]
         return [attr if val == second_highest_value else "" for val in row]
     return [""] * len(row)
+
+
+def plot_hex_summaries(
+    combined_grid,
+    study_area,
+    destination,
+    fp,
+    figsize=(20, 10),
+    font_size=14,
+    attribution_text="(C) OSM, CVR",
+    titles=[
+        "OSM",
+        "CVR",
+        "Difference (OSM - CVR)",
+    ],
+    cmaps=[
+        "viridis",
+        "viridis",
+        "RdBu_r",
+    ],
+):
+
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=figsize)
+
+    axes = axes.flatten()
+
+    suptitle = f"{destination.replace('_', ' ').title()}"
+
+    viridis_norm = plt.Normalize(
+        vmin=0,
+        vmax=max(
+            combined_grid[destination + "_osm"].max(),
+            combined_grid[destination + "_cvr"].max(),
+        ),
+    )
+
+    largest_abs_value = combined_grid[destination + "_diff"].abs().max()
+    divnorm = colors.TwoSlopeNorm(
+        vmin=-largest_abs_value,
+        vcenter=0,
+        vmax=largest_abs_value,
+    )
+
+    norms = [viridis_norm, viridis_norm, divnorm]
+
+    for j, col in enumerate(["_osm", "_cvr", "_diff"]):
+
+        ax = axes[j]
+
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="3.5%", pad="1%")
+        cax.tick_params(labelsize=font_size)
+
+        study_area.plot(ax=ax, color="white", edgecolor="black")
+
+        grid_subset = combined_grid[
+            (combined_grid[destination + "_osm"] > 0)
+            | (combined_grid[destination + "_cvr"] > 0)
+        ].copy()
+
+        grid_subset[destination + "_osm"] = grid_subset[destination + "_osm"].replace(
+            {0: np.nan}
+        )
+
+        grid_subset[destination + "_cvr"] = grid_subset[destination + "_cvr"].replace(
+            {0: np.nan}
+        )
+
+        grid_subset.plot(
+            cax=cax,
+            ax=ax,
+            column=destination + col,
+            cmap=cmaps[j],
+            norm=norms[j],
+            # legend=True,
+            alpha=0.5,
+            # legend_kwds={
+            #     "shrink": 0.9,
+            #     "aspect": 30,
+            # },
+        )
+
+        sm = plt.cm.ScalarMappable(
+            cmap=cmaps[j],
+            norm=norms[j],
+        )
+        sm._A = []
+        cbar = fig.colorbar(sm, cax=cax)
+        cbar.outline.set_visible(False)
+
+        if j == 2:
+            min_val = -largest_abs_value
+            max_val = largest_abs_value
+            cbar.set_ticks(
+                [min_val, round(min_val / 2), 0, round(max_val / 2), max_val]
+            )
+
+        ax.set_axis_off()
+        ax.set_title(titles[j], fontsize=font_size)
+
+    fig.suptitle(
+        suptitle,
+        fontsize=font_size + 4,
+        fontdict={"fontweight": "bold"},
+    )
+
+    axes[0].add_artist(
+        ScaleBar(
+            dx=1,
+            units="m",
+            dimension="si-length",
+            length_fraction=0.15,
+            width_fraction=0.002,
+            location="lower left",
+            box_alpha=0,
+            font_properties={"size": font_size},
+        )
+    )
+
+    cx.add_attribution(ax=axes[-1], text=attribution_text, font_size=font_size)
+    txt = ax.texts[-1]
+    txt.set_position([0.99, 0.01])
+    txt.set_ha("right")
+    txt.set_va("bottom")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        fp,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.show()
+
+    plt.close()
 
 
 def count_destinations_in_municipalities(
@@ -631,564 +1168,3 @@ def plot_destinations_combined_subplot(
     plt.show()
 
     plt.close()
-
-
-def create_hex_grid(polygon_gdf, hex_resolution, crs, buffer_dist):
-
-    # Inspired by https://stackoverflow.com/questions/51159241/how-to-generate-shapefiles-for-h3-hexagons-in-a-particular-area
-
-    poly_bounds = polygon_gdf.buffer(buffer_dist).to_crs("EPSG:4326").total_bounds
-
-    latlng_poly = h3.LatLngPoly(
-        [
-            (poly_bounds[0], poly_bounds[1]),
-            (poly_bounds[0], poly_bounds[3]),
-            (poly_bounds[2], poly_bounds[3]),
-            (poly_bounds[2], poly_bounds[1]),
-        ]
-    )
-
-    hex_list = []
-    hex_list.extend(h3.polygon_to_cells(latlng_poly, res=hex_resolution))
-
-    # Create hexagon data frame
-    hex_pd = pd.DataFrame(hex_list, columns=["hex_id"])
-
-    # Create hexagon geometry and GeoDataFrame
-    hex_pd["latlng_geometry"] = [
-        h3.cells_to_h3shape([x], tight=True) for x in hex_pd["hex_id"]
-    ]
-
-    hex_pd["geometry"] = hex_pd["latlng_geometry"].apply(lambda x: Polygon(x.outer))
-
-    grid = gpd.GeoDataFrame(hex_pd)
-
-    grid.set_crs("4326", inplace=True).to_crs(crs, inplace=True)
-
-    grid["grid_id"] = grid.hex_id
-
-    grid = grid[["grid_id", "geometry"]]
-
-    return grid
-
-
-def count_destinations_in_hex_grid(gdf, hex_grid, destination_col):
-
-    joined = gpd.sjoin(hex_grid, gdf, how="left", predicate="intersects")
-
-    counts = (
-        joined.groupby(["grid_id", destination_col])[destination_col]
-        .count()
-        .reset_index(name="count")
-    )
-
-    # Pivot the counts DataFrame to create a column for each destination type
-    counts_pivot = counts.pivot(
-        index="grid_id", columns=destination_col, values="count"
-    ).fillna(0)
-
-    # Merge the pivoted counts back into the hex grid
-    hex_grid = hex_grid.merge(
-        counts_pivot, left_on="grid_id", right_index=True, how="left"
-    )
-
-    # Fill NaN values with 0 for missing destination counts
-    hex_grid = hex_grid.fillna(0)
-
-    return hex_grid
-
-
-def plot_hex_summaries(
-    combined_grid,
-    study_area,
-    destination,
-    fp,
-    figsize=(20, 10),
-    font_size=14,
-    attribution_text="(C) OSM, CVR",
-    titles=[
-        "OSM",
-        "CVR",
-        "Difference (OSM - CVR)",
-    ],
-    cmaps=[
-        "viridis",
-        "viridis",
-        "RdBu_r",
-    ],
-):
-
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=figsize)
-
-    axes = axes.flatten()
-
-    suptitle = f"{destination.replace('_', ' ').title()}"
-
-    viridis_norm = plt.Normalize(
-        vmin=0,
-        vmax=max(
-            combined_grid[destination + "_osm"].max(),
-            combined_grid[destination + "_cvr"].max(),
-        ),
-    )
-
-    largest_abs_value = combined_grid[destination + "_diff"].abs().max()
-    divnorm = colors.TwoSlopeNorm(
-        vmin=-largest_abs_value,
-        vcenter=0,
-        vmax=largest_abs_value,
-    )
-
-    norms = [viridis_norm, viridis_norm, divnorm]
-
-    for j, col in enumerate(["_osm", "_cvr", "_diff"]):
-
-        ax = axes[j]
-
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="3.5%", pad="1%")
-        cax.tick_params(labelsize=font_size)
-
-        study_area.plot(ax=ax, color="white", edgecolor="black")
-
-        grid_subset = combined_grid[
-            (combined_grid[destination + "_osm"] > 0)
-            | (combined_grid[destination + "_cvr"] > 0)
-        ].copy()
-
-        grid_subset[destination + "_osm"] = grid_subset[destination + "_osm"].replace(
-            {0: np.nan}
-        )
-
-        grid_subset[destination + "_cvr"] = grid_subset[destination + "_cvr"].replace(
-            {0: np.nan}
-        )
-
-        grid_subset.plot(
-            cax=cax,
-            ax=ax,
-            column=destination + col,
-            cmap=cmaps[j],
-            norm=norms[j],
-            # legend=True,
-            alpha=0.5,
-            # legend_kwds={
-            #     "shrink": 0.9,
-            #     "aspect": 30,
-            # },
-        )
-
-        sm = plt.cm.ScalarMappable(
-            cmap=cmaps[j],
-            norm=norms[j],
-        )
-        sm._A = []
-        cbar = fig.colorbar(sm, cax=cax)
-        cbar.outline.set_visible(False)
-
-        if j == 2:
-            min_val = -largest_abs_value
-            max_val = largest_abs_value
-            cbar.set_ticks(
-                [min_val, round(min_val / 2), 0, round(max_val / 2), max_val]
-            )
-
-        ax.set_axis_off()
-        ax.set_title(titles[j], fontsize=font_size)
-
-    fig.suptitle(
-        suptitle,
-        fontsize=font_size + 4,
-        fontdict={"fontweight": "bold"},
-    )
-
-    axes[0].add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower left",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-
-    cx.add_attribution(ax=axes[-1], text=attribution_text, font_size=font_size)
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    plt.savefig(
-        fp,
-        dpi=300,
-        bbox_inches="tight",
-    )
-
-    plt.show()
-
-    plt.close()
-
-
-def linestring_to_polygon(geom):
-    # Only convert if LineString is closed
-    if geom.is_ring:
-        return Polygon(geom)
-    else:
-        return None  # or raise a warning / try to close it manually
-
-
-def drop_contained_polygons(gdf, drop=True):
-    """
-    Find polygons that are fully contained by another polygon in the same GeoDataFrame.
-    """
-    contained_indices = set()
-
-    for idx, geom in gdf.geometry.items():
-        others = gdf.drop(idx)
-        for other_idx, other_geom in others.geometry.items():
-            if geom.within(other_geom):
-                contained_indices.add(idx)
-                break
-
-    if drop:
-        return gdf.drop(index=contained_indices)
-    else:
-        return list(contained_indices)
-
-
-def plot_no_connection(df, study_area, attribution_text, font_size, title, fp=None):
-    """
-    Plot the results on a map.
-    """
-
-    # Convert DataFrame to GeoDataFrame
-    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-    gdf.to_crs("EPSG:25832", inplace=True)
-
-    assert study_area.crs == gdf.crs, "CRS mismatch between study area and GeoDataFrame"
-
-    _, ax = plt.subplots(figsize=(10, 10))
-
-    study_area.plot(
-        ax=ax,
-        color="none",
-        edgecolor="black",
-        alpha=0.5,
-    )
-
-    gdf.plot(
-        ax=ax,
-        legend=True,
-        markersize=5,
-        color="orange",
-        edgecolor="orange",
-        alpha=0.5,
-        legend_kwds={"label": "No connection"},
-    )
-
-    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
-
-    ax.set_axis_off()
-
-    ax.add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower left",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    if fp:
-
-        plt.savefig(
-            fp,
-            dpi=300,
-            bbox_inches="tight",
-        )
-
-    plt.show()
-    plt.close()
-
-
-def plot_traveltime_results(df, plot_col, attribution_text, font_size, title, fp=None):
-    """
-    Plot the results on a map.
-    """
-
-    # Convert DataFrame to GeoDataFrame
-    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-    gdf.to_crs("EPSG:25832", inplace=True)
-
-    _, ax = plt.subplots(figsize=(10, 10))
-
-    divider = make_axes_locatable(ax)
-
-    cax = divider.append_axes("right", size="3.5%", pad="1%")
-    cax.tick_params(labelsize=font_size)
-
-    gdf.plot(
-        ax=ax,
-        cax=cax,
-        column=plot_col,
-        cmap="viridis",
-        legend=True,
-        markersize=5,
-    )
-
-    for spine in cax.spines.values():
-        spine.set_visible(False)
-
-    ax.set_title(title, fontsize=font_size + 2, fontdict={"weight": "bold"})
-
-    ax.set_axis_off()
-
-    ax.add_artist(
-        ScaleBar(
-            dx=1,
-            units="m",
-            dimension="si-length",
-            length_fraction=0.15,
-            width_fraction=0.002,
-            location="lower left",
-            box_alpha=0,
-            font_properties={"size": font_size},
-        )
-    )
-    cx.add_attribution(ax=ax, text=attribution_text, font_size=font_size)
-    txt = ax.texts[-1]
-    txt.set_position([0.99, 0.01])
-    txt.set_ha("right")
-    txt.set_va("bottom")
-
-    plt.tight_layout()
-
-    if fp:
-
-        plt.savefig(
-            fp,
-            dpi=300,
-            bbox_inches="tight",
-        )
-
-    plt.show()
-    plt.close()
-
-
-def convert_otp_time(millis, tz="Europe/Copenhagen"):
-    if isinstance(millis, (int, float)) and millis > 0:
-        try:
-            return datetime.fromtimestamp(millis / 1000, tz=ZoneInfo(tz)).strftime(
-                "%Y-%m-%d %H:%M"
-            )
-        except Exception as e:
-            print(f"Failed to convert timestamp {millis}: {e}")
-            return None
-    return None
-
-
-def get_travel_info(
-    from_lat,
-    from_lon,
-    to_lat,
-    to_lon,
-    date,
-    time,
-    url,
-    walk_speed=1.3,
-    search_window=7200,  # 2 hours in seconds
-    arrive_by="true",
-):
-
-    query = f"""
-    {{
-    plan(
-        from: {{lat: {from_lat}, lon: {from_lon}}}
-        to: {{lat: {to_lat}, lon: {to_lon}}}
-        date: "{date}"
-        time: "{time}"
-        walkSpeed: {walk_speed}
-        arriveBy: {arrive_by},
-        searchWindow: {search_window}
-        numItineraries: 1
-    ) {{
-        itineraries {{
-        startTime
-        waitingTime
-        duration
-        walkDistance
-        legs {{
-            mode
-            duration
-        }}
-        }}
-    }}
-    }}
-    """
-
-    # print(f"Sending request to OTP API with query: {query}")
-    response = requests.post(url, json={"query": query})
-    # print(f"Error: {response.status_code} - {response.text}")
-
-    # print(response.json())
-
-    return response.json()
-
-
-# Process the individual service types
-def process_adresses(
-    dataset,
-    sampelsize,
-    time,
-    date,
-    walk_speed,
-    search_window,
-    url,
-    data_path,
-    otp_con,
-    con,
-    chunk_size=1000,
-    max_workers=16,
-):
-    filename = dataset + ".parquet"
-    data = data_path / filename
-    dataset = dataset.replace("-", "_")
-
-    # Create target table
-
-    otp_con.execute(f"DROP TABLE IF EXISTS {dataset};")
-    otp_con.execute(
-        f"""
-        CREATE TABLE {dataset} (
-            source_id TEXT,
-            target_id TEXT,
-            from_lat DOUBLE,
-            from_lon DOUBLE,
-            startTime TEXT,
-            waitingTime DOUBLE,
-            duration DOUBLE,
-            walkDistance DOUBLE,
-            abs_dist DOUBLE,
-            mode_durations_json TEXT,
-        )
-    """
-    )
-
-    # Load data into a temporary table
-    if sampelsize == 0:
-        con.execute(
-            f"""
-            CREATE OR REPLACE TEMP TABLE data_pairs AS 
-            SELECT * 
-            FROM '{data}'
-        """
-        )
-    else:
-        con.execute(
-            f"""
-            CREATE OR REPLACE TEMP TABLE data_pairs AS 
-            SELECT * 
-            FROM '{data}'
-            USING SAMPLE {sampelsize} ROWS
-        """
-        )
-
-    # Function to process a single row
-    def process_row(row, date, time, search_window=7200):
-        try:
-            travel_info = get_travel_info(
-                row.source_lat,
-                row.source_lon,
-                row.dest_lat,
-                row.dest_lon,
-                date,
-                time,
-                url=url,
-                walk_speed=walk_speed,
-                search_window=search_window,
-                arrive_by="true",
-            )
-            itinerary = travel_info["data"]["plan"]["itineraries"][0]
-
-            # Duration per mode
-            mode_durations = {}
-            for leg in itinerary["legs"]:
-                mode = leg["mode"]
-                duration = leg["duration"]
-                mode_durations[mode] = mode_durations.get(mode, 0) + duration
-
-            mode_durations_json = json.dumps(mode_durations)
-
-            return (
-                row.source_address_id,
-                row.dest_address_id,
-                row.source_lat,
-                row.source_lon,
-                convert_otp_time(itinerary["startTime"]),
-                itinerary["waitingTime"],
-                itinerary["duration"],
-                itinerary["walkDistance"],
-                row.dest_distance,
-                mode_durations_json,
-            )
-        except Exception:
-            return (
-                row.source_address_id,
-                row.dest_address_id,
-                row.source_lat,
-                row.source_lon,
-                np.nan,
-                np.nan,
-                np.nan,
-                np.nan,
-                row.dest_distance,
-                json.dumps({}),  # Empty dict as JSON
-            )
-
-    # Process in chunks with parallel execution
-    offset = 0
-    while True:
-        chunk = con.execute(
-            f"""
-            SELECT * FROM data_pairs 
-            LIMIT {chunk_size} OFFSET {offset}
-        """
-        ).fetchdf()
-
-        if chunk.empty:
-            break
-
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [
-                executor.submit(process_row, row, date, time, search_window)
-                for row in chunk.itertuples(index=False)
-            ]
-
-            for future in as_completed(futures):
-                result = future.result()
-                otp_con.execute(
-                    f"""
-                    INSERT INTO {dataset} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,)
-                """,
-                    result,
-                )
-
-        offset += chunk_size
