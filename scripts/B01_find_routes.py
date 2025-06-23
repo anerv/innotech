@@ -4,6 +4,8 @@ import yaml
 from pathlib import Path
 import duckdb
 from src.helper_functions import process_adresses
+import pandas as pd
+import os
 
 # %%
 
@@ -75,15 +77,10 @@ for service in services[1:]:
         )
 
 # %%
-# TODO: implement a second run with a larger search window
-
-
-import pandas as pd
-import os
 
 services = config_model["services"]
 
-for service in services[0:1]:
+for service in services:
     for i in range(1, int(service["n_neighbors"]) + 1):
         dataset = f"{service['service_type']}_{i}"
 
@@ -105,9 +102,12 @@ for service in services[0:1]:
         )
 
         print(
+            f"Found {input_data_no_solution.shape[0]} addresses with no solution in the first run."
+        )
+
+        print(
             f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size} and search window {search_window} seconds"
         )
-        print(f"New search window: {search_window} seconds")
 
         dataset = f"{dataset}_second_run"  # Update dataset name for second run
 
@@ -138,6 +138,10 @@ for service in services[0:1]:
 
         results_second_run = pd.read_parquet(f"{results_path}/{dataset}_otp.parquet")
 
+        print(
+            f"Found {results_second_run[results_second_run.duration.notna()].shape[0]} results in the second run for {dataset}."
+        )
+
         # Combine the results
         combined_results = pd.concat(
             [results_first_run, results_second_run], ignore_index=True
@@ -148,20 +152,21 @@ for service in services[0:1]:
             == results_first_run.shape[0] + results_second_run.shape[0]
         ), "Combined results do not match the expected number of rows"
 
+        assert (
+            combined_results.source_id.is_unique
+        ), "Source IDs are not unique in combined results"
+
         # reset dataset name for export
         dataset = f"{service['service_type']}_{i}"
 
         # Export the combined results
         combined_results.to_parquet(
             f"{results_path}/{dataset}_combined_otp.parquet", index=False
-        )  # TODO: once results are cleared, just export the combined results to the original file
+        )
 
         # remove exported files from second run
-        # os.remove(f"{results_path}/{dataset}_second_run_otp.parquet")
-        # os.remove(f"{data_path}/{dataset}_second_run.parquet")
+        os.remove(f"{results_path}/{dataset}_second_run_otp.parquet")
+        os.remove(f"{data_path}/{dataset}_second_run.parquet")
 
 
-# %%
-# %%
-test = pd.read_parquet("../results/data/doctor_1_otp.parquet")
 # %%
