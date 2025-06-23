@@ -20,7 +20,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+from functools import reduce
 
 ######################## OTP FUNCTIONS ########################
 
@@ -236,6 +236,63 @@ def process_adresses(
 
 
 ############################ RANDOM HELPER FUNCTIONS ############################
+
+
+def compute_weighted_travel_time(
+    services,
+    path,
+    weight_dictionary,
+    travel_time_column="total_time_min",
+):
+
+    all_travel_times = []
+
+    for service in services:
+        for i in range(1, int(service["n_neighbors"]) + 1):
+            dataset = f"{service['service_type']}_{i}"
+            fp = path / f"data/{dataset}_otp_geo.parquet"
+            if not fp.exists():
+                print(f"File {fp} does not exist. Skipping.")
+                continue
+            df = pd.read_parquet(fp)
+
+            df = df[["source_id", travel_time_column]]
+
+            df.rename(
+                columns={travel_time_column: f"{dataset}_travel_time"}, inplace=True
+            )
+
+            df[f"{dataset}_weighted_travel_time"] = df.apply(
+                lambda row: row[f"{dataset}_travel_time"]
+                * weight_dictionary.get(service["service_type"], 1),
+                axis=1,
+            )
+
+            all_travel_times.append(df)
+
+    all_travel_times_df = reduce(
+        lambda left, right: pd.merge(left, right, on="source_id", how="outer"),
+        all_travel_times,
+    )
+
+    gdf = gpd.read_parquet(path / f"data/{dataset}_otp_geo.parquet")
+    all_travel_times_gdf = pd.merge(
+        gdf[["source_id", "geometry"]], all_travel_times_df, on="source_id", how="left"
+    )
+
+    assert len(all_travel_times_gdf) == len(
+        df
+    ), "Mismatch in number of rows after merge."
+
+    all_travel_times_gdf["total_travel_time"] = all_travel_times_gdf[
+        [
+            col
+            for col in all_travel_times_gdf.columns
+            if col.endswith("_weighted_travel_time")
+        ]
+    ].sum(axis=1)
+
+    return all_travel_times_gdf
 
 
 def transfers_from_json(json_str):

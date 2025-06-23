@@ -15,6 +15,8 @@ from src.helper_functions import (
     highlight_min_traveltime,
     unpack_modes_from_json,
     transfers_from_json,
+    create_hex_grid,
+    compute_weighted_travel_time,
 )
 
 
@@ -53,7 +55,7 @@ services = config_model["services"]
 # %%
 summaries = []
 
-plot = True
+plot = False
 
 for service in services:
 
@@ -104,14 +106,8 @@ for service in services:
         result_count = df[df["duration"].notna()].shape[0]
         print(f"{result_count} solutions found in {dataset} with {len(df)} rows.")
 
-        print(
-            f"{len(df[df["source_id"] == df["target_id"]])} rows where source and target are the same."
-        )
-
         # Count sources with no results
-        # Exclude rows where source and target are the same
-        df_subset = df[df["source_id"] != df["target_id"]]
-        no_results_count = df_subset[df_subset["duration"].isna()].shape[0]
+        no_results_count = df[df["duration"].isna()].shape[0]
         if no_results_count > 0:
             print(
                 f"{no_results_count} sources have no results in {dataset}. This may indicate that the search window was too small or that no transit solution is available."
@@ -293,7 +289,7 @@ rows_to_style = [
     "median_wait_time",
     "median_transfers",
     "max_transfers",
-]  # or any list of index values you want
+]
 
 
 styled_table = (
@@ -340,24 +336,8 @@ styled_table.to_html(
 
 
 # %%
-# TODO: Implement weighted average travel time calculation
 
-# TODO: load all results - just the results for access points
-
-keep_cols = [
-    "source_id",
-    "arrival_time",
-    "waitingTime",
-    "walkDistance",
-    "abs_dist",
-    "duration_min",
-    "wait_time_dest_min",
-    "total_time_min",
-    "transfers",
-    "geometry",
-]
-
-# TODO: subset the relevant columns
+# Compute weighted travel times based on service importance
 
 weight_dictionary = {
     "doctor": 0.05,
@@ -372,54 +352,58 @@ weight_dictionary = {
 }
 
 
-def compute_weighted_travel_time(
-    services,
-    path,
-    weight_dictionary,
-    travel_time_column="total_time_min",
-    crs=crs,
-):
+weighted_travel_times = compute_weighted_travel_time(
+    services, results_path, weight_dictionary
+)
 
-    all_travel_times = []
-    for service in services:
-        for i in range(1, int(service["n_neighbors"]) + 1):
-            dataset = f"{service['service_type']}_{i}"
-            fp = path / f"data/{dataset}_otp_geo.parquet"
-            if not fp.exists():
-                print(f"File {fp} does not exist. Skipping.")
-                continue
-            df = pd.read_parquet(fp)
+weighted_travel_times.to_parquet(
+    results_path / "data/weighted_travel_times_otp_geo.parquet",
+    index=False,
+    engine="pyarrow",
+)
 
-            df = df[["source_id", travel_time_column]]
+# %%
+# compute average travel time per hex bin
 
-            df.rename(
-                columns={travel_time_column: f"{dataset}_travel_time"}, inplace=True
-            )
+study_area = gpd.read_file(config_model["study_area_fp"])
 
-            df["weighted_travel_time"] = df.apply(
-                lambda row: row[f"{dataset}_travel_time"]
-                * weight_dictionary.get(service["service_type"], 1),
-                axis=1,
-            )
+hex_grid = create_hex_grid(study_area, 8, crs, 200)
 
-            all_travel_times.append(df[keep_cols])
+hex_travel_times = gpd.sjoin(
+    hex_grid,
+    weighted_travel_times,
+    how="inner",
+    predicate="intersects",
+    rsuffix="travel",
+    lsuffix="hex",
+)
 
-    all_travel_times_df = pd.concat(all_travel_times, ignore_index=True)
+hex_id_col = "grid_id"
 
-    all_travel_times_df = pd.merge(
-        df[["source_id", "geometry"]], all_travel_times_df, on="source_id", how="left"
-    )
+weighted_cols = [
+    col for col in hex_travel_times.columns if col.endswith("_weighted_travel_time")
+]
+cols_to_average = weighted_cols + ["total_travel_time"]
 
-    assert len(all_travel_times_df) == len(
-        df
-    ), "Mismatch in number of rows after merge."
+hex_avg_travel_times = (
+    hex_travel_times.groupby(hex_id_col)[cols_to_average].mean().reset_index()
+)
 
-    all_travel_times_df = gpd.GeoDataFrame(
-        all_travel_times_df, geometry="geometry", crs=crs
-    )
+hex_avg_travel_times_gdf = hex_grid.merge(
+    hex_avg_travel_times, on="grid_id", how="left"
+)
 
-    return all_travel_times_df
+hex_avg_travel_times_gdf.to_parquet(
+    results_path / "data/hex_avg_travel_times_otp.parquet",
+)
 
 
 # %%
+
 # TODO: implement k-means classification
+
+# TODO: summarize by municipality
+
+# TODO: compare to urban areas and population
+
+# %%
