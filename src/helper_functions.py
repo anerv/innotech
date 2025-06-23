@@ -45,8 +45,8 @@ def get_travel_info(
     date,
     time,
     url,
+    search_window,
     walk_speed=1.3,
-    search_window=7200,  # 2 hours in seconds
     arrive_by="true",
 ):
 
@@ -163,8 +163,8 @@ def process_adresses(
                 date,
                 time,
                 url=url,
-                walk_speed=walk_speed,
                 search_window=search_window,
+                walk_speed=walk_speed,
                 arrive_by=arrive_by,
             )
             itinerary = travel_info["data"]["plan"]["itineraries"][0]
