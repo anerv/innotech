@@ -21,6 +21,8 @@ config_path = root_path / "config.yml"
 with open(config_path, "r") as file:
     config_model = yaml.safe_load(file)
 
+    crs = config_model["crs"]  # Load the coordinate reference system
+
 
 sample_size = config_model[
     "sample_size"
@@ -97,7 +99,7 @@ results["geometry"] = results["geometry"] = gpd.points_from_xy(
     results["from_lon"], results["from_lat"]
 )
 gdf = gpd.GeoDataFrame(results, geometry="geometry", crs="EPSG:4326")
-gdf.to_crs("EPSG:25832", inplace=True)
+gdf.to_crs(crs, inplace=True)
 gdf.to_file("results.gpkg", driver="GPKG")
 
 # %%

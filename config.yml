@@ -2,6 +2,7 @@
 
 study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
 
+crs : "EPSG:25832" # The coordinate reference system used for the data, must be the same as the data files
 
 #### FILEPATHS #####
 # The filepaths are relative to the main directory for the repository and should point to the data files

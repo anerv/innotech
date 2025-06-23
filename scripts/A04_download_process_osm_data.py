@@ -29,6 +29,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     osm_destinations_fp = parsed_yaml_file["osm_destinations_fp"]
 
+    crs = parsed_yaml_file["crs"]
+
 # %%
 
 nace_dict = {}
@@ -82,11 +84,11 @@ for category, query_list in queries.items():
             nodes_gdf = create_nodes_gdf(joined.nodes)
             ways_gdf = create_ways_gdf(joined.ways)
 
-            # Reproject to EPSG:25832 if necessary
+            # Reproject  if necessary
             if not nodes_gdf.empty:
                 # Drop nodes where the key is none (these nodes belong to a way)
                 nodes_gdf = nodes_gdf[nodes_gdf[key].notna()]
-                nodes_gdf = nodes_gdf.to_crs("EPSG:25832")
+                nodes_gdf = nodes_gdf.to_crs(crs)
 
                 nodes_gdf = nodes_gdf[
                     [
@@ -101,7 +103,7 @@ for category, query_list in queries.items():
                 ways_gdf["geometry"] = ways_gdf["geometry"].apply(linestring_to_polygon)
                 ways_gdf = ways_gdf[ways_gdf["geometry"].notnull()]
 
-                ways_gdf = ways_gdf.to_crs("EPSG:25832")
+                ways_gdf = ways_gdf.to_crs(crs)
 
                 # Drop polygons completely contained by other polygons
                 ways_gdf = drop_contained_polygons(ways_gdf, drop=True)

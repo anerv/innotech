@@ -35,18 +35,25 @@ config_path = root_path / "config.yml"
 with open(config_path, "r") as file:
     config_model = yaml.safe_load(file)
 
+    crs = config_model["crs"]
+
 
 # %%
 walkspeed_min = config_model["walk_speed"] * 60  # convert to minutes
 
-
 # load study area for plotting
 study_area = gpd.read_file(config_model["study_area_fp"])
+
+# Load address data for correct geometries
+address_points = gpd.read_parquet(config_model["addresses_fp_all"])
 
 # Load results
 services = config_model["services"]
 
+# %%
 summaries = []
+
+plot = True
 
 for service in services:
 
@@ -66,6 +73,14 @@ for service in services:
         if df.duplicated(subset=["source_id", "target_id"]).any():
             print(f"Duplicates found in {dataset}. Dropping duplicates.")
             df = df.drop_duplicates(subset=["source_id", "target_id"])
+
+        # Fill out rows where source and target are the same
+        df.loc[df["source_id"] == df["target_id"], "duration"] = 0
+        df.loc[df["source_id"] == df["target_id"], "waitingTime"] = 0
+        df.loc[df["source_id"] == df["target_id"], "walkDistance"] = 0
+        df.loc[df["source_id"] == df["target_id"], "startTime"] = (
+            config_model["travel_date"] + " " + service["arival_time"]
+        )
 
         # Convert duration to minutes
         df["duration_min"] = df["duration"] / 60
@@ -136,44 +151,46 @@ for service in services:
 
         summaries.append(summary)
 
-        plot_columns = [
-            "duration_min",
-            "wait_time_dest_min",
-            "total_time_min",
-        ]
+        if plot:
 
-        labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
+            plot_columns = [
+                "duration_min",
+                "wait_time_dest_min",
+                "total_time_min",
+            ]
 
-        attribution_text = "KDS, OpenStreetMap"
-        font_size = 10
+            labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
 
-        for i, plot_col in enumerate(plot_columns):
-            fp = results_path / f"maps/{dataset}_{plot_col}.png"
+            attribution_text = "KDS, OpenStreetMap"
+            font_size = 10
 
-            title = f"{labels[i]} to {dataset.split("_")[-1]} nearest {dataset.split("_")[0]} by public transport"
+            for i, plot_col in enumerate(plot_columns):
+                fp = results_path / f"maps/{dataset}_{plot_col}.png"
 
-            plot_traveltime_results(
-                df,
-                plot_col,
-                attribution_text,
-                font_size,
-                title,
-                fp,
-            )
+                title = f"{labels[i]} to {dataset.split("_")[-1]} nearest {dataset.split("_")[0]} by public transport"
 
-        no_results = df[df["duration"].isna()].copy()
-        if not no_results.empty:
-            fp_no_results = results_path / f"maps/{dataset}_no_results.png"
-            title_no_results = f"Locations with no results for {dataset.split('_')[-1]} nearest {dataset.split('_')[0]} by public transport"
+                plot_traveltime_results(
+                    df,
+                    plot_col,
+                    attribution_text,
+                    font_size,
+                    title,
+                    fp,
+                )
 
-            plot_no_connection(
-                no_results,
-                study_area,
-                attribution_text,
-                font_size,
-                title_no_results,
-                fp_no_results,
-            )
+            no_results = df[(df["duration"].isna()) & (df.abs_dist > 0)].copy()
+            if not no_results.empty:
+                fp_no_results = results_path / f"maps/{dataset}_no_results.png"
+                title_no_results = f"Locations with no results for {dataset.split('_')[-1]} nearest {dataset.split('_')[0]} by public transport"
+
+                plot_no_connection(
+                    no_results,
+                    study_area,
+                    attribution_text,
+                    font_size,
+                    title_no_results,
+                    fp_no_results,
+                )
 
         # export to geoparquet
         all_columns = df.columns.tolist()
@@ -192,11 +209,72 @@ for service in services:
             "geometry",
         ]
         keep_cols.extend([col for col in all_columns if col.endswith("_duration")])
+
         df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
         gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-        gdf.to_crs("EPSG:25832", inplace=True)
+        gdf.to_crs(crs, inplace=True)
         gdf[keep_cols].to_parquet(
             results_path / f"data/{dataset}_otp_geo.parquet",
+            index=False,
+            engine="pyarrow",
+        )
+
+        df.drop(columns=["geometry"], inplace=True)
+        address_travel_times = pd.merge(
+            df,
+            address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
+            left_on="source_id",
+            right_on="adresseIdentificerer",
+            how="left",
+        )
+
+        address_travel_times.drop_duplicates(inplace=True)
+
+        assert (
+            address_travel_times["adgangspunkt"].notna().all()
+        ), "Some travel time results were not matched with an address. Please check the address data."
+
+        address_travel_times = gpd.GeoDataFrame(
+            address_travel_times,
+            geometry="geometry",
+            crs=crs,
+        )
+
+        address_travel_times[keep_cols].to_parquet(
+            results_path / f"data/{dataset}_addresses_otp_geo.parquet",
+            index=False,
+            engine="pyarrow",
+        )
+
+        # get travel times for all unique addresses - includes multiple data points for the same locations for apartment buildings etc.
+        all_addresses_travel_times = pd.merge(
+            address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
+            address_travel_times,
+            right_on="adgangspunkt",
+            left_on="adgangspunkt",
+            how="left",
+            suffixes=("", "_travel_times"),
+        )
+
+        all_addresses_travel_times = all_addresses_travel_times[
+            all_addresses_travel_times.source_id.notna()
+        ]
+
+        keep_cols.extend(
+            [
+                "adresseIdentificerer",
+                "adgangspunkt",
+            ]
+        )
+
+        all_addresses_travel_times = gpd.GeoDataFrame(
+            all_addresses_travel_times[keep_cols],
+            geometry="geometry",
+            crs=crs,
+        )
+
+        all_addresses_travel_times.to_parquet(
+            results_path / f"data/{dataset}_addresses_all_otp_geo.parquet",
             index=False,
             engine="pyarrow",
         )
@@ -263,4 +341,85 @@ styled_table.to_html(
 
 # %%
 # TODO: Implement weighted average travel time calculation
+
+# TODO: load all results - just the results for access points
+
+keep_cols = [
+    "source_id",
+    "arrival_time",
+    "waitingTime",
+    "walkDistance",
+    "abs_dist",
+    "duration_min",
+    "wait_time_dest_min",
+    "total_time_min",
+    "transfers",
+    "geometry",
+]
+
+# TODO: subset the relevant columns
+
+weight_dictionary = {
+    "doctor": 0.05,
+    "dentist": 0.05,
+    "pharmacy": 0.05,
+    "kindergarten-nursery": 5,
+    "school": 5,
+    "supermarket": 5,
+    "library": 1,
+    "train_station": 5,
+    "sports_facility": 1,
+}
+
+
+def compute_weighted_travel_time(
+    services,
+    path,
+    weight_dictionary,
+    travel_time_column="total_time_min",
+    crs=crs,
+):
+
+    all_travel_times = []
+    for service in services:
+        for i in range(1, int(service["n_neighbors"]) + 1):
+            dataset = f"{service['service_type']}_{i}"
+            fp = path / f"data/{dataset}_otp_geo.parquet"
+            if not fp.exists():
+                print(f"File {fp} does not exist. Skipping.")
+                continue
+            df = pd.read_parquet(fp)
+
+            df = df[["source_id", travel_time_column]]
+
+            df.rename(
+                columns={travel_time_column: f"{dataset}_travel_time"}, inplace=True
+            )
+
+            df["weighted_travel_time"] = df.apply(
+                lambda row: row[f"{dataset}_travel_time"]
+                * weight_dictionary.get(service["service_type"], 1),
+                axis=1,
+            )
+
+            all_travel_times.append(df[keep_cols])
+
+    all_travel_times_df = pd.concat(all_travel_times, ignore_index=True)
+
+    all_travel_times_df = pd.merge(
+        df[["source_id", "geometry"]], all_travel_times_df, on="source_id", how="left"
+    )
+
+    assert len(all_travel_times_df) == len(
+        df
+    ), "Mismatch in number of rows after merge."
+
+    all_travel_times_df = gpd.GeoDataFrame(
+        all_travel_times_df, geometry="geometry", crs=crs
+    )
+
+    return all_travel_times_df
+
+
+# %%
 # TODO: implement k-means classification

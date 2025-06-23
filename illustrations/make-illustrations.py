@@ -9,11 +9,16 @@ import contextily as cx
 from matplotlib_scalebar.scalebar import ScaleBar
 import os
 import sys
+import yaml
 
 os.environ["GDAL_DATA"] = os.path.join(
     f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
 )
 
+with open(r"../config.yml", encoding="utf-8") as file:
+    parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
+
+    crs = parsed_yaml_file["crs"]
 # %%
 
 ##### ILLUSTRATIONS OF SERVICES/DESTINATIONS #####
@@ -180,7 +185,7 @@ results_gdf = gpd.GeoDataFrame(
     crs="EPSG:4326",
 )
 
-results_gdf = results_gdf.to_crs("EPSG:25832")
+results_gdf = results_gdf.to_crs(crs)
 
 results_gdf["duration_min"] = results_gdf["duration"] / 60
 # %%

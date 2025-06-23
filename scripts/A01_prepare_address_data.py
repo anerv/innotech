@@ -22,6 +22,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
     adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]
     study_area_name = parsed_yaml_file["study_area_name"]
 
+    crs = parsed_yaml_file["crs"]
+
 
 # %%
 
@@ -43,7 +45,7 @@ else:
 address.drop_duplicates(subset=["id_lokalId"], inplace=True)
 
 address_points["geometry"] = address_points["position"].apply(wkt.loads)
-address_gdf = gpd.GeoDataFrame(address_points, geometry="geometry", crs="EPSG:25832")
+address_gdf = gpd.GeoDataFrame(address_points, geometry="geometry", crs=crs)
 
 # %%
 housenumbers_with_geoms = pd.merge(
@@ -60,6 +62,8 @@ housenumbers_with_geoms.rename(
     columns={"id_lokalId_hus": "husnummer", "id_lokalId_adg": "adgangspunkt"},
     inplace=True,
 )
+
+housenumbers_with_geoms.drop_duplicates(inplace=True)
 
 # %%
 
@@ -98,6 +102,7 @@ addresses_with_geoms.rename(
 )
 addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
+addresses_with_geoms.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
 
 addresses_with_geoms.to_parquet(addresses_fp_all, index=False)
 
