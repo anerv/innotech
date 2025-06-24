@@ -5,10 +5,6 @@
 # adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" 
 # sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" 
 
-study_area_fp: "../data/processed/adm_boundaries/study_area.gpkg"
-sub_study_areas_fp: "../data/processed/adm_boundaries/sub_areas.parquet"
-
-
 # administrative boundaries
 study_area_config:
   regions:
