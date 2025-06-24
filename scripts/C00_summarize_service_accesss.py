@@ -14,7 +14,8 @@ from src.helper_functions import (
     unpack_modes_from_json,
     transfers_from_json,
     create_hex_grid,
-    compute_weighted_travel_time,
+    compute_weighted_time,
+    combine_results,
 )
 
 
@@ -39,7 +40,6 @@ with open(config_path, "r") as file:
 
 # %%
 walkspeed_min = config_model["walk_speed"] * 60  # convert to minutes
-
 
 # Load address data for correct geometries
 address_points = gpd.read_parquet(config_model["addresses_fp_all"])
@@ -228,7 +228,7 @@ for service in services:
             engine="pyarrow",
         )
 
-# %%
+
 # Convert summaries to DataFrame
 summary_df = pd.DataFrame(summaries)
 summary_df.set_index("dataset", inplace=True)
@@ -273,10 +273,6 @@ styled_table = (
     .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
 )
 
-styled_table
-
-
-# %%
 
 summary_df.to_csv(
     results_path / "data/service_access_summary.csv", index=True, float_format="%.2f"
@@ -286,6 +282,8 @@ styled_table.to_html(
     results_path / "data/service_access_summary.html",
     table_attributes='style="width: 50%; border-collapse: collapse;"',
 )
+
+styled_table
 
 
 # %%
@@ -305,27 +303,56 @@ weight_dictionary = {
     "sports_facility": 1,
 }
 
+weight_cols = ["duration_min", "total_time_min"]
 
-weighted_travel_times = compute_weighted_travel_time(
-    services, results_path, weight_dictionary, "total_time_min"
-)
+for w in weight_cols:
 
-weighted_travel_times.to_parquet(
-    results_path / "data/weighted_travel_times_otp_geo.parquet",
-    index=False,
-    engine="pyarrow",
-)
+    weighted_travel_times = compute_weighted_time(
+        services, 1, results_path, weight_dictionary, w
+    )
+
+    weighted_travel_times.to_parquet(
+        results_path / f"data/weighted_{w}_otp_geo.parquet",
+        index=False,
+        engine="pyarrow",
+    )
+
 
 # %%
+
+travel_time_columns = [
+    # "waitingTime",
+    "walkDistance",
+    "abs_dist",
+    "duration_min",
+    "wait_time_dest_min",
+    "total_time_min",
+    # "transfers",
+]
+
+
+all_travel_times_gdf = combine_results(
+    config_model["services"],
+    results_path,
+    travel_time_columns,
+    n_neighbors=1,
+)
+
+all_travel_times_gdf["total_time"] = all_travel_times_gdf[
+    [col for col in all_travel_times_gdf.columns if col.endswith("total_time_min")]
+].sum(axis=1)
+
+# %%
+
 # compute average travel time per hex bin
 
-study_area = gpd.read_file(config_model["study_area_fp"])
+study_area = gpd.read_file(config_model["study_area_config"]["regions"]["outputpath"])
 
 hex_grid = create_hex_grid(study_area, 8, crs, 200)
 
 hex_travel_times = gpd.sjoin(
     hex_grid,
-    weighted_travel_times,
+    all_travel_times_gdf,
     how="inner",
     predicate="intersects",
     rsuffix="travel",
@@ -334,10 +361,11 @@ hex_travel_times = gpd.sjoin(
 
 hex_id_col = "grid_id"
 
-weighted_cols = [
-    col for col in hex_travel_times.columns if col.endswith("_weighted_travel_time")
+cols_to_average = [
+    col for col in hex_travel_times.columns if col.endswith("_total_time_min")
 ]
-cols_to_average = weighted_cols + ["total_travel_time"]
+cols_to_average.extend(["total_time"])
+
 
 hex_avg_travel_times = (
     hex_travel_times.groupby(hex_id_col)[cols_to_average].mean().reset_index()
@@ -363,7 +391,7 @@ municipalities = municipalities[["geometry", id_column]]
 
 regional_travel_times = gpd.sjoin(
     municipalities,
-    weighted_travel_times,
+    all_travel_times_gdf,
     how="inner",
     predicate="intersects",
     rsuffix="travel",
@@ -371,10 +399,10 @@ regional_travel_times = gpd.sjoin(
 )
 
 
-weighted_cols = [
-    col for col in hex_travel_times.columns if col.endswith("_weighted_travel_time")
+cols_to_average = [
+    col for col in regional_travel_times.columns if col.endswith("_total_time_min")
 ]
-cols_to_average = weighted_cols + ["total_travel_time"]
+cols_to_average.extend(["total_time"])
 
 municipal_avg_travel_times = (
     regional_travel_times.groupby(id_column)[cols_to_average].mean().reset_index()
