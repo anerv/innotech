@@ -39,7 +39,7 @@ cd innotech
 
 #### A2. Skab Conda environment
 ```bash
-conda create -n innotech geopandas pyyaml pyarrow overpy contextily scikit-learn h3-py python-duckdb ipykernel osmium-tool
+conda create -n innotech geopandas pyyaml pyarrow overpy contextily seaborn scikit-learn h3-py python-duckdb ipykernel osmium-tool
 ```
 
 *ELLER*
