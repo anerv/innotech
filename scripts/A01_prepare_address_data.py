@@ -18,9 +18,9 @@ with open(r"../config.yml", encoding="utf-8") as file:
     address_points_fp = parsed_yaml_file["address_points_fp"]
     housenumbers_fp = parsed_yaml_file["housenumbers_fp"]
 
-    study_area_fp = parsed_yaml_file["study_area_fp"]
-    adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]
-    study_area_name = parsed_yaml_file["study_area_name"]
+    adm_boundaries_config = parsed_yaml_file["study_area_config"]
+    study_area_fp = adm_boundaries_config["regions"]["outputpath"]
+    study_area_name = adm_boundaries_config["regions"]["study_area_name"]
 
     crs = parsed_yaml_file["crs"]
 

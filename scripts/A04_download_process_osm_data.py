@@ -19,9 +19,9 @@ from src.helper_functions import (
 with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
-    adm_boundaries_fp = parsed_yaml_file["adm_boundaries_fp"]
-    study_area_fp = parsed_yaml_file["study_area_fp"]
-    study_area_name = parsed_yaml_file["study_area_name"]
+    adm_boundaries_config = parsed_yaml_file["study_area_config"]
+    study_area_fp = adm_boundaries_config["regions"]["outputpath"]
+    study_area_name = adm_boundaries_config["regions"]["study_area_name"]
 
     addresses_fp_all = parsed_yaml_file["addresses_fp_all"]
 
