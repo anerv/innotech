@@ -635,16 +635,8 @@ def highlight_min_traveltime(s):
 
 
 def plot_no_connection(
-    df, study_area, attribution_text, font_size, title, fp=None, crs="EPSG:25832"
+    gdf, study_area, attribution_text, font_size, title, fp=None, crs="EPSG:25832"
 ):
-    """
-    Plot the results on a map.
-    """
-
-    # Convert DataFrame to GeoDataFrame
-    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-    gdf.to_crs(crs, inplace=True)
 
     assert study_area.crs == gdf.crs, "CRS mismatch between study area and GeoDataFrame"
 
@@ -704,16 +696,16 @@ def plot_no_connection(
 
 
 def plot_traveltime_results(
-    df, plot_col, attribution_text, font_size, title, fp=None, crs="EPSG:25832"
+    gdf,
+    plot_col,
+    attribution_text,
+    font_size,
+    title,
+    fp=None,
 ):
     """
     Plot the results on a map.
     """
-
-    # Convert DataFrame to GeoDataFrame
-    df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-    gdf.to_crs(crs, inplace=True)
 
     _, ax = plt.subplots(figsize=(10, 10))
 
