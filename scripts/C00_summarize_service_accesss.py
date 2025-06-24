@@ -9,8 +9,6 @@ from pathlib import Path
 import os
 import sys
 from src.helper_functions import (
-    plot_traveltime_results,
-    plot_no_connection,
     highlight_max_traveltime,
     highlight_min_traveltime,
     unpack_modes_from_json,
@@ -43,8 +41,6 @@ with open(config_path, "r") as file:
 # %%
 walkspeed_min = config_model["walk_speed"] * 60  # convert to minutes
 
-# load study area for plotting
-study_area = gpd.read_file(config_model["study_area_fp"])
 
 # Load address data for correct geometries
 address_points = gpd.read_parquet(config_model["addresses_fp_all"])
@@ -55,7 +51,6 @@ services = config_model["services"]
 # %%
 summaries = []
 
-plot = False
 
 for service in services:
 
@@ -146,47 +141,6 @@ for service in services:
         }
 
         summaries.append(summary)
-
-        if plot:
-
-            plot_columns = [
-                "duration_min",
-                "wait_time_dest_min",
-                "total_time_min",
-            ]
-
-            labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
-
-            attribution_text = "KDS, OpenStreetMap"
-            font_size = 10
-
-            for i, plot_col in enumerate(plot_columns):
-                fp = results_path / f"maps/{dataset}_{plot_col}.png"
-
-                title = f"{labels[i]} to {dataset.split("_")[-1]} nearest {dataset.split("_")[0]} by public transport"
-
-                plot_traveltime_results(
-                    df,
-                    plot_col,
-                    attribution_text,
-                    font_size,
-                    title,
-                    fp,
-                )
-
-            no_results = df[(df["duration"].isna()) & (df.abs_dist > 0)].copy()
-            if not no_results.empty:
-                fp_no_results = results_path / f"maps/{dataset}_no_results.png"
-                title_no_results = f"Locations with no results for {dataset.split('_')[-1]} nearest {dataset.split('_')[0]} by public transport"
-
-                plot_no_connection(
-                    no_results,
-                    study_area,
-                    attribution_text,
-                    font_size,
-                    title_no_results,
-                    fp_no_results,
-                )
 
         # export to geoparquet
         all_columns = df.columns.tolist()
@@ -339,6 +293,7 @@ styled_table.to_html(
 
 # Compute weighted travel times based on service importance
 
+# TODO: move to config file
 weight_dictionary = {
     "doctor": 0.05,
     "dentist": 0.05,
@@ -353,7 +308,7 @@ weight_dictionary = {
 
 
 weighted_travel_times = compute_weighted_travel_time(
-    services, results_path, weight_dictionary
+    services, results_path, weight_dictionary, "total_time_min"
 )
 
 weighted_travel_times.to_parquet(
@@ -400,10 +355,21 @@ hex_avg_travel_times_gdf.to_parquet(
 
 # %%
 
-# TODO: implement k-means classification
+sub_regions = gpd.read_file(config_model["sub_adm_boundaries_fp"])
+
+sub_regions = sub_regions[["geometry", "kommunekode", "navn"]]
+
+regional_travel_times = gpd.sjoin(
+    sub_regions,
+    weighted_travel_times,
+    how="inner",
+    predicate="intersects",
+    rsuffix="travel",
+    lsuffix="region",
+)
+
 
 # TODO: summarize by municipality
 
-# TODO: compare to urban areas and population
 
 # %%
