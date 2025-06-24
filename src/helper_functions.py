@@ -238,8 +238,57 @@ def process_adresses(
 ############################ RANDOM HELPER FUNCTIONS ############################
 
 
-def compute_weighted_travel_time(
+def combine_results(
     services,
+    path,
+    travel_time_columns,
+    id_column="source_id",
+    n_neighbors=1,
+):
+
+    all_travel_times = []
+
+    for service in services:
+
+        dataset = f"{service['service_type']}_{n_neighbors}"
+        fp = path / f"data/{dataset}_otp_geo.parquet"
+        if not fp.exists():
+            print(f"File {fp} does not exist. Skipping.")
+            continue
+        df = pd.read_parquet(fp)
+
+        df = df[[id_column] + travel_time_columns]
+
+        rename_dict = {
+            col: f"{dataset}_{col}" for col in travel_time_columns if col in df.columns
+        }
+
+        df.rename(columns=rename_dict, inplace=True)
+
+        all_travel_times.append(df)
+
+    all_travel_times_df = reduce(
+        lambda left, right: pd.merge(left, right, on="source_id", how="outer"),
+        all_travel_times,
+    )
+
+    # get geoms
+    gdf = gpd.read_parquet(path / f"data/{dataset}_otp_geo.parquet")
+
+    all_travel_times_gdf = pd.merge(
+        gdf[["source_id", "geometry"]], all_travel_times_df, on="source_id", how="left"
+    )
+
+    assert len(all_travel_times_gdf) == len(
+        all_travel_times_df
+    ), "Mismatch in number of rows after merge."
+
+    return all_travel_times_gdf
+
+
+def compute_weighted_time(
+    services,
+    n_neighbors,
     path,
     weight_dictionary,
     travel_time_column="total_time_min",
@@ -248,27 +297,25 @@ def compute_weighted_travel_time(
     all_travel_times = []
 
     for service in services:
-        for i in range(1, int(service["n_neighbors"]) + 1):
-            dataset = f"{service['service_type']}_{i}"
-            fp = path / f"data/{dataset}_otp_geo.parquet"
-            if not fp.exists():
-                print(f"File {fp} does not exist. Skipping.")
-                continue
-            df = pd.read_parquet(fp)
 
-            df = df[["source_id", travel_time_column]]
+        dataset = f"{service['service_type']}_{n_neighbors}"
+        fp = path / f"data/{dataset}_otp_geo.parquet"
+        if not fp.exists():
+            print(f"File {fp} does not exist. Skipping.")
+            continue
+        df = pd.read_parquet(fp)
 
-            df.rename(
-                columns={travel_time_column: f"{dataset}_travel_time"}, inplace=True
-            )
+        df = df[["source_id", travel_time_column]]
 
-            df[f"{dataset}_weighted_travel_time"] = df.apply(
-                lambda row: row[f"{dataset}_travel_time"]
-                * weight_dictionary.get(service["service_type"], 1),
-                axis=1,
-            )
+        df.rename(columns={travel_time_column: f"{dataset}_travel_time"}, inplace=True)
 
-            all_travel_times.append(df)
+        df[f"{dataset}_weighted_time"] = df.apply(
+            lambda row: row[f"{dataset}_travel_time"]
+            * weight_dictionary.get(service["service_type"], 1),
+            axis=1,
+        )
+
+        all_travel_times.append(df)
 
     all_travel_times_df = reduce(
         lambda left, right: pd.merge(left, right, on="source_id", how="outer"),
@@ -284,12 +331,8 @@ def compute_weighted_travel_time(
         df
     ), "Mismatch in number of rows after merge."
 
-    all_travel_times_gdf["total_travel_time"] = all_travel_times_gdf[
-        [
-            col
-            for col in all_travel_times_gdf.columns
-            if col.endswith("_weighted_travel_time")
-        ]
+    all_travel_times_gdf["total_weighted_time"] = all_travel_times_gdf[
+        [col for col in all_travel_times_gdf.columns if col.endswith("_weighted_time")]
     ].sum(axis=1)
 
     return all_travel_times_gdf
