@@ -22,7 +22,6 @@ os.environ["GDAL_DATA"] = os.path.join(
     f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
 )
 
-# %%
 
 # Define the path to the config.yml file
 script_path = Path(__file__).resolve()
@@ -355,12 +354,15 @@ hex_avg_travel_times_gdf.to_parquet(
 
 # %%
 
-sub_regions = gpd.read_file(config_model["sub_adm_boundaries_fp"])
+municipalities = gpd.read_parquet(
+    config_model["study_area_config"]["municipalities"]["outputpath"]
+)
 
-sub_regions = sub_regions[["geometry", "kommunekode", "navn"]]
+id_column = config_model["study_area_config"]["municipalities"]["id_column"]
+municipalities = municipalities[["geometry", id_column]]
 
 regional_travel_times = gpd.sjoin(
-    sub_regions,
+    municipalities,
     weighted_travel_times,
     how="inner",
     predicate="intersects",
@@ -369,7 +371,22 @@ regional_travel_times = gpd.sjoin(
 )
 
 
-# TODO: summarize by municipality
+weighted_cols = [
+    col for col in hex_travel_times.columns if col.endswith("_weighted_travel_time")
+]
+cols_to_average = weighted_cols + ["total_travel_time"]
+
+municipal_avg_travel_times = (
+    regional_travel_times.groupby(id_column)[cols_to_average].mean().reset_index()
+)
+
+municipal_avg_travel_times_gdf = municipalities.merge(
+    municipal_avg_travel_times, on=id_column, how="left"
+)
+
+municipal_avg_travel_times_gdf.to_parquet(
+    results_path / "data/municipal_avg_travel_times_otp.parquet",
+)
 
 
 # %%
