@@ -103,9 +103,9 @@ for col in travel_time_columns:
 # %%
 
 
-def run_kmeans(k, scaled_data):
+def run_kmeans(k, scaled_data, seed=13):
 
-    np.random.seed(13)
+    np.random.seed(seed)
 
     kmeans = KMeans(n_clusters=k)
     k_class = kmeans.fit(scaled_data)
@@ -120,6 +120,9 @@ def get_mean_cluster_variables(gdf, cluster_col, cluster_variables):
     cluster_means = cluster_means.T.round(3)
 
     return cluster_means
+
+
+# TODO: implement function for silhouette coefficient to evaluate clustering quality: https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
 
 
 def find_k_elbow_method(input_data, min_k=1, max_k=10):
