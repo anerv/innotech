@@ -14,7 +14,6 @@ from src.helper_functions import (
     unpack_modes_from_json,
     transfers_from_json,
     create_hex_grid,
-    compute_weighted_time,
     combine_results,
 )
 
@@ -288,37 +287,6 @@ styled_table
 
 # %%
 
-# Compute weighted travel times based on service importance
-
-# TODO: move to config file
-weight_dictionary = {
-    "doctor": 0.05,
-    "dentist": 0.05,
-    "pharmacy": 0.05,
-    "kindergarten-nursery": 5,
-    "school": 5,
-    "supermarket": 5,
-    "library": 1,
-    "train_station": 5,
-    "sports_facility": 1,
-}
-
-weight_cols = ["duration_min", "total_time_min"]
-
-for w in weight_cols:
-
-    weighted_travel_times = compute_weighted_time(
-        services, 1, results_path, weight_dictionary, w
-    )
-
-    weighted_travel_times.to_parquet(
-        results_path / f"data/weighted_{w}_otp_geo.parquet",
-        index=False,
-        engine="pyarrow",
-    )
-
-
-# %%
 
 travel_time_columns = [
     # "waitingTime",
@@ -377,43 +345,6 @@ hex_avg_travel_times_gdf = hex_grid.merge(
 
 hex_avg_travel_times_gdf.to_parquet(
     results_path / "data/hex_avg_travel_times_otp.parquet",
-)
-
-
-# %%
-
-municipalities = gpd.read_parquet(
-    config_model["study_area_config"]["municipalities"]["outputpath"]
-)
-
-id_column = config_model["study_area_config"]["municipalities"]["id_column"]
-municipalities = municipalities[["geometry", id_column]]
-
-regional_travel_times = gpd.sjoin(
-    municipalities,
-    all_travel_times_gdf,
-    how="inner",
-    predicate="intersects",
-    rsuffix="travel",
-    lsuffix="region",
-)
-
-
-cols_to_average = [
-    col for col in regional_travel_times.columns if col.endswith("_total_time_min")
-]
-cols_to_average.extend(["total_time"])
-
-municipal_avg_travel_times = (
-    regional_travel_times.groupby(id_column)[cols_to_average].mean().reset_index()
-)
-
-municipal_avg_travel_times_gdf = municipalities.merge(
-    municipal_avg_travel_times, on=id_column, how="left"
-)
-
-municipal_avg_travel_times_gdf.to_parquet(
-    results_path / "data/municipal_avg_travel_times_otp.parquet",
 )
 
 
