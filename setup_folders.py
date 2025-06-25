@@ -36,7 +36,7 @@ for f in processed_subfolders:
 
         print("Successfully created folder: " + os.path.join(processed_base, f))
 
-result_subfolders = ["data", "maps", "plots"]
+result_subfolders = ["data", "maps"]
 
 for f in result_subfolders:
     if not os.path.exists(os.path.join("results", f)):
