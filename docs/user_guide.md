@@ -64,15 +64,12 @@ java -Xmx2G -jar otp.jar --load .
 **B.** Kør notebook ``B_run_otp.ipynb`` (i mappen ``/run``).
 
 - For et område som Region Sjælland med standard-indstillinger vil det tage 8+ timer at køre analysen på en almindelig laptop (testet på  Windows 11, Intel(R) Core(TM) Ultra 5 125U, 32 GB ram)
+- Efter at notebook B er kørt successfuldt kan resultaterne findes i mappen ``results``: Se [results_overview](results_overview.md) for en oversigt over output fra analysen.
 
-
-### 4. Processer resultater :bar_chart:
-
-- Kør notebook ``C_process_results.ipynb`` (i mappen ``/run``) for at eksportere og opsummere resultaterne på rejsetider.
  
 ### Sammenlign datakilder [valgfri] :arrow_right::arrow_left:
 
-- Data på destinationer stammer både fra det danske CVR-register og OpenStreetMap. For en sammenligning af det to datakilder for hver destinationstype, kør notebook ``D00_compare_cvr_osm.ipynb`` (i mappen ``/scripts``). Resultaterne af sammenligningen findes i ``/results/destination_data_evaluation/``.
+- Data på destinationer stammer både fra det danske CVR-register og OpenStreetMap. For en sammenligning af det to datakilder for hver destinationstype, kør notebook ``C00_compare_cvr_osm.ipynb`` (i mappen ``/scripts``). Resultaterne af sammenligningen findes i ``/results/destination_data_evaluation/``.
 
 Se ``results_overview.md`` for en oversigt over, hvilke typer resultater analysen producerer.
 
