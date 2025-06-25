@@ -7,14 +7,14 @@
 
 # administrative boundaries
 study_area_config:
-  regions:
+  regions: # if model is only to be run for a single municipality, provide the filepath to the municipal boundaries here, change study_area_name to the kommunekode or name and the id_column to kommunekode or navn
     inputpath: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg"
     outputpath: "../data/processed/adm_boundaries/study_area.gpkg"
     study_area_name: "Region Sjælland"
     id_column: "navn"
   municipalities:
     inputpath: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" 
-    outputpath: "../data/processed/adm_boundaries/sub_areas.parquet"
+    outputpath: "../data/processed/adm_boundaries/municipalities.parquet"
     id_column: "kommunekode" # The ID column used to identify the municipality in the data
 
 
@@ -172,7 +172,7 @@ services:
 
 restrictions:
     - name: "municipality"
-      file_path: "../data/processed/adm_boundaries/sub_areas.parquet" # should be the same as in the sub_study_areas_fp!
+      file_path: "../data/processed/adm_boundaries/municipalities.parquet" # should be the same as in the sub_study_areas_fp!
       id_attribute: kommunekode
 
 # The following parameters are used when calling OTP
