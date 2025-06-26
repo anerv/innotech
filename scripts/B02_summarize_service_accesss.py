@@ -13,8 +13,8 @@ from src.helper_functions import (
     highlight_min_traveltime,
     unpack_modes_from_json,
     transfers_from_json,
-    create_hex_grid,
-    combine_results,
+    plot_traveltime_results,
+    plot_no_connection,
 )
 
 
@@ -40,7 +40,7 @@ with open(config_path, "r") as file:
 # %%
 walkspeed_min = config_model["walk_speed"] * 60  # convert to minutes
 
-# Load address data for correct geometries
+# Load address data for original geometries/locations
 address_points = gpd.read_parquet(config_model["addresses_fp_all"])
 
 # Load results
@@ -287,65 +287,59 @@ styled_table
 
 # %%
 
-
-travel_time_columns = [
-    # "waitingTime",
-    "walkDistance",
-    "abs_dist",
-    "duration_min",
-    "wait_time_dest_min",
-    "total_time_min",
-    # "transfers",
-]
-
-
-all_travel_times_gdf = combine_results(
-    config_model["services"],
-    results_path,
-    travel_time_columns,
-    n_neighbors=1,
-)
-
-all_travel_times_gdf["total_time"] = all_travel_times_gdf[
-    [col for col in all_travel_times_gdf.columns if col.endswith("total_time_min")]
-].sum(axis=1)
-
-# %%
-
-# compute average travel time per hex bin
+# load study area for plotting
 
 study_area = gpd.read_file(config_model["study_area_config"]["regions"]["outputpath"])
 
-hex_grid = create_hex_grid(study_area, 8, crs, 200)
+services = config_model["services"]
 
-hex_travel_times = gpd.sjoin(
-    hex_grid,
-    all_travel_times_gdf,
-    how="inner",
-    predicate="intersects",
-    rsuffix="travel",
-    lsuffix="hex",
-)
+for service in services:
 
-hex_id_col = "grid_id"
+    for i in range(1, int(service["n_neighbors"]) + 1):
+        dataset = f"{service['service_type']}_{i}"
 
-cols_to_average = [
-    col for col in hex_travel_times.columns if col.endswith("_total_time_min")
-]
-cols_to_average.extend(["total_time"])
+        gdf = gpd.read_parquet(
+            results_path / f"data/{dataset}_addresses_otp_geo.parquet"
+        )
+        # Process each dataset
 
+        plot_columns = [
+            "duration_min",
+            "wait_time_dest_min",
+            "total_time_min",
+        ]
 
-hex_avg_travel_times = (
-    hex_travel_times.groupby(hex_id_col)[cols_to_average].mean().reset_index()
-)
+        labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
 
-hex_avg_travel_times_gdf = hex_grid.merge(
-    hex_avg_travel_times, on="grid_id", how="left"
-)
+        attribution_text = "KDS, OpenStreetMap"
+        font_size = 10
 
-hex_avg_travel_times_gdf.to_parquet(
-    results_path / "data/hex_avg_travel_times_otp.parquet",
-)
+        for i, plot_col in enumerate(plot_columns):
+            fp = results_path / f"maps/{dataset}_{plot_col}.png"
 
+            title = f"{labels[i]} to {dataset.split("_")[-1]} nearest {dataset.split("_")[0]} by public transport"
+
+            plot_traveltime_results(
+                gdf,
+                plot_col,
+                attribution_text,
+                font_size,
+                title,
+                fp,
+            )
+
+        no_results = gdf[(gdf["duration_min"].isna()) & (gdf.abs_dist > 0)].copy()
+        if not no_results.empty:
+            fp_no_results = results_path / f"maps/{dataset}_no_results.png"
+            title_no_results = f"Locations with no results for {dataset.split('_')[-1]} nearest {dataset.split('_')[0]} by public transport"
+
+            plot_no_connection(
+                no_results,
+                study_area,
+                attribution_text,
+                font_size,
+                title_no_results,
+                fp_no_results,
+            )
 
 # %%
