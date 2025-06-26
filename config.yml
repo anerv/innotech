@@ -1,9 +1,13 @@
 # This is a configuration file for the service location model.
 
-#study_area_name: "Region Sjælland" # Name of region in datasæt. Must be a valid name of a Danish region or municipality
+# All data referenced under INPUT DATA must be downloaded and placed in the data directory. Update paths and file names as needed.
 
-# adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg" 
-# sub_adm_boundaries_fp: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" 
+crs : "EPSG:25832" # The coordinate reference system used for the data, must be the same as the data files
+
+#### FILEPATHS #####
+# The filepaths are relative to the main directory for the repository and should point to the data files
+
+# INPUT DATA
 
 # administrative boundaries
 study_area_config:
@@ -16,14 +20,6 @@ study_area_config:
     inputpath: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" 
     outputpath: "../data/processed/adm_boundaries/municipalities.parquet"
     id_column: "kommunekode" # The ID column used to identify the municipality in the data
-
-
-crs : "EPSG:25832" # The coordinate reference system used for the data, must be the same as the data files
-
-#### FILEPATHS #####
-# The filepaths are relative to the main directory for the repository and should point to the data files
-
-# INPUT DATA
 
 
 # CVR data

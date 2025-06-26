@@ -145,7 +145,6 @@ Se ``config.yml`` for forventede filnavne og placeringer.
 
 For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: LINK TIL RAPPORT.
 
-***TODO: Inkluder input-data i Docker???***
 
 ### Inputdata til OTP :globe_with_meridians:
 
