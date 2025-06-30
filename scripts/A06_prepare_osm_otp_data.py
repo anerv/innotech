@@ -22,8 +22,11 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
 ### PREPATE OSM DATA FOR OTP
 
-datafolder = Path("/Users/anerv/repositories/innotech/data")
-otp_folder = Path("/Users/anerv/repositories/innotech/otp")
+script_path = Path(__file__).resolve()
+root_path = script_path.parent.parent
+
+datafolder = root_path / Path("data")
+otp_folder = root_path / Path("otp")
 input_pbf = datafolder / osm_input_pbf
 output_pbf = otp_folder / "osm_study_area.pbf"
 clipfile = datafolder / f"processed/adm_boundaries/study_area.geojson"
@@ -64,7 +67,7 @@ print(f"OSM data extracted to {output_pbf} successfully.")
 # %%
 #### BUILD OTP GRAPH
 
-otp_folder = Path("/Users/anerv/repositories/innotech/otp")
+# otp_folder = Path("/Users/anerv/repositories/innotech/otp")
 osm_pbf = otp_folder / "osm_study_area.pbf"
 netex_file = otp_folder / "netex"
 
@@ -82,7 +85,7 @@ config_exists = any(
     f.name == "build-config.json" for f in otp_folder.iterdir() if f.is_file()
 )
 
-os.chdir("c:\\Users\\anerv\\repositories\\innotech\\otp\\")
+os.chdir(otp_folder)  # "c:\\Users\\anerv\\repositories\\innotech\\otp\\"
 
 cmd = "java -Xmx2G -jar otp-shaded-2.7.0.jar --build --save ."
 
