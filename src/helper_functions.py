@@ -741,6 +741,7 @@ def plot_no_connection(
 def plot_traveltime_results(
     gdf,
     plot_col,
+    study_area,
     attribution_text,
     font_size,
     title,
@@ -756,6 +757,13 @@ def plot_traveltime_results(
 
     cax = divider.append_axes("right", size="3.5%", pad="1%")
     cax.tick_params(labelsize=font_size)
+
+    study_area.plot(
+        ax=ax,
+        color="none",
+        edgecolor="black",
+        alpha=0.5,
+    )
 
     gdf.plot(
         ax=ax,
