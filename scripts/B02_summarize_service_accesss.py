@@ -56,6 +56,7 @@ for service in services:
         dataset = f"{service['service_type']}_{i}"
         # Process each dataset
 
+        print("-" * 40)
         print(f"Processing result dataset: {dataset}")
         fp = results_path / f"data/{dataset}_otp.parquet"
         if not fp.exists():
