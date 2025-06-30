@@ -20,7 +20,8 @@ with open(r"../config.yml") as file:
 
     services = parsed_yaml_file["services"]
 
-    study_area_fp = parsed_yaml_file["study_area_fp"]
+    adm_boundaries_config = parsed_yaml_file["study_area_config"]
+    study_area_fp = adm_boundaries_config["regions"]["outputpath"]
 
     cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
     cvr_destinations_all_fp = parsed_yaml_file["cvr_destinations_all_fp"]
