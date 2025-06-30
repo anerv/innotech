@@ -5,6 +5,7 @@
 import geopandas as gpd
 import pandas as pd
 import overpy
+import numpy as np
 import yaml
 from src.helper_functions import (
     create_nodes_gdf,
@@ -87,6 +88,8 @@ for category, query_list in queries.items():
             # Reproject  if necessary
             if not nodes_gdf.empty:
                 # Drop nodes where the key is none (these nodes belong to a way)
+                if key not in nodes_gdf.columns:
+                    nodes_gdf[key] = np.nan
                 nodes_gdf = nodes_gdf[nodes_gdf[key].notna()]
                 nodes_gdf = nodes_gdf.to_crs(crs)
 
