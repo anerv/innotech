@@ -605,7 +605,7 @@ def create_hex_grid(polygon_gdf, hex_resolution, crs, buffer_dist):
     return grid
 
 
-def count_destinations_in_hex_grid(gdf, hex_grid, destination_col):
+def count_destinations_hex_grid(gdf, hex_grid, destination_col):
 
     joined = gpd.sjoin(hex_grid, gdf, how="left", predicate="intersects")
 
@@ -969,7 +969,7 @@ def plot_hex_summaries(
     plt.close()
 
 
-def count_destinations_in_municipalities(
+def count_destinations_municipalities(
     municipalities, muni_id_col, destinations, destination_col, csv_fp, html_fp
 ):
 
@@ -984,7 +984,7 @@ def count_destinations_in_municipalities(
     )
 
     muni_service_pivot = muni_service_counts.pivot(
-        index="navn", columns=destination_col, values="count"
+        index=muni_id_col, columns=destination_col, values="count"
     ).fillna(0)
 
     muni_service_pivot.loc["Total"] = muni_service_pivot.sum()
