@@ -1,6 +1,7 @@
 # This is a configuration file for the service location model.
 
 # All data referenced under INPUT DATA must be downloaded and placed in the data directory. Update paths and file names as needed.
+# Additionally, transit data in the NeTEx-format must be downloaded and placed in the otp directory.
 
 crs : "EPSG:25832" # The coordinate reference system used for the data, must be the same as the data files
 
