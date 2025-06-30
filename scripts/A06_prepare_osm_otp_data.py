@@ -67,7 +67,6 @@ print(f"OSM data extracted to {output_pbf} successfully.")
 # %%
 #### BUILD OTP GRAPH
 
-# otp_folder = Path("/Users/anerv/repositories/innotech/otp")
 osm_pbf = otp_folder / "osm_study_area.pbf"
 netex_file = otp_folder / "netex"
 
@@ -85,7 +84,7 @@ config_exists = any(
     f.name == "build-config.json" for f in otp_folder.iterdir() if f.is_file()
 )
 
-os.chdir(otp_folder)  # "c:\\Users\\anerv\\repositories\\innotech\\otp\\"
+os.chdir(otp_folder)
 
 cmd = "java -Xmx2G -jar otp-shaded-2.7.0.jar --build --save ."
 
