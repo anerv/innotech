@@ -318,11 +318,14 @@ for service in services:
         for i, plot_col in enumerate(plot_columns):
             fp = results_path / f"maps/{dataset}_{plot_col}.png"
 
-            title = f"{labels[i]} to {dataset.split("_")[-1]} nearest {dataset.split("_")[0]} by public transport"
+            label = dataset.rsplit("_", 1)[0]
+
+            title = f"{labels[i]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} by public transport"
 
             plot_traveltime_results(
                 gdf,
                 plot_col,
+                study_area,
                 attribution_text,
                 font_size,
                 title,
@@ -332,7 +335,7 @@ for service in services:
         no_results = gdf[(gdf["duration_min"].isna()) & (gdf.abs_dist > 0)].copy()
         if not no_results.empty:
             fp_no_results = results_path / f"maps/{dataset}_no_results.png"
-            title_no_results = f"Locations with no results for {dataset.split('_')[-1]} nearest {dataset.split('_')[0]} by public transport"
+            title_no_results = f"Locations with no results for {dataset.split('_')[-1]}. nearest {label.replace("_", " ")} by public transport"
 
             plot_no_connection(
                 no_results,
