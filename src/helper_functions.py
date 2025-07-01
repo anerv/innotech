@@ -21,8 +21,211 @@ from zoneinfo import ZoneInfo
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import reduce
+from pathlib import Path
 
 ######################## OTP FUNCTIONS ########################
+
+
+def validate_restriction_config(config, duck_con, data_path):
+    defined_restrictions = {}
+    used_restrictions = set()
+    missing_restrictions = set()
+
+    # Validate restriction definitions using DuckDB
+    for restriction in config.get("restrictions", []):
+        name = restriction["name"]
+        file_path = data_path / Path(restriction["file_path"])
+        id_attr = restriction["id_attribute"]
+
+        if not file_path.exists():
+            raise FileNotFoundError(
+                f"Restriction '{name}' references missing file: {file_path}"
+            )
+
+        # Use DuckDB to get schema
+        try:
+            df_columns = (
+                duck_con.execute(f"DESCRIBE SELECT * FROM '{file_path}' LIMIT 0")
+                .fetchdf()["column_name"]
+                .tolist()
+            )
+
+            if id_attr not in df_columns:
+                raise ValueError(
+                    f"Restriction '{name}' expects id_attribute '{id_attr}', "
+                    f"but it's not found in file: {file_path}"
+                )
+        except Exception as e:
+            raise RuntimeError(f"Failed to inspect schema for {file_path}: {e}")
+
+        defined_restrictions[name] = restriction
+
+    # Validate service restrictions
+    for service in config.get("services", []):
+        restriction = service.get("spatial_restriction_type")
+        if restriction:
+            if restriction in defined_restrictions:
+                used_restrictions.add(restriction)
+            else:
+                missing_restrictions.add(restriction)
+
+    if missing_restrictions:
+        raise ValueError(
+            f"The following spatial_restriction_type(s) are used in services "
+            f"but not defined in restrictions: {', '.join(missing_restrictions)}"
+        )
+
+    unused_restrictions = set(defined_restrictions.keys()) - used_restrictions
+    if unused_restrictions:
+        print(
+            f"⚠️ Warning: restrictions defined but not used: {', '.join(unused_restrictions)}"
+        )
+
+    return {name: defined_restrictions[name] for name in used_restrictions}
+
+
+# Enrich adresses with and service data with restriction id.
+
+
+def assign_restriction_to_table(
+    con, restriction_config, table_name: str, data_path: Path
+):
+    """
+    Assigns a spatial restriction (e.g., municipality_id) to a DuckDB table.
+    Uses bounding box prefiltering + ST_Within.
+    The target table (e.g. 'dwellings' or 'services') must already exist in DuckDB.
+    """
+    name = restriction_config["name"]
+    id_col = restriction_config["id_attribute"]
+    new_col = f"{name}_id"
+    restriction_fp = Path(data_path) / restriction_config["file_path"]
+    restriction_table = f"restrictions_{name}"
+
+    # Load restriction polygons (renaming the ID field)
+    con.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE {restriction_table} AS
+        SELECT 
+            "{id_col}" AS {new_col},
+            geometry
+        FROM '{restriction_fp}'
+    """
+    )
+
+    # Join using bounding box prefilter and ST_Within
+    con.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE {table_name} AS
+        SELECT 
+            d.*,
+            r.{new_col}
+        FROM {table_name} d
+        LEFT JOIN {restriction_table} r
+        ON ST_Intersects(ST_Envelope(d.geometry), ST_Envelope(r.geometry))
+        AND ST_Within(d.geometry, r.geometry)
+    """
+    )
+
+
+def assign_restriction_if_missing(
+    con, restriction_config, table_name: str, data_path: Path
+):
+    """
+    Checks if a restriction column is already present in the table.
+    If not, assigns it using a spatial join.
+    """
+    name = restriction_config["name"]
+    new_col = f"{name}_id"
+
+    column_names = (
+        con.execute(f"PRAGMA table_info('{table_name}')").fetchdf()["name"].tolist()
+    )
+
+    if new_col in column_names:
+        print(f"✅ Skipping {name}: '{new_col}' already exists in '{table_name}'.")
+    else:
+        print(f"🔄 Assigning restriction '{new_col}' to '{table_name}'...")
+        assign_restriction_to_table(con, restriction_config, table_name, data_path)
+
+
+def load_table_with_restrictions(
+    con,
+    parquet_path: Path,
+    base_columns: dict,
+    validated_restrictions: dict,
+    table_name: str,
+):
+    """
+    Loads a Parquet dataset into a DuckDB temp table.
+    - Uses user-defined aliases from `base_columns` (e.g., "address_id", "geometry" etc.)
+    - Automatically extracts x/y from geometry if available
+    - Includes any *_id restriction columns if they already exist in the source file
+    - Creates or replaces a DuckDB temp table with the given `table_name`
+    """
+    parquet_path_str = str(parquet_path)
+
+    # Step 1: Expected *_id restriction columns
+    restriction_id_cols = [f"{r['name']}_id" for r in validated_restrictions.values()]
+
+    # Step 2: Inspect available columns in the source file
+    table_info = con.execute(
+        f"DESCRIBE SELECT * FROM '{parquet_path_str}' LIMIT 0"
+    ).fetchdf()
+    available_columns = table_info["column_name"].tolist()
+
+    # Step 3: Keep only those restriction columns that are present
+    present_restriction_cols = [
+        col for col in restriction_id_cols if col in available_columns
+    ]
+
+    # Step 4: Build select expressions from aliases
+    select_expressions = []
+    for alias, col in base_columns.items():
+        if alias == "x":
+            select_expressions.append(f"ST_X({col}) AS x")
+        elif alias == "y":
+            select_expressions.append(f"ST_Y({col}) AS y")
+        else:
+            select_expressions.append(f"{col} AS {alias}")
+
+    # Add automatic x/y extraction if geometry is present but x/y not already defined
+    if "x" not in base_columns and "geometry" in base_columns:
+        select_expressions.append(f"ST_X({base_columns['geometry']}) AS x")
+    if "y" not in base_columns and "geometry" in base_columns:
+        select_expressions.append(f"ST_Y({base_columns['geometry']}) AS y")
+
+    # Add present restriction columns as-is
+    select_expressions += present_restriction_cols
+
+    # Final SELECT clause
+    select_clause = ",\n        ".join(select_expressions)
+
+    # Build filter clause based on expected base fields
+    geom_col = base_columns.get("geometry", "geometry")
+    lat_col = base_columns.get("road_point_lat", "vej_pos_lat")
+    lon_col = base_columns.get("road_point_lon", "vej_pos_lon")
+
+    sql = f"""
+        CREATE OR REPLACE TEMP TABLE {table_name} AS
+        SELECT 
+            {select_clause}
+        FROM '{parquet_path_str}'
+        WHERE {geom_col} IS NOT NULL 
+          AND {lat_col} IS NOT NULL 
+          AND {lon_col} IS NOT NULL
+    """
+
+    try:
+        con.execute(sql)
+        print(
+            f"✅ Loaded '{table_name}' with {len(base_columns)} base fields and {len(present_restriction_cols)} restriction ID(s)"
+        )
+    except Exception as e:
+        print(f"❌ Failed to create table '{table_name}'")
+        print(e)
+        print("SQL used:")
+        print(sql)
+        raise
 
 
 def convert_otp_time(millis, tz="Europe/Copenhagen"):
