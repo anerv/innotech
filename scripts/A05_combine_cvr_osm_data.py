@@ -20,8 +20,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     cvr_destinations_fp = parsed_yaml_file["cvr_destinations_fp"]
 
-    sub_adm_boundaries_fp = parsed_yaml_file["sub_adm_boundaries_fp"]
-    study_area_fp = parsed_yaml_file["study_area_fp"]
+    adm_boundaries_config = parsed_yaml_file["study_area_config"]
+    study_area_fp = adm_boundaries_config["regions"]["outputpath"]
 
     destinations_combined_fp = parsed_yaml_file["destinations_combined_fp"]
     destinations_combined_agg_fp = parsed_yaml_file["destinations_combined_agg_fp"]

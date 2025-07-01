@@ -47,7 +47,7 @@ otp_con = duckdb.connect(otp_db_fp)
 # %%
 services = config_model["services"]
 
-for service in services[1:]:
+for service in services:
     for i in range(1, int(service["n_neighbors"]) + 1):
         dataset = f"{service['service_type']}_{i}"
         # Process each dataset

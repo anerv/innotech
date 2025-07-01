@@ -22,7 +22,14 @@ input_base = "data/input"
 processed_base = "data/processed"
 
 input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit", "osm"]
-processed_subfolders = ["cvr", "adresser", "bbr", "adm_boundaries", "destinations"]
+processed_subfolders = [
+    "cvr",
+    "adresser",
+    "bbr",
+    "adm_boundaries",
+    "destinations",
+    "osm",
+]
 
 for f in input_subfolders:
     if not os.path.exists(os.path.join(input_base, f)):
@@ -36,7 +43,7 @@ for f in processed_subfolders:
 
         print("Successfully created folder: " + os.path.join(processed_base, f))
 
-result_subfolders = ["data", "maps"]
+result_subfolders = ["data", "maps", "destination_data_evaluation"]
 
 for f in result_subfolders:
     if not os.path.exists(os.path.join("results", f)):
