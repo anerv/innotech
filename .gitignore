@@ -38,3 +38,6 @@ scripts/.ipynb_checkpoints/*
 run/.ipynb_checkpoints/*
 
 debug/*.gpkg
+debug/no_train_connection.qmd
+.gitignore
+debug/no_train_connection.parquet
