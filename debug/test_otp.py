@@ -55,7 +55,7 @@ address_data = pd.read_parquet(
 )  # Load the address data
 
 address_data.rename(columns={"source_adress_id": "source_address_id"}, inplace=True)
-no_connection = gpd.read_file("no_train_connection_all.gpkg")
+no_connection = gpd.read_parquet("no_train_connection.parquet")
 source_ids = no_connection.source_id.to_list()
 
 # Choose which starting points to use for debugging
