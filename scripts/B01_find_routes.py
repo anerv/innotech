@@ -161,7 +161,7 @@ for service in services:
 
         # Export the combined results
         combined_results.to_parquet(
-            f"{results_path}/{dataset}_combined_otp.parquet", index=False
+            f"{results_path}/{dataset}_otp.parquet", index=False
         )
 
         # remove exported files from second run
