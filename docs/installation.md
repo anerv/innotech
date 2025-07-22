@@ -81,12 +81,19 @@ python setup_folders.py
 
 * Kræver en installation af [Git](https://git-scm.com/downloads) og (valgfrit) [Visual Studio Code](https://code.visualstudio.com/) med *Remote - Containers* udvidelsen.
 
-#### B1. Installer Docker Desktop
+#### B1. Klon GitHub repository
+
+````bash
+git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
+cd innotech
+````
+
+#### B2. Installer Docker Desktop
 
 * Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
 * Start Docker Desktop
 
-#### B2. Download Docker image
+#### B3. Download Docker image
 
 * Download docker imaget fra Docker Hub:
 
@@ -94,7 +101,7 @@ python setup_folders.py
 docker pull anerv/innotech-env:latest
 ```
 
-#### B3. Kør Docker container
+#### B4. Kør Docker container
 
 * Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det.
 
@@ -104,7 +111,7 @@ docker pull anerv/innotech-env:latest
 docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work anerv/innotech-env:latest
 ```
 
-#### B4. Anvend Docker Python environment
+#### B5. Anvend Docker Python environment
 
 ##### Med Jupyter:
 
