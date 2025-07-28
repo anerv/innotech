@@ -441,6 +441,48 @@ def process_adresses(
 ############################ RANDOM HELPER FUNCTIONS ############################
 
 
+def get_geo_address_sample(
+    dataset,
+    data_path,
+    dataset_name,
+    h3_resolution=8,
+):
+    # NOTE: Does not create a statistically representative sample, but rather a geographically distributed sample!
+
+    assert dataset.crs == "EPSG:4326", "Dataset must be in EPSG:4326 CRS"
+
+    # Function to get H3 index for a point at resolution 8
+    def get_h3_index(lat, lng):
+        return h3.latlng_to_cell(lat, lng, res=h3_resolution)
+
+    # Apply the function to each point in the GeoDataFramegdf.apply(lambda row: get_h3_index(row.geometry.y, row.geometry.x), axis=1)
+    dataset["h3_index"] = dataset.apply(
+        lambda row: get_h3_index(row.geometry.y, row.geometry.x), axis=1
+    )
+
+    samples = (
+        dataset.groupby(["h3_index", "dest_address_id"])["source_address_id"]
+        .apply(lambda x: x.sample(n=1, random_state=42))
+        .reset_index(drop=True)
+    )
+
+    assert samples.is_unique == True, "Sampled points are not unique"
+
+    sampled_points = dataset[dataset["source_address_id"].isin(samples)]
+
+    assert (
+        sampled_points.columns == dataset.columns
+    ).all(), "Sampled points do not have the same columns as the original dataset"
+
+    assert len(sampled_points) == len(
+        samples
+    ), "Sampled points do not match the number of samples"
+
+    sampled_points.to_parquet(data_path / f"{dataset_name}.parquet")
+
+    return sampled_points
+
+
 def combine_results(
     services,
     path,
