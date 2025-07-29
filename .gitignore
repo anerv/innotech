@@ -1,5 +1,4 @@
 
-
 *.pyc
 *.jar
 *.pbf
@@ -21,23 +20,20 @@ otp/Rejseplanen+NeTEx/
 otp/report/
 otp/graph.obj
 
-
 data/otp_results.db
 data/otp_results.db.wal
+
+image.png
+scripts/.ipynb_checkpoints/*
+run/.ipynb_checkpoints/*
+
+test/*.gpkg
+test/no_train_connection.qmd
+test/no_train_connection.parquet
 
 
 todo.md
 notes.md
 prelim-results-service-access.md
 comparison-cvr-osm-destination-data.md
-
 resultater.qgz
-
-image.png
-scripts/.ipynb_checkpoints/*
-run/.ipynb_checkpoints/*
-
-debug/*.gpkg
-debug/no_train_connection.qmd
-.gitignore
-debug/no_train_connection.parquet
