@@ -30,6 +30,8 @@ run/.ipynb_checkpoints/*
 test/*.gpkg
 test/no_train_connection.qmd
 test/no_train_connection.parquet
+test/destinations_test/*
+test/result_data_test/*
 
 
 todo.md
