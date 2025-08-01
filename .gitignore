@@ -32,6 +32,7 @@ test/no_train_connection.qmd
 test/no_train_connection.parquet
 test/destinations_test/*
 test/result_data_test/*
+test/result_plots_test/*
 
 
 todo.md
