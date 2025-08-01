@@ -18,11 +18,13 @@ script_path = Path(__file__).resolve()
 root_path = script_path.parent.parent
 data_path = root_path / "data/processed/destinations"
 data_test_path = root_path / "test/destinations_test"
-results_path = root_path / "test/result_data_test"
+results_path_data = root_path / "test/result_data_test"
+results_path_plots = root_path / "test/result_plots_test"
 config_path = root_path / "config.yml"
 
 # make data_test folder if it does not exist
-results_path.mkdir(parents=True, exist_ok=True)
+results_path_plots.mkdir(parents=True, exist_ok=True)
+results_path_data.mkdir(parents=True, exist_ok=True)
 data_test_path.mkdir(parents=True, exist_ok=True)
 
 # Read and parse the YAML file
@@ -40,7 +42,7 @@ parallelism = config_model["parallelism"]  # number of parallel processes to use
 url = config_model["otp_url"]  # Load the OTP endpoint URL
 date = config_model["travel_date"]  # Load the date of the travel
 otp_db_fp = (
-    results_path / config_model["otp_results"]
+    results_path_data / config_model["otp_results"]
 )  # Load the persistant OTP database file path
 
 # %%
@@ -148,7 +150,7 @@ for search_window in search_windows:
                 tabelname = dataset.replace("-", "_")
                 otp_con.execute(
                     f"""
-                    COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_otp.parquet' (FORMAT 'parquet')
+                    COPY (SELECT * FROM {tabelname}) TO '{results_path_data}/{dataset}_otp.parquet' (FORMAT 'parquet')
                 """
                 )
 
@@ -177,9 +179,10 @@ for search_window in search_windows:
 # EXPORT RESULTS TO CSV
 
 results_df = pd.DataFrame(results_parameters)
-results_df.to_csv(results_path / "results.csv", index=False)
+results_df.to_csv(results_path_data / "results.csv", index=False)
 # %%
 
+# Make a pivot table for results data
 values = ["no_connection_count", "no_connection_percentage"]
 
 for value in values:
@@ -192,7 +195,7 @@ for value in values:
     )
 
     # Save the pivot table to a CSV file
-    results_pivot.to_csv(results_path / f"results_pivot_{value}.csv")
+    results_pivot.to_csv(results_path_data / f"results_pivot_{value}.csv")
 
     styled_pivot = results_pivot.style.set_table_styles(
         [
@@ -214,6 +217,7 @@ avg_time_elapsed = (
 display(avg_time_elapsed)
 # %%
 
+# Plot connected and disconnected points for each service type, search window, and arrival time combination
 study_area = gpd.read_file(study_area_fp)
 
 # Number of services (assumed to be 9)
@@ -255,7 +259,10 @@ for search_window in search_windows:
                 )
 
                 ax.set_axis_off()
-                ax.set_title(f"{service['service_type'].title()} (k={i})", fontsize=9)
+                ax.set_title(
+                    f"{service['service_type'].title().replace("_"," ")} (k={i})",
+                    fontsize=9,
+                )
 
                 break  # Only plot for the first k (remove this if you want multiple neighbors plotted)
 
@@ -267,8 +274,9 @@ for search_window in search_windows:
             f"Search Window: {search_window}, Arrival Time: {arrival_time}", fontsize=14
         )
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        plt.savefig(
-            results_path / f"otp_connection_{search_window}_{arrival_time}.png",
+        fig.savefig(
+            results_path_plots
+            / f"connections_{search_window}_{arrival_time.replace(":","-")}.png",
             dpi=300,
             bbox_inches="tight",
         )
