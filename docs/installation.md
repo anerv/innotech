@@ -116,7 +116,7 @@ docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/ho
 ##### Med Jupyter:
 
 * Åben et browservindue og gå til http://localhost:8888
-* Kør analysen (se anvendelsesguiden ``analysis_guide.md``), brug ``Python Innotech`` som kernel.
+* Kør analysen (se anvendelsesguiden ``user_guide.md``), brug ``Python Innotech`` som kernel.
 
 ##### Med Visual Studio Code
 
