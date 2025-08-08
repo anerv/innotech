@@ -33,7 +33,7 @@ For at installere de resterende værktøjer køres nedenstående i et terminalvi
 #### A1. Klon GitHub repository
 
 ````bash
-git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
+git clone https://github.com/anerv/innotech
 cd innotech
 ````
 
