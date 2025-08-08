@@ -84,7 +84,7 @@ python setup_folders.py
 #### B1. Klon GitHub repository
 
 ````bash
-git clone -b main --single-branch https://github.com/anerv/innotech --depth 1
+git clone https://github.com/anerv/innotech --depth 1
 cd innotech
 ````
 
