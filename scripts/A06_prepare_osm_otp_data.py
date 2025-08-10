@@ -65,14 +65,23 @@ assert (
 
 print(f"OSM data extracted to {output_pbf} successfully.")
 # %%
+## Rename otp file if exists
+
+otp_jar_files = list(otp_folder.glob("otp*.jar"))
+if len(otp_jar_files) == 0:
+    print("No OTP jar file found in otp folder.")
+else:
+    otp_jar_file = otp_jar_files[0]
+    otp_jar_file.rename(otp_folder / "otp.jar")
+    print(f"Renamed OTP jar file to {otp_folder / 'otp.jar'}")
+
+# %%
 #### BUILD OTP GRAPH
 
 osm_pbf = otp_folder / "osm_study_area.pbf"
 netex_file = otp_folder / "netex"
 
-otp_exists = any(
-    f.name == "otp-shaded-2.7.0.jar" for f in otp_folder.iterdir() if f.is_file()
-)
+otp_exists = any(f.name == "otp.jar" for f in otp_folder.iterdir() if f.is_file())
 
 netex_zip_exists = any(
     f.name.endswith("NeTEx.zip") for f in otp_folder.iterdir() if f.is_file()
@@ -86,7 +95,7 @@ config_exists = any(
 
 os.chdir(otp_folder)
 
-cmd = "java -Xmx2G -jar otp-shaded-2.7.0.jar --build --save ."
+cmd = "java -Xmx2G -jar otp.jar --build --save ."
 
 if netex_zip_exists and osm_pbf_exists and config_exists and otp_exists:
     print("All required files are in place, building OTP graph...")

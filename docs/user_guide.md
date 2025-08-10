@@ -36,7 +36,7 @@ cd innotech/otp
 
 * Kør kommandoen:
 ```bash
-java -Xmx2G -jar "the name of your otp.jar file" --load .
+java -Xmx2G -jar otp.jar --load .
 ```
 
 ##### Hvis du bruger Docker-installation:
