@@ -18,7 +18,7 @@ echo "Running setup_folders.py..."
 python /home/jovyan/work/setup_folders.py
 
 # Configurable OTP version
-OTP_VERSION="2.6.0"
+OTP_VERSION="2.7.0"
 OTP_JAR_NAME="otp-${OTP_VERSION}-shaded.jar"
 OTP_DIR="/home/jovyan/work/otp"
 OTP_JAR_PATH="${OTP_DIR}/otp.jar"
