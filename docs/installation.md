@@ -79,7 +79,7 @@ python setup_folders.py
 
 ### B. Installation med Docker
 
-* Kræver en installation af [Git](https://git-scm.com/downloads) og (valgfrit) [Visual Studio Code](https://code.visualstudio.com/) med *Remote - Containers* udvidelsen.
+* Kræver en installation af [Git](https://git-scm.com/downloads).
 
 #### B1. Klon GitHub repository
 
@@ -113,26 +113,8 @@ docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/ho
 
 #### B5. Anvend Docker Python environment
 
-##### Med Jupyter:
-
 * Åben et browservindue og gå til http://localhost:8888
 * Kør analysen (se anvendelsesguiden ``user_guide.md``), brug ``Python Innotech`` som kernel.
-
-##### Med Visual Studio Code
-
-* Åben Visual Studio Code
-
-* Åben den første notebook (*.ipynb)
-
-* Klik i øverste højre hjørne, hvor Python kernel vælges
-
-* Vælg ``Select Another Kernel`` eller ``Existing Jupyter Server``
-
-* Indtast htttp:localhost:8888
-
-* Vælg ``Python (innotech)``
-
-* Herfra kan notebook'en køres (se anvendelsesguiden ``analysis_guide.md``). Det kan være nødvendigt eksplicit at vælge den korrekte Python-kernel for hver notebook.
 
 
 ## Inputdata :file_folder:
