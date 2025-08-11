@@ -19,6 +19,8 @@ Hvis andre destinationer, ankomsttider, inputdata, m.m. ønskes opdateres de her
 
 ### 2. Generer inputdata :arrows_counterclockwise:
 
+> **_OBS:_** Husk at anvende innotech Python environment (manuel installation) eller at starte Docker containeren og vælge ``Python (innotech)`` Jupyter Server (installation med Docker), før du går i gang. Se installationsvejledningen for detaljerede instruktioner.
+
 - Kør notebook ``A_prepare_data.ipynb`` (i mappen ``/run``).
 Denne notebook kører en række sub-scripts der klargør input-data og bygger en ``graph.obj`` fil, der senere anvendes i OpenTripPlanner.
 
