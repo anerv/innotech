@@ -75,6 +75,12 @@ Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har 
 python setup_folders.py
 ````
 
+#### A7. Anvend Python-environment
+
+* Åben den første notebook (se anvendelsesguiden ``user_guide.md``) i din Python IDE (f.eks. Visual Studio Code).
+* Brug conda environment ``innotech`` som Python interpreter.
+
+
 ***
 
 ### B. Installation med Docker
