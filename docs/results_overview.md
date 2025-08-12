@@ -10,13 +10,14 @@
 | - | - |
 | source_id | Adresse-id på startpunktet |
 | target_id | Adresse-id på slutpunktet (destinationen) |
-| startTime | Afgangstid |
 | from_lat | Koordinat på startpunktet (latitude) |
 | from_lon | Koordinat på slutpunktet (longitude) |
+| startTime | Afgangstid |
 | waitingTime | Ventetid i løbet af turen (sekunder) |
 | duration | Rejsetid i sekunder |
 | walkDistance | Gåafstand (meter), målt i afstand langs med vejnettet |
 | abs_dist | Afstand mellem start og slutpunkter (meter), målt i fugleflugtafstand |
+| mode_duration_json | Rejsetid for hvert transportmiddel (sek.) |
 
 ### [destination]_[nummer]_otp_geo.parquet
 
@@ -33,5 +34,8 @@
 | duration_min | Rejsetid i minutter |
 | wait_time_dest_min | Ventetid på destinationen i minutter |
 | total_time_min | Samlet tid (rejse + ventetid) i minutter |
-| only_walking | Om turen udelukkende består af gang (sandt/falsk) |
+| transfers | Antal skift |
+| bus_duration | Rejsetid med bus |
+| rail_duration | Rejsetid med tog |
+| walk_duration | Rejsetid gang |
 | geometry | Punktgeometri for startpunktet |
