@@ -596,11 +596,11 @@ def transfers_from_json(json_str):
         return pd.NA
 
 
+# Parse JSON strings into dictionaries (handle None or empty strings gracefully)
 def unpack_modes_from_json(df, json_column="mode_durations_json"):
     if json_column not in df.columns:
         raise ValueError(f"Column '{json_column}' does not exist in the DataFrame.")
 
-    # Parse JSON strings into dictionaries (handle None or empty strings gracefully)
     def parse_json(x):
         if pd.isna(x) or x == "":
             return {}
@@ -611,34 +611,25 @@ def unpack_modes_from_json(df, json_column="mode_durations_json"):
         except Exception:
             return {}
 
-    # Apply parsing
     modes_dicts = df[json_column].apply(parse_json)
 
-    # Get all unique mode keys across all rows
-    all_modes = set()
+    # Get all unique original keys
+    all_raw_modes = set()
     for d in modes_dicts:
-        all_modes.update(d.keys())
+        all_raw_modes.update(d.keys())
 
-    all_modes = list(all_modes)
-    all_modes = [mode.lower() for mode in all_modes]  # Normalize to lowercase
-    all_modes = [
-        mode + "_duration" for mode in all_modes
-    ]  # Append '_duration' to each mode
-    all_modes = sorted(all_modes)  # Sort modes for consistent order
+    # Create a mapping from original keys to desired column names
+    mode_column_map = {
+        raw_mode: raw_mode.lower() + "_duration" for raw_mode in all_raw_modes
+    }
 
-    # Create a DataFrame with one column per mode, filled with NaN initially
-    modes_df = pd.DataFrame(index=df.index, columns=all_modes)
+    # Initialize the new columns
+    for raw_mode, col_name in mode_column_map.items():
+        df[col_name] = modes_dicts.apply(lambda d: d.get(raw_mode, 0))
 
-    # Fill the modes_df with durations from the dicts
-    for mode in all_modes:
-        modes_df[mode] = modes_dicts.apply(lambda d: d.get(mode, None))
-
-    modes_df = modes_df.apply(pd.to_numeric, errors="coerce")
-
-    modes_df = modes_df.fillna(0)  # Replace NaN with 0 for easier analysis
-
-    # Combine original df with the expanded modes_df
-    df = pd.concat([df, modes_df], axis=1)
+    # Ensure numeric type
+    for col_name in mode_column_map.values():
+        df[col_name] = pd.to_numeric(df[col_name], errors="coerce").fillna(0)
 
     return df
 
