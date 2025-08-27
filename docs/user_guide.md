@@ -1,10 +1,6 @@
 
 ## Anvendelse
 
-> **_OBS:_**  De danske NeTEx-data indeholder ikke rute/rejsetidsdata for færgeforbindelser. Rejsetidsberegninger for ikke-brofaste øer fungerer derfor kun internt på øerne og ikke mellem øer og fastland.
-
-> **_OBS:_**  Hvis OTP returnerer *(StreetIndex.java:405) Couldn't link (10.969541647227851, 55.330497255524456, NaN)* kan det skyldes, at enten start- eller slutadressen ikke kan forbindes til vejnettet og der derfor ikke kan beregnes en rute.
-
 ### 1. Opdater indstillinger :pencil2:
 
 * ``config.yml`` indeholder bl.a. filnavne og placeringer på inputdata og resultater, navnet på studieområdet, samt indstillinger for, visse destinationer analysen indholder.
@@ -70,10 +66,28 @@ java -Xmx2G -jar otp.jar --load .
 - For et område som Region Sjælland med standard-indstillinger vil det tage 8+ timer at køre analysen på en almindelig laptop (testet på  Windows 11, Intel(R) Core(TM) Ultra 5 125U, 32 GB ram)
 - Efter at notebook B er kørt successfuldt kan resultaterne findes i mappen ``results``: Se [results_overview](results_overview.md) for en oversigt over output fra analysen.
 
- 
-### Sammenlign datakilder [valgfri] :arrow_right::arrow_left:
-
-- Data på destinationer stammer både fra det danske CVR-register og OpenStreetMap. For en sammenligning af det to datakilder for hver destinationstype, kør notebook ``C00_compare_cvr_osm.ipynb`` (i mappen ``/scripts``). Resultaterne af sammenligningen findes i ``/results/destination_data_evaluation/``.
+<br>
 
 Se ``results_overview.md`` for en oversigt over, hvilke typer resultater analysen producerer.
 
+
+
+***
+
+### [Valgfrit] Sammenlign datakilder :arrow_right::arrow_left:
+
+- Data på destinationer stammer både fra det danske CVR-register og OpenStreetMap. For en sammenligning af det to datakilder for hver destinationstype, kør notebook ``C00_compare_cvr_osm.ipynb`` (i mappen ``/scripts``). Resultaterne af sammenligningen findes i ``/results/destination_data_evaluation/``.
+
+<br>
+
+***
+
+<br>
+
+> **_OBS:_**  De danske NeTEx-data indeholder ikke rute/rejsetidsdata for færgeforbindelser. Rejsetidsberegninger for ikke-brofaste øer fungerer derfor kun internt på øerne og ikke mellem øer og fastland.
+
+> **_OBS:_**  Hvis OTP returnerer *(StreetIndex.java:405) Couldn't link (10.969541647227851, 55.330497255524456, NaN)* kan det skyldes, at enten start- eller slutadressen ikke kan forbindes til vejnettet og der derfor ikke kan beregnes en rute.
+
+<br>
+
+***

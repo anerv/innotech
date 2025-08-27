@@ -6,12 +6,57 @@ Se ***[LINK TIL RAPPORT]*** for baggrund for projektet og en detaljeret oversigt
 
 ## Installation :computer:
 
-Modellen kan *enten* installeres manuelt (metode A) eller ved hjælp af Docker (metode B).
+Modellen kan *enten* installeres ved hjælp af Docker (metode A) eller manuelt (metode B).
 Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(TM) Ultra 5 125U.
 
 ***
 
-### A. Manuel installation
+
+### A. Installation med Docker
+
+* Kræver en installation af [Git](https://git-scm.com/downloads).
+
+#### A1. Klon GitHub 
+
+Åben et terminal-vindue og kør kommandoen:
+
+````bash
+git clone https://github.com/anerv/innotech
+````
+
+#### A2. Installer Docker Desktop
+
+* Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
+* Start Docker Desktop
+
+#### A3. Download Docker image
+
+* Download docker imaget fra Docker Hub:
+
+```bash
+docker pull anerv/innotech-env:latest
+```
+
+#### A4. Kør Docker container
+
+* Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det.
+
+* Kør Docker containeren:
+
+```bash
+docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work anerv/innotech-env:latest
+```
+
+#### A5. Anvend Docker Python environment
+
+* Åben et browservindue og gå til http://localhost:8888
+* Kør analysen (se anvendelsesguiden ``user_guide.md``), brug ``Python Innotech`` som kernel.
+
+
+
+***
+
+### B. Manuel installation
 
 Projektet kræver at følgende programmer og værktøjer er installeret:
 
@@ -30,14 +75,14 @@ Projektet kræver at følgende programmer og værktøjer er installeret:
 
 For at installere de resterende værktøjer køres nedenstående i et terminalvindue:
 
-#### A1. Klon GitHub repository
+#### B1. Klon GitHub repository
 
 ````bash
 git clone https://github.com/anerv/innotech
 cd innotech
 ````
 
-#### A2. Skab Conda environment
+#### B2. Skab Conda environment
 ```bash
 conda create -n innotech geopandas pyyaml pyarrow overpy contextily scikit-learn h3-py python-duckdb ipykernel osmium-tool
 ```
@@ -48,26 +93,26 @@ conda create -n innotech geopandas pyyaml pyarrow overpy contextily scikit-learn
 conda env create -f environment.yml
 ```
 
-#### A3. Aktiver Conda environment og installer sidste elementer
+#### B3. Aktiver Conda environment og installer sidste elementer
 ````bash
 conda activate innotech
 pip install matplotlib-scalebar
 pip install --use-pep517 -e .
 ````
 
-#### A4. Installer DuckDB
+#### B4. Installer DuckDB
 ````bash
 winget install DuckDB.cli
 ````
 
-#### A5. Installer OpenTripPlanner
+#### B5. Installer OpenTripPlanner
 
 Følg instruktionerne for installation af OpenTripPlanner (OTP) her: https://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/.
 
 OTP-programmet skal placeres i ``otp``-mappen, eksempelvis:
 ``innotech/otp/otp-shaded-2.7.0.jar``.
 
-#### A6. Klargør mapper til data og resultater
+#### B6. Klargør mapper til data og resultater
 
 Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det, og kør:
 
@@ -75,52 +120,11 @@ Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har 
 python setup_folders.py
 ````
 
-#### A7. Anvend Python-environment
+#### B7. Anvend Python-environment
 
 * Åben den første notebook (se anvendelsesguiden ``user_guide.md``) i din Python IDE (f.eks. Visual Studio Code).
 * Brug conda environment ``innotech`` som Python interpreter.
 
-
-***
-
-### B. Installation med Docker
-
-* Kræver en installation af [Git](https://git-scm.com/downloads).
-
-#### B1. Klon GitHub repository
-
-````bash
-git clone https://github.com/anerv/innotech
-cd innotech
-````
-
-#### B2. Installer Docker Desktop
-
-* Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
-* Start Docker Desktop
-
-#### B3. Download Docker image
-
-* Download docker imaget fra Docker Hub:
-
-```bash
-docker pull anerv/innotech-env:latest
-```
-
-#### B4. Kør Docker container
-
-* Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det.
-
-* Kør Docker containeren:
-
-```bash
-docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work anerv/innotech-env:latest
-```
-
-#### B5. Anvend Docker Python environment
-
-* Åben et browservindue og gå til http://localhost:8888
-* Kør analysen (se anvendelsesguiden ``user_guide.md``), brug ``Python Innotech`` som kernel.
 
 
 ## Inputdata :file_folder:
@@ -138,7 +142,7 @@ Alle data kan downloades fra Datafordeler.dk.
 
 Se ``config.yml`` for forventede filnavne og placeringer.
 
-For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: LINK TIL RAPPORT.
+For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: *[LINK TIL RAPPORT]*.
 
 
 ### Inputdata til OTP :globe_with_meridians:
