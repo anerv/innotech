@@ -10,36 +10,43 @@ Modellen kan *enten* installeres ved hjælp af Docker (metode A) eller manuelt (
 Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(TM) Ultra 5 125U.
 
 ***
-
+***
+***
 
 ### A. Installation med Docker
 
 * Kræver en installation af [Git](https://git-scm.com/downloads).
 
-#### A1. Klon GitHub 
-
-Åben et terminal-vindue og kør kommandoen:
-
-````bash
-git clone https://github.com/anerv/innotech
-````
-
-#### A2. Installer Docker Desktop
+#### A1. Installer Docker Desktop
 
 * Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
 * Start Docker Desktop
 
-#### A3. Download Docker image
+**TODO: INDSÆT BILLEDE AF DOCKER**
 
-* Download docker imaget fra Docker Hub:
+#### A2. Download Docker image
+
+* Åbn et terminalvindue og kør kommadoen:
 
 ```bash
 docker pull anerv/innotech-env:latest
 ```
 
-#### A4. Kør Docker container
+#### A3. Klon GitHub 
 
-* Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det.
+* Kør kommandoen:
+
+````bash
+git clone https://github.com/anerv/innotech
+````
+
+#### A4. Check at installationen var successfuld
+
+* Naviger til hovedmappen (``innotech``) i en terminal:
+
+```bash
+cd innotech
+```
 
 * Kør Docker containeren:
 
@@ -47,13 +54,25 @@ docker pull anerv/innotech-env:latest
 docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work anerv/innotech-env:latest
 ```
 
-#### A5. Anvend Docker Python environment
+* Åben et browservindue og gå til http://localhost:8888/ og bekræft at siden viser Jupyter med indholdet af ```innotech```-mappen.
 
-* Åben et browservindue og gå til http://localhost:8888
-* Kør analysen (se anvendelsesguiden ``user_guide.md``), brug ``Python Innotech`` som kernel.
+Hvis du kan køre Docker containeren uden problemer og se Jupyter på http://localhost:8888/ er programmet installeret successfuldt.
 
+**For at stoppe Docker og Jupyter:**
 
+Tast CTRL+C i din terminal og bekræft med 'y' for at stoppe Jupyter serveren.
 
+Kør nedenstående for at stoppe Docker containeren:
+
+```bash
+docker stop innotech-container
+docker rm innotech-container
+```
+
+**TODO: INDSÆT SCREENSHOT**
+
+***
+***
 ***
 
 ### B. Manuel installation
@@ -114,42 +133,47 @@ OTP-programmet skal placeres i ``otp``-mappen, eksempelvis:
 
 #### B6. Klargør mapper til data og resultater
 
-Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det, og kør:
+* Naviger til hovedmappen (``innotech``) i en terminal, hvis du ikke allerede har gjort det: 
+
+```bash
+cd innotech
+```
+
+* Kør kommandoen:
 
 ````bash
 python setup_folders.py
 ````
 
-#### B7. Anvend Python-environment
+***TODO: ADD SCREENSHOT HER***
 
-* Åben den første notebook (se anvendelsesguiden ``user_guide.md``) i din Python IDE (f.eks. Visual Studio Code).
-* Brug conda environment ``innotech`` som Python interpreter.
+#### B7. Check at installationen var successfuld
 
+* Tjek at alle ovenstående skridt er gennemført uden fejl.
+* Tjek at du i din Python IDE (f.eks. Visual Studio Code) can vælge conda environment ```innotech``` som Python interpreter.
+* Tjek at OTP virker:
 
+    - Naviger til undermappen ``otp``:
 
-## Inputdata :file_folder:
+    ```bash
+    cd innotech/otp
+    ```
 
-Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og destinationer samt data på vejnetværket og offentlig transport.
+    -  Kør kommandoen:
 
-### Destinationer og adresser :house:
+    ```bash
+    java -Xmx2G -jar otp.jar --load .
+    ```
 
-- Adresse-data fra DAR (adresser, husnumre, og adressepunkter) for den ønskede region.
-- BBR-data (enheder) for den ønskede region: 
-- CVR-data (produktionsenheder, CVR-enheder med brancher, og CVR-enheder med adresser) for den ønskede region.
-- Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml hvis et andet område end Region Sjælland ønskes.). 
+    -  Gå til http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
 
-Alle data kan downloades fra Datafordeler.dk.
+    - For at stoppe OTP igen, tast CTRL+C i din terminal.
 
-Se ``config.yml`` for forventede filnavne og placeringer.
+***TODO: ADD SCREENSHOT HER***
 
-For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: *[LINK TIL RAPPORT]*.
-
-
-### Inputdata til OTP :globe_with_meridians:
-
-- OpenStreetMap: A pbf-file for det pågældende land, downloadet fra eksempelvis https://download.geofabrik.de/.
-
-- NeTEx rejseplansdata: I Danmark kan rejseplansdata i NeTEx-formattet downloades fra det Nationale Access Point: https://du-portal-ui.dataudveksler.app.vd.dk/data/242/overview.
+***
+***
+***
 
 
 Se [anvendelsesguiden](user_guide.md) for instruktioner til at køre analysen.

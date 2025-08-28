@@ -1,5 +1,6 @@
 # Docker
 
+> ***OBS:*** Vejledning i at lave Docker image - ikke relevant for brugere af programmet!
 
 ## Build docker image
 
