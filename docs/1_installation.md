@@ -22,7 +22,7 @@ Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(
 * Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
 * Start Docker Desktop
 
-![Docker logo](img/docker_logo.png "logo")
+![Docker logo](img/docker-logo-blue.png "logo")
 
 
 #### A2. Download Docker image
