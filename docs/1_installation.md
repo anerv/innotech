@@ -61,7 +61,7 @@ Hvis du kan køre Docker containeren uden problemer og se Jupyter på http://loc
 
 <img src="../img/docker_install.png" alt="Docker installation terminal screenshot" width="800"/>
 
-*Screenshot af terminal hvor Docker image er downloadet, Github-repository er klonet, og Docker container er startet.*
+*Screenshot af terminal hvor Docker image downloades, Github-repository klones, og Docker container startes.*
 
 **For at stoppe Docker og Jupyter:**
 
