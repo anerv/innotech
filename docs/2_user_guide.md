@@ -18,7 +18,7 @@ Alle data kan downloades fra Datafordeler.dk.
 
 Se ``config.yml`` for forventede filnavne og placeringer.
 
-For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: *[LINK TIL RAPPORT]*.
+For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: ***[LINK TIL RAPPORT]***.
 
 
 ### Inputdata til OTP :globe_with_meridians:
@@ -42,13 +42,14 @@ Hvis andre destinationer, ankomsttider, inputdata, m.m. ønskes opdateres de her
 * Hvis specifikke indstillinger for ruteberegningen ønskes (f.eks. max antal skift, vægtning af ventetid vs. rejsetid, adgang for kørestole etc.) tilføjes en ``router-config.json`` til ``otp``-mappen. Se https://docs.opentripplanner.org/en/latest/RouteRequest/ for eksempel.
 
 
-***TODO: INDSÆT HER - TO FORSKELLIGE GUIDES***
+Har du fulgt Docker-installationsvejledningen skal du følge vejledning **3A**. Har du fulgt den manuelle installationsvejledning, følg vejledning **3B**.
 
 ## 3A. Vejledning hvis du har fulgt Docker-installationen
 
 ### 3A.1. Start Docker og kør Docker container
 
 * Start Docker Desktop-applikationen
+
 * Naviger til ```innotech```- mappen:
 
 ```bash
@@ -61,6 +62,8 @@ cd innotech
 docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/home/jovyan/work anerv/innotech-env:latest
 ```
 
+<img src="../img/start_docker.png" alt="Terminal - Start Docker" width="600"/>
+
 ### 3A.2. Generer inputdata :arrows_counterclockwise:
 
 * Åben et browservindue og gå til http://localhost:8888
@@ -68,9 +71,11 @@ docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/ho
 * Åbn og kør notebook ``A_prepare_data.ipynb`` (i mappen ``/run``).
 Denne notebook kører en række sub-scripts der klargør input-data og bygger en ``graph.obj`` fil, der senere anvendes i OpenTripPlanner.
 
-> **_OBS:_** Husk at anvende Python (innotech) Jupyter Server når du kører notebook'en. Det kan være nødvendigt manuelt at vælge den rigtige Jupyter Server for hver notebook.
+> **_OBS:_** Husk at anvende Python (innotech) Jupyter Kernel når du kører notebook'en. Det kan være nødvendigt manuelt at vælge den rigtige Jupyter Kernel for hver notebook.
 
-***INDSÆT SCREENSHOT HER***
+<img src="../img/jupyter_kernel_1.png" alt="Vælg Jupyter Kernel 1" width="400"/>
+
+<img src="../img/jupyter_kernel_2.png" alt="Vælg Jupyter Kernel 2" width="400"/>
 
 ### 3A.3. Start OpenTripPlanner
 
@@ -85,7 +90,7 @@ docker exec -it innotech-container bash
 * Naviger til undermappen ``otp``:
 
 ```bash
-cd innotech/otp
+cd otp
 ```
 
 * Kør kommandoen:
@@ -94,9 +99,15 @@ cd innotech/otp
 java -Xmx2G -jar otp.jar --load .
 ```
 
-***INDSÆT SCREENSHOT HER***
-
 * Tjek eventuelt http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
+
+<img src="../img/start_otp.png" alt="Terminal - start OTP" width="600"/>
+
+*Først sættes terminalen til at køre inde i Docker containeren, derefter startes OTP.*
+
+<img src="../img/otp_browser.png" alt="OTP på localhost:8080" width="600"/>
+
+*OTP som programmet ser ud i browseren (localhost:8080).*
 
 
 ### 3A.4. Beregn rejsetider :bus:
