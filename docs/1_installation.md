@@ -4,16 +4,11 @@ Guiden indeholder en vejledning til at installere og downloade alle nødvendige 
 
 Se ***[LINK TIL RAPPORT]*** for baggrund for projektet og en detaljeret oversigt over datakilder og databehandling.
 
-## Installation :computer:
-
 Modellen kan *enten* installeres ved hjælp af Docker (metode A) eller manuelt (metode B).
 Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(TM) Ultra 5 125U.
 
-***
-***
-***
 
-### A. Installation med Docker
+## A. Installation med Docker :whale2:
 
 * Kræver en installation af [Git](https://git-scm.com/downloads).
 
@@ -22,7 +17,7 @@ Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(
 * Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
 * Start Docker Desktop
 
-![Docker logo](img/docker-logo-blue.png "logo")
+<img src="../img/docker-logo-blue.png" alt="Docker logo" width="200"/>
 
 
 #### A2. Download Docker image
@@ -41,6 +36,7 @@ docker pull anerv/innotech-env:latest
 git clone https://github.com/anerv/innotech
 ````
 
+
 #### A4. Check at installationen var successfuld
 
 * Naviger til hovedmappen (``innotech``) i en terminal:
@@ -57,11 +53,19 @@ docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/ho
 
 * Åben et browservindue og gå til http://localhost:8888/ og bekræft at siden viser Jupyter med indholdet af ```innotech```-mappen.
 
+<img src="../img/jupyter_browser_screenshot.png" alt="Jupyter server screenshot" width="400"/>
+
+*Screenshot a Jupyter serveren på localhost:8888 kørt fra innotech-mappen.*
+
 Hvis du kan køre Docker containeren uden problemer og se Jupyter på http://localhost:8888/ er programmet installeret successfuldt.
+
+<img src="../img/docker_install.png" alt="Docker installation terminal screenshot" width="800"/>
+
+*Screenshot af terminal hvor Docker image er downloadet, Github-repository er klonet, og Docker container er startet.*
 
 **For at stoppe Docker og Jupyter:**
 
-* Tast CTRL+C i din terminal og bekræft med 'y' for at stoppe Jupyter serveren.
+* Tast ***CTRL+C*** i din terminal og bekræft med ***'y'*** for at stoppe Jupyter serveren.
 
 * Kør nedenstående for at stoppe Docker containeren:
 
@@ -70,13 +74,8 @@ docker stop innotech-container
 docker rm innotech-container
 ```
 
-![Docker install](img/docker_install.png "install")
 
-***
-***
-***
-
-### B. Manuel installation
+## B. Manuel installation :computer:
 
 Projektet kræver at følgende programmer og værktøjer er installeret:
 
@@ -172,8 +171,6 @@ python setup_folders.py
 
 ***TODO: ADD SCREENSHOT HER***
 
-***
-***
 ***
 
 
