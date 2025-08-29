@@ -182,7 +182,7 @@ java -Xmx2G -jar otp.jar --load .
 
 ***
 
-### 4. [Valgfrit] Sammenlign datakilder :arrow_right::arrow_left:
+## 4. [Valgfrit] Sammenlign datakilder :arrow_right::arrow_left:
 
 - Data på destinationer stammer både fra det danske CVR-register og OpenStreetMap. For en sammenligning af det to datakilder for hver destinationstype, kør notebook ``C00_compare_cvr_osm.ipynb`` (i mappen ``/scripts``). Resultaterne af sammenligningen findes i ``/results/destination_data_evaluation/``.
 
@@ -190,7 +190,7 @@ java -Xmx2G -jar otp.jar --load .
 
 ***
 
-### Fejlfinding
+## Fejlfinding
 
 <br>
 
