@@ -60,6 +60,8 @@ Har du fulgt Docker-installationsvejledningen skal du følge vejledning **3A**. 
 
 ## 3A. Vejledning hvis du har fulgt Docker-installationen
 
+<img src="../img/docker_brugervejledning.png" alt="Visuel guide til Docker installation" width="800"/>
+
 ### 3A.1. Start Docker og kør Docker container
 
 * Start Docker Desktop-applikationen

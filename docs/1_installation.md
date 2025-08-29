@@ -10,7 +10,10 @@ Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(
 
 ## A. Installation med Docker :whale2:
 
-* Kræver en installation af [Git](https://git-scm.com/downloads).
+> **_OBS:_**  Kræver en installation af [Git](https://git-scm.com/downloads).
+
+<img src="../img/docker_installation.png" alt="Visuel guide til Docker installation" width="800"/>
+
 
 #### A1. Installer Docker Desktop
 
@@ -145,8 +148,6 @@ cd innotech
 python setup_folders.py
 ````
 
-***TODO: ADD SCREENSHOT HER***
-
 #### B7. Check at installationen var successfuld
 
 * Tjek at alle ovenstående skridt er gennemført uden fejl.
@@ -165,7 +166,7 @@ python setup_folders.py
     java -Xmx2G -jar otp.jar --load .
     ```
 
-    -  Gå til http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
+    -  Gå til http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt (Når OpenTripPlanner kører kan man tilgå ruteplanlæggeren på http://localhost:8080/).
 
     - For at stoppe OTP igen, tast **CTRL+C** i din terminal.
 
