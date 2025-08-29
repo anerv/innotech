@@ -22,7 +22,8 @@ Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(
 * Installer Docker Desktop fra: https://docs.docker.com/desktop/setup/install/windows-install/
 * Start Docker Desktop
 
-**TODO: INDSÆT BILLEDE AF DOCKER**
+![Docker logo](img/docker_logo.png "logo")
+
 
 #### A2. Download Docker image
 
@@ -60,16 +61,16 @@ Hvis du kan køre Docker containeren uden problemer og se Jupyter på http://loc
 
 **For at stoppe Docker og Jupyter:**
 
-Tast CTRL+C i din terminal og bekræft med 'y' for at stoppe Jupyter serveren.
+* Tast CTRL+C i din terminal og bekræft med 'y' for at stoppe Jupyter serveren.
 
-Kør nedenstående for at stoppe Docker containeren:
+* Kør nedenstående for at stoppe Docker containeren:
 
 ```bash
 docker stop innotech-container
 docker rm innotech-container
 ```
 
-**TODO: INDSÆT SCREENSHOT**
+![Docker install](img/docker_install.png "install")
 
 ***
 ***
