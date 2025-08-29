@@ -3,11 +3,9 @@
 
 ## 1. Klargør inputdata :file_folder:
 
-Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og destinationer samt data på vejnetværket og offentlig transport.
+Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og destinationer samt data på vejnetværket og rejseplansdata for offentlig transport.
 
 ### Destinationer og adresser :house:
-
-***TODO: mere detaljeret + screenshot***
 
 - Adresse-data fra DAR (adresser, husnumre, og adressepunkter) for den ønskede region.
 - BBR-data (enheder) for den ønskede region: 
@@ -15,8 +13,6 @@ Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og des
 - Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml hvis et andet område end Region Sjælland ønskes.). 
 
 Alle data kan downloades fra Datafordeler.dk.
-
-Se ``config.yml`` for forventede filnavne og placeringer.
 
 For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: ***[LINK TIL RAPPORT]***.
 
@@ -26,6 +22,24 @@ For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen
 - OpenStreetMap: A pbf-file for det pågældende land, downloadet fra eksempelvis https://download.geofabrik.de/.
 
 - NeTEx rejseplansdata: I Danmark kan rejseplansdata i NeTEx-formattet downloades fra det Nationale Access Point: https://du-portal-ui.dataudveksler.app.vd.dk/data/242/overview.
+
+
+Se nedenstående tabel og ``config.yml`` for forventede filnavne og placeringer.
+
+| Kategori               | Type                 | Navn på dataset i config.yml  | Placering                                                                      |
+|------------------------|----------------------|-------------------------------|--------------------------------------------------------------------------------|
+|                        | Adresser             | input_address_fp              | *"../data/input/adresser/DAR_V1_Adresse_TotalDownload_csv_Current_256.csv"*    |
+| **Adressedata**        | Adressepunkter       | address_points_fp             |*"../data/input/adresser/DAR_V1_Adressepunkt_TotalDownload_csv_Current_256.csv"* |
+|                        | Husnumre             | housenumbers_fp               | *"../data/input/adresser/DAR_V1_Husnummer_TotalDownload_csv_Current_256.csv"*  |
+| **BBR-data**           | BBR-enheder          | bbr_fp                        | *"../data/input/bbr/BBR_V1_Enhed_TotalDownload_csv_Current_263.csv"*           |
+|                        | CVR-adresser         | cvr_address_input_fp          | *"../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"*       |
+| **CVR-data**           | CVR-brancher         | cvr_brancher_input_fp         | *"../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Current_8.csv"*           |
+|                        | CVR-penhed           | cvr_penhed_input_fp           | *"../data/input/cvr/CVR_V1_Produktionsenhed_TotalDownload_csv_Current_8.csv"*  |
+| **OpenStreetMap**      | OpenStreetmap        | osm_input_pbf                 | *"input/osm/denmark-latest.osm.pbf"*                                           |
+| **Regionsinddelinger** | Rergionspolygoner    | -                             | *"../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg"* |
+| **Kommuneinddelinger** | Kommunepolygoner     | -                             | *"../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg"* |
+| **Rejseplansdata**     | NeTEx-rejseplansdata | -                             | *"otp/Rejseplanen+NeTEx.zip"*                                                  |
+
 
 
 ## 2. Opdater indstillinger :pencil2:
