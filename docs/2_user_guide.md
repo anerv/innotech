@@ -79,7 +79,7 @@ Denne notebook kører en række sub-scripts der klargør input-data og bygger en
 
 ### 3A.3. Start OpenTripPlanner
 
-* Åben et nyt terminalvindue (men lad det vindue være, hvor du har startet Docker containeren)
+* Åben et nyt terminalvindue (men lad det terminalvindue, hvor du har startet Docker containeren køre).
 
 * I det nye terminalvindue, kør kommandoen:
 
@@ -127,9 +127,17 @@ java -Xmx2G -jar otp.jar --load .
 * Kør notebook ``A_prepare_data.ipynb`` (i mappen ``/run``).
 Denne notebook kører en række sub-scripts der klargør input-data og bygger en ``graph.obj`` fil, der senere anvendes i OpenTripPlanner.
 
-> **_OBS:_** Husk at vælge conda environment ``innotech`` som Python interpreter når du kører notebook'en. Det kan være nødvendigt at vælge conda environment for hver notebook:
+> **_OBS:_** Husk at vælge conda environment ``innotech`` som Python interpreter når du kører notebook'en. Det kan være nødvendigt at vælge conda environment for hver notebook.
 
-***INDSÆT SCREENSHOT***
+***Valg af Jupyter Kernel vist i Visual Studio Code:***
+
+<img src="../img/vsc_vaelg_env_1.png" alt="OTP på localhost:8080" width="400"/>
+
+*Klik først på "Select Kernel".*
+
+<img src="../img/vsc_vaelg_env_2.png" alt="OTP på localhost:8080" width="400"/>
+
+*Vælg "innotech (Python)".*
 
 ### 3B.2. Start OpenTripPlanner
 
