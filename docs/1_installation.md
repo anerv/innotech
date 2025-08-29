@@ -4,7 +4,7 @@ Guiden indeholder en vejledning til at installere og downloade alle nødvendige 
 
 Se ***[LINK TIL RAPPORT]*** for baggrund for projektet og en detaljeret oversigt over datakilder og databehandling.
 
-Modellen kan *enten* installeres ved hjælp af Docker (metode A) eller manuelt (metode B).
+Modellen kan *enten* installeres ved hjælp af Docker (metode A) (***anbefalet***) eller manuelt (metode B).
 Modellen og installationsvejledningen er udviklet på Windows 11, Intel(R) Core(TM) Ultra 5 125U.
 
 
