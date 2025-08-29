@@ -167,9 +167,11 @@ python setup_folders.py
 
     -  Gå til http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
 
-    - For at stoppe OTP igen, tast CTRL+C i din terminal.
+    - For at stoppe OTP igen, tast **CTRL+C** i din terminal.
 
-***TODO: ADD SCREENSHOT HER***
+<img src="../img/otp_browser.png" alt="OTP på localhost:8080" width="600"/>
+
+*OTP som programmet ser ud i browseren (localhost:8080).*
 
 ***
 
