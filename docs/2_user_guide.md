@@ -171,7 +171,7 @@ Denne notebook kører en række sub-scripts der klargør input-data og bygger en
 
 *Vælg "innotech (Python)".*
 
-### 3B.2. Start OpenTripPlanner
+### 3B.2. Start OpenTripPlanner (OTP)
 
 * Åben et terminalvindue
 * Naviger til undermappen ``otp``:
@@ -191,6 +191,9 @@ java -Xmx2G -jar otp.jar --load .
 ### 3B.3. Beregn rejsetider :bus:
 
 * Kør notebook ``B_run_otp.ipynb`` (i mappen ``/run``).
+
+Output fra OTP vil blive printet i det andet terminal-vindue, hvor du startede OTP.
+
 * Efter at notebook B er kørt successfuldt kan resultaterne findes i mappen ``results``: Se [results_overview](results_overview.md) for en oversigt over output fra analysen.
 
 > **_OBS:_** For et område som Region Sjælland med standard-indstillinger vil det tage 8+ timer at køre analysen på en almindelig laptop (testet på  Windows 11, Intel(R) Core(TM) Ultra 5 125U, 32 GB ram)
