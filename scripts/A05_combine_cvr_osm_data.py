@@ -8,9 +8,6 @@ import os
 import sys
 import yaml
 
-os.environ["GDAL_DATA"] = os.path.join(
-    f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
-)
 from src.helper_functions import (
     aggregate_points_by_distance,
 )
