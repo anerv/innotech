@@ -18,11 +18,6 @@ from src.helper_functions import (
 )
 
 
-os.environ["GDAL_DATA"] = os.path.join(
-    f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
-)
-
-
 # Define the path to the config.yml file
 script_path = Path(__file__).resolve()
 root_path = script_path.parent.parent

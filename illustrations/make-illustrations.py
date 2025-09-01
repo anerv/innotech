@@ -11,10 +11,6 @@ import os
 import sys
 import yaml
 
-os.environ["GDAL_DATA"] = os.path.join(
-    f"{os.sep}".join(sys.executable.split(os.sep)[:-1]), "Library", "share", "gdal"
-)
-
 with open(r"../config.yml", encoding="utf-8") as file:
     parsed_yaml_file = yaml.load(file, Loader=yaml.FullLoader)
 
