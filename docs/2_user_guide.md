@@ -143,6 +143,7 @@ java -Xmx2G -jar otp.jar --load .
 
 * Efter at notebook B er kørt successfuldt kan resultaterne findes i mappen ``results``: Se [results_overview](results_overview.md) for en oversigt over output fra analysen.
 
+* Når analysen er færdig kan OTP og Jupyter stoppes ved at taste **CTR+C** i begge terminal-vinduer.
 <br>
 
 > **_OBS:_** For et område som Region Sjælland med standard-indstillinger vil det tage 8+ timer at køre analysen på en almindelig laptop (testet på  Windows 11, Intel(R) Core(TM) Ultra 5 125U, 32 GB ram)
