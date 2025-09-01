@@ -177,5 +177,5 @@ python setup_folders.py
 ***
 
 
-Se [anvendelsesguiden](user_guide.md) for instruktioner til at køre analysen.
+Se [anvendelsesguiden](2_user_guide.md) for instruktioner til at køre analysen.
 
