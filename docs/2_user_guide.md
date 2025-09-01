@@ -87,11 +87,19 @@ docker run -it --name innotech-container -p 8888:8888 -p 8080:8080 -v ${PWD}:/ho
 * Åbn og kør notebook ``A_prepare_data.ipynb`` (i mappen ``/run``).
 Denne notebook kører en række sub-scripts der klargør input-data og bygger en ``graph.obj`` fil, der senere anvendes i OpenTripPlanner.
 
+<br>
+
 > **_OBS:_** Husk at anvende Python (innotech) Jupyter Kernel når du kører notebook'en. Det kan være nødvendigt manuelt at vælge den rigtige Jupyter Kernel for hver notebook.
 
 <img src="../img/jupyter_kernel_1.png" alt="Vælg Jupyter Kernel 1" width="400"/>
 
 <img src="../img/jupyter_kernel_2.png" alt="Vælg Jupyter Kernel 2" width="400"/>
+
+<br>
+
+> **_OBS:_** Der vil muligvis blive printet advarsler om datatyper og diverse statusmeldinger. Så længe der for hvert script printes *"Script XX completed successfully"* og der *ikke* bliver printet, at et script er *"exited with status code 1"* er alt som det skal være.
+
+<br>
 
 ### 3A.3. Start OpenTripPlanner
 
@@ -117,6 +125,8 @@ java -Xmx2G -jar otp.jar --load .
 
 * Tjek eventuelt http://localhost:8080/ i din browser for at bekræfte, at OpenTripPlanner er startet korrekt.
 
+<br>
+
 <img src="../img/start_otp.png" alt="Terminal - start OTP" width="600"/>
 
 *Først sættes terminalen til at køre inde i Docker containeren, derefter startes OTP.*
@@ -125,6 +135,7 @@ java -Xmx2G -jar otp.jar --load .
 
 *OTP som programmet ser ud i browseren (localhost:8080).*
 
+<br>
 
 ### 3A.4. Beregn rejsetider :bus:
 
@@ -132,8 +143,11 @@ java -Xmx2G -jar otp.jar --load .
 
 * Efter at notebook B er kørt successfuldt kan resultaterne findes i mappen ``results``: Se [results_overview](results_overview.md) for en oversigt over output fra analysen.
 
+<br>
+
 > **_OBS:_** For et område som Region Sjælland med standard-indstillinger vil det tage 8+ timer at køre analysen på en almindelig laptop (testet på  Windows 11, Intel(R) Core(TM) Ultra 5 125U, 32 GB ram)
 
+<br>
 
 ## 3B. Vejledning til manuel installation
 
@@ -142,6 +156,8 @@ java -Xmx2G -jar otp.jar --load .
 
 * Kør notebook ``A_prepare_data.ipynb`` (i mappen ``/run``).
 Denne notebook kører en række sub-scripts der klargør input-data og bygger en ``graph.obj`` fil, der senere anvendes i OpenTripPlanner.
+
+<br>
 
 > **_OBS:_** Husk at vælge conda environment ``innotech`` som Python interpreter når du kører notebook'en. Det kan være nødvendigt at vælge conda environment for hver notebook.
 
