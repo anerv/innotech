@@ -189,7 +189,7 @@ otp_url : "http://localhost:8080/otp/gtfs/v1" #
 otp_results : "otp_results.db" # The persistant duckdb  where the OTP results are stored
 
 # Define date used for OTP query (the time is defined in the service array)
-travel_date : "2025-04-22"
+travel_date : "2025-08-26"
 
 
 # Filepaths for input data when calculating the travel matrix in the nearest.py (to and from)
