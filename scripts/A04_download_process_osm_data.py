@@ -5,6 +5,7 @@
 import geopandas as gpd
 import pandas as pd
 import overpy
+import time
 import numpy as np
 import yaml
 from src.helper_functions import (
@@ -60,6 +61,27 @@ bbox_wgs84 = (bbox[1].item(), bbox[0].item(), bbox[3].item(), bbox[2].item())
 # connect to the overpass API
 api = overpy.Overpass()
 
+
+def query_with_retries(api, query, retries=5, delay=10):
+    for attempt in range(retries):
+        try:
+            return api.query(query)
+        except overpy.exception.OverpassTooManyRequests:
+            print(
+                f"[Overpass] Rate limit hit. Sleeping for {delay}s (Attempt {attempt+1}/{retries})"
+            )
+        except overpy.exception.OverpassGatewayTimeout:
+            print(
+                f"[Overpass] Gateway timeout. Sleeping for {delay}s (Attempt {attempt+1}/{retries})"
+            )
+        except Exception as e:
+            print(
+                f"[Overpass] Unexpected error: {e}. Sleeping for {delay}s (Attempt {attempt+1}/{retries})"
+            )
+        time.sleep(delay)
+    raise Exception("Max retries exceeded.")
+
+
 all_osm = []
 
 for category, query_list in queries.items():
@@ -79,7 +101,8 @@ for category, query_list in queries.items():
             """
 
             # Fetch the data
-            joined = api.query(query)
+            # joined = api.query(query)
+            joined = query_with_retries(api, query)
 
             # Create GeoDataFrames
             nodes_gdf = create_nodes_gdf(joined.nodes)
