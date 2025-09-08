@@ -23,7 +23,7 @@ Se ***[LINK TIL RAPPORT]*** for baggrund for projektet og en detaljeret oversigt
 
 #### A2. Download Docker image
 
-* Åbn et terminalvindue og kør kommadoen:
+* Åbn et terminalvindue (**gerne Docker Desktops indbyggede terminal**) og kør kommadoen:
 
 ```bash
 docker pull anerv/innotech-env:latest
@@ -31,7 +31,7 @@ docker pull anerv/innotech-env:latest
 
 #### A3. Klon GitHub 
 
-* Kør kommandoen:
+* I samme terminalvindue, kør kommandoen:
 
 ````bash
 git clone https://github.com/anerv/innotech
@@ -40,7 +40,7 @@ git clone https://github.com/anerv/innotech
 
 #### A4. Check at installationen var successfuld
 
-* Naviger til hovedmappen (``innotech``) i en terminal:
+* I samme terminalvindue, naviger til hovedmappen (``innotech``):
 
 ```bash
 cd innotech
