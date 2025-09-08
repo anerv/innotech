@@ -167,7 +167,11 @@ print(
 if len(cvr_region[cvr_region.adresseIdentificerer.isnull()]) > 0:
 
     print("Unmatched CVR locations in each category:")
-    cvr_region[cvr_region.adresseIdentificerer.isnull()]["service_type"].value_counts()
+    print(
+        cvr_region[cvr_region.adresseIdentificerer.isnull()][
+            "service_type"
+        ].value_counts()
+    )
 
 # %%
 

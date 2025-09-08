@@ -66,6 +66,8 @@ Har du fulgt Docker-installationsvejledningen skal du følge vejledning **3A**. 
 
 * Start Docker Desktop-applikationen
 
+* Åben et terminal-vindue (**gerne Docker Desktops indbyggede terminal**)
+
 * Naviger til ```innotech```- mappen:
 
 ```bash
@@ -103,7 +105,7 @@ Denne notebook kører en række sub-scripts der klargør input-data og bygger en
 
 ### 3A.3. Start OpenTripPlanner
 
-* Åben et nyt terminalvindue (men lad det terminalvindue, hvor du har startet Docker containeren køre).
+* Åben et nyt terminalvindue (men lad det terminalvindue, hvor du har startet Docker containeren køre). *Man kan åbne et ekstra terminalvindue i Docker ved at klikke på '+'-ikonet i højre hjørne af terminal-vinduet.*
 
 * I det nye terminalvindue, kør kommandoen:
 

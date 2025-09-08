@@ -149,7 +149,7 @@ for category, query_list in queries.items():
                 ways_centroids = None
 
             if nodes_gdf.empty and (ways_centroids is None):
-                print(f"No data found for {key} = {value}")
+                print(f"No OSM data found for {key} = {value}")
                 continue
 
             # Combine nodes and ways if both exist
@@ -170,10 +170,10 @@ for category, query_list in queries.items():
             data_list.append(combined_gdf)
 
     if not data_list:
-        print(f"No data found for {category}")
+        print(f"No OSM data found for {category}")
 
     if len(data_list) == 0:
-        print(f"No data found for {category}")
+        print(f"No OSM data found for {category}")
         continue
 
     all_data = pd.concat(data_list, ignore_index=True)
