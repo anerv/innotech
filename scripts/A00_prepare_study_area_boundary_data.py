@@ -22,13 +22,19 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
 # %%
 
+print(
+    "Preparing study area boundary data for study area with names/codes:",
+    study_area_name,
+)
+
 # Subtract the study area (region) from the administrative boundaries input data
 
 administrative_boundaries = gpd.read_file(adm_boundaries_fp)
 
 region = administrative_boundaries[
-    administrative_boundaries[adm_boundaries_config["regions"]["id_column"]]
-    == study_area_name
+    administrative_boundaries[adm_boundaries_config["regions"]["id_column"]].isin(
+        study_area_name
+    )
 ]
 
 region = region[["navn", "geometry"]]
