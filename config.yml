@@ -194,10 +194,9 @@ otp_url : "http://localhost:8080/otp/gtfs/v1" #
 
 otp_results : "otp_results.db" # The persistant duckdb  where the OTP results are stored
 
-# Define date used for OTP query (the time is defined in the service array)
 # OBS: The date must be within the valid time range in the downloaded NeTEx data
 # For valid date, see one of the included HTML files in the otp/netex directory (check for dates in this pattern: <FromDate>202X-XX-XXT00:00:00</FromDate><ToDate>202X-XX-XXT00:00:00</ToDate>)
-travel_date : "2025-04-22"
+travel_date : "2025-04-25" # The date used for the OTP query in the format YYYY-MM-DD
 
 
 # Filepaths for input data when calculating the travel matrix in the nearest.py (to and from)
