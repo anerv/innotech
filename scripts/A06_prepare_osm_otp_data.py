@@ -39,6 +39,8 @@ study_area = gpd.read_file(study_area_fp)
 
 study_area["geometry"] = study_area["geometry"].apply(remove_z)
 
+study_area.geometry = study_area.geometry.buffer(1000)
+
 study_area.to_crs(epsg=4326, inplace=True)
 
 study_area.to_file(clipfile, driver="GeoJSON")
