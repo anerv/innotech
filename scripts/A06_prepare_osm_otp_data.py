@@ -99,14 +99,12 @@ cmd = "java -Xmx2G -jar otp.jar --build --save ."
 
 if netex_zip_exists and osm_pbf_exists and config_exists and otp_exists:
     print("All required files are in place, building OTP graph...")
-    # os.system(cmd)
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
     if result.stderr:
         print("Error output:")
         print(result.stderr)
     if result.returncode == 0:
         print("OTP graph built successfully.")
-    # print(result.decode("utf-8"))
 
 else:
     print("Missing input data: Netex zip file or osm pbf file not found in otp folder!")
