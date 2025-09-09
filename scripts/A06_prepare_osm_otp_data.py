@@ -99,8 +99,6 @@ cmd = "java -Xmx2G -jar otp.jar --build --save ."
 
 if netex_zip_exists and osm_pbf_exists and config_exists and otp_exists:
     print("All required files are in place, building OTP graph...")
-    # result = subprocess.check_output(cmd, shell=True)
-    # print(result.decode("utf-8"))
     result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
     if result.stderr:
         print("Error output:")
