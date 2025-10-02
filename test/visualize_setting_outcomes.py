@@ -3,12 +3,12 @@ import yaml
 from pathlib import Path
 import pandas as pd
 import duckdb
-from src.helper_functions import process_adresses, get_geo_address_sample
 import geopandas as gpd
 import time
 import matplotlib.pyplot as plt
 from IPython.display import display
 import math
+import seaborn as sns
 
 # Define the path to the config.yml file
 script_path = Path(__file__).resolve()
@@ -67,6 +67,205 @@ walk_speed = 1.3  # walking speed in m/s
 h3_resolution = 7  # H3 resolution for spatial sampling. Decrease h3 resolution for a smaller sample size.
 
 services = config_model["services"]
+
+# %%
+
+
+def compute_wait_times(results, arrival_deadline_str):
+
+    arrival_deadline = pd.to_datetime(arrival_deadline_str)
+
+    results["duration_min"] = results["duration"] / 60
+
+    results["arrival_time"] = pd.to_datetime(results["startTime"]) + pd.to_timedelta(
+        results["duration_min"], unit="m"
+    )
+    results["wait_time_dest"] = arrival_deadline - results["arrival_time"]
+    results["wait_time_dest_min"] = results["wait_time_dest"].dt.total_seconds() / 60
+    return results
+
+
+def plot_histograms(results, ax, column, color, title, count_no_connection):
+
+    results[column].plot.hist(
+        ax=ax,
+        bins=30,
+        color=color,
+        alpha=0.7,
+    )
+
+    ax.set_title(title, fontsize=9)
+
+    ymax = ax.get_ylim()[1]
+    xmax = ax.get_xlim()[1]
+    ax.text(
+        xmax / 5,
+        ymax / 5,
+        f"No connection count: {count_no_connection}",
+        fontsize=10,
+    )
+
+    sns.despine()
+
+    return ax
+
+
+def plot_histograms_compare_arrival_times(
+    results,
+    arrival_times,
+    search_windows,
+    services,
+    walk_speed,
+    column,
+    arrival_date,
+    label="waittime",
+):
+
+    n_cols = 3
+    n_rows = math.ceil(len(arrival_times) / n_cols)
+
+    for search_window in search_windows:
+
+        for service in services:
+
+            fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 15))
+            axes = axes.flatten()
+
+            for idx, arrival_time in enumerate(arrival_times):
+
+                for i in range(1, int(service["n_neighbors"]) + 1):
+
+                    dataset = f"{service['service_type']}_{i}_{search_window}_{walk_speed}_{arrival_time}"
+                    dataset = dataset.replace(":", "-").replace(".", "-")
+                    tabelname = dataset.replace("-", "_")
+
+                    results = otp_con.execute(f"SELECT * FROM {tabelname}").df()
+
+                    count_no_connection = results["duration"].isna().sum()
+                    count_total = len(results)
+
+                    ax = axes[idx]
+
+                    arrival_deadline_str = f"{arrival_date} {arrival_time}"
+                    results = compute_wait_times(results, arrival_deadline_str)
+
+                    ax = plot_histograms(
+                        results,
+                        ax,
+                        column,
+                        "green",
+                        f"{arrival_time} (k={i})",
+                        count_no_connection,
+                    )
+
+                    break  # Only plot for the first k (remove this if you want multiple neighbors plotted)
+
+            # Remove unused subplots if services < subplot slots
+            for j in range(len(arrival_times), len(axes)):
+                fig.delaxes(axes[j])
+
+            fig.suptitle(
+                f"{service['service_type'].title().replace('_',' ')} - Search Window: {search_window}",
+                fontsize=14,
+            )
+            plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+            fig.savefig(
+                results_path_plots
+                / f"hist_{label}_{service['service_type']}_{search_window}.png",
+                dpi=300,
+                bbox_inches="tight",
+            )
+            plt.show()
+            plt.close()
+
+
+def map_arrival_times_one_plot(
+    arrival_times,
+    search_windows,
+    services,
+    walk_speed,
+    study_area,
+    label,
+    crs="EPSG:25832",
+    arrival_date="2025-04-22",
+):
+
+    n_cols = 3
+    n_rows = math.ceil(len(arrival_times) / n_cols)
+
+    for search_window in search_windows:
+
+        for service in services:
+
+            fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 15))
+            axes = axes.flatten()
+
+            for idx, arrival_time in enumerate(arrival_times):
+
+                for i in range(1, int(service["n_neighbors"]) + 1):
+
+                    dataset = f"{service['service_type']}_{i}_{search_window}_{walk_speed}_{arrival_time}"
+                    dataset = dataset.replace(":", "-").replace(".", "-")
+                    tabelname = dataset.replace("-", "_")
+
+                    results = otp_con.execute(f"SELECT * FROM {tabelname}").df()
+
+                    results_gdf = gpd.GeoDataFrame(
+                        results,
+                        geometry=gpd.points_from_xy(
+                            results.from_lon, results.from_lat, crs="EPSG:4326"
+                        ),
+                    )
+                    results_gdf.to_crs(crs, inplace=True)
+
+                    results_gdf.dropna(subset=["duration"], inplace=True)
+
+                    ax = axes[idx]
+
+                    arrival_deadline_str = f"{arrival_date} {arrival_time}"
+                    results_gdf = compute_wait_times(results_gdf, arrival_deadline_str)
+
+                    study_area.plot(
+                        ax=ax, color="white", edgecolor="grey", linewidth=0.5
+                    )
+                    results_gdf.plot(
+                        ax=ax,
+                        column="wait_time_dest_min",
+                        cmap="viridis",
+                        markersize=3,
+                        legend=True,
+                        legend_kwds={
+                            "label": f"{label.title()} (m)",
+                            "shrink": 0.6,
+                        },
+                    )
+
+                    ax.set_axis_off()
+                    ax.set_title(
+                        f"{arrival_time} (k={i})",
+                        fontsize=9,
+                    )
+
+                    break  # Only plot for the first k (remove this if you want multiple neighbors plotted)
+
+            # Remove unused subplots if services < subplot slots
+            for j in range(len(arrival_times), len(axes)):
+                fig.delaxes(axes[j])
+
+            fig.suptitle(
+                f"{service['service_type'].title().replace('_',' ')} - Search Window: {search_window}",
+                fontsize=14,
+            )
+            plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+            fig.savefig(
+                results_path_plots
+                / f"{label}_{service['service_type']}_{search_window}.png",
+                dpi=300,
+                bbox_inches="tight",
+            )
+            plt.show()
+            plt.close()
+
 
 # %%
 
@@ -178,82 +377,39 @@ for search_window in search_windows:
 
 study_area = gpd.read_file(study_area_fp)
 
-# Number of services (assumed to be 9)
-n_cols = 3
-n_rows = math.ceil(len(arrival_times) / n_cols)
+map_arrival_times_one_plot(
+    arrival_times,
+    search_windows,
+    services,
+    walk_speed,
+    study_area,
+    label="duration",
+    crs=crs,
+    arrival_date="2025-04-22",
+)
 
-for search_window in search_windows:
+# %%
 
-    for service in services:
+# WAITTIMES
 
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 15))
-        axes = axes.flatten()
-
-        for idx, arrival_time in enumerate(arrival_times):
-
-            for i in range(1, int(service["n_neighbors"]) + 1):
-
-                dataset = f"{service['service_type']}_{i}_{search_window}_{walk_speed}_{arrival_time}"
-                dataset = dataset.replace(":", "-").replace(".", "-")
-                tabelname = dataset.replace("-", "_")
-
-                results = otp_con.execute(f"SELECT * FROM {tabelname}").df()
-
-                results_gdf = gpd.GeoDataFrame(
-                    results,
-                    geometry=gpd.points_from_xy(
-                        results.from_lon, results.from_lat, crs="EPSG:4326"
-                    ),
-                )
-                results_gdf.to_crs(crs, inplace=True)
-
-                ax = axes[idx]
-
-                results_gdf["duration_min"] = results_gdf["duration"] / 60
-
-                study_area.plot(ax=ax, color="white", edgecolor="grey", linewidth=0.5)
-                results_gdf.plot(
-                    ax=ax,
-                    column="duration_min",
-                    cmap="viridis",
-                    markersize=3,
-                    legend=True,
-                    legend_kwds={
-                        "label": "Travel Time (m)",
-                        "shrink": 0.6,
-                    },
-                )
-
-                ax.set_axis_off()
-                ax.set_title(
-                    f"{arrival_time} (k={i})",
-                    fontsize=9,
-                )
-
-                break  # Only plot for the first k (remove this if you want multiple neighbors plotted)
-
-        # Remove unused subplots if services < subplot slots
-        for j in range(len(arrival_times), len(axes)):
-            fig.delaxes(axes[j])
-
-        fig.suptitle(
-            f"{service['service_type'].title().replace('_',' ')} - Search Window: {search_window}",
-            fontsize=14,
-        )
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        fig.savefig(
-            results_path_plots
-            / f"traveltime_{service['service_type']}_{search_window}.png",
-            dpi=300,
-            bbox_inches="tight",
-        )
-        plt.show()
-        plt.close()
+map_arrival_times_one_plot(
+    arrival_times,
+    search_windows,
+    services,
+    walk_speed,
+    study_area,
+    label="wait_time_dest_min",
+    crs=crs,
+    arrival_date="2025-04-22",
+)
 
 
 # %%
 
 # DURATION - all services in one plot
+
+# TODO: Make this function
+# TODO: also repeat for wait times
 
 # Number of services (assumed to be 9)
 n_cols = 3
@@ -326,103 +482,33 @@ for search_window in search_windows:
         plt.show()
         plt.close()
 
+
 # %%
+
+# DURATION - all arrival times in one plot
+
+plot_histograms_compare_arrival_times(
+    results,
+    arrival_times,
+    search_windows,
+    services,
+    walk_speed,
+    column="duration_min",
+    arrival_date="2025-04-22",
+    label="duration",
+)
+
 # WAITTIME - all arrival times in one plot
 
-study_area = gpd.read_file(study_area_fp)
+plot_histograms_compare_arrival_times(
+    results,
+    arrival_times,
+    search_windows,
+    services,
+    walk_speed,
+    column="wait_time_dest_min",
+    arrival_date="2025-04-22",
+    label="waittime",
+)
 
-# Number of services (assumed to be 9)
-n_cols = 3
-n_rows = math.ceil(len(arrival_times) / n_cols)
-
-for search_window in search_windows:
-
-    for service in services:
-
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 15))
-        axes = axes.flatten()
-
-        for idx, arrival_time in enumerate(arrival_times):
-
-            for i in range(1, int(service["n_neighbors"]) + 1):
-
-                dataset = f"{service['service_type']}_{i}_{search_window}_{walk_speed}_{arrival_time}"
-                dataset = dataset.replace(":", "-").replace(".", "-")
-                tabelname = dataset.replace("-", "_")
-
-                results = otp_con.execute(f"SELECT * FROM {tabelname}").df()
-
-                results_gdf = gpd.GeoDataFrame(
-                    results,
-                    geometry=gpd.points_from_xy(
-                        results.from_lon, results.from_lat, crs="EPSG:4326"
-                    ),
-                )
-                results_gdf.to_crs(crs, inplace=True)
-
-                results_gdf.dropna(subset=["duration"], inplace=True)
-
-                ax = axes[idx]
-
-                # arrival_deadline = pd.to_datetime(
-                #     f"{config_model['travel_date']} {arrival_time}"
-                # )
-                arrival_deadline = pd.to_datetime(f"2025-04-22 {arrival_time}")
-                results_gdf["duration_min"] = results_gdf["duration"] / 60
-
-                results_gdf["arrival_time"] = pd.to_datetime(
-                    results_gdf["startTime"]
-                ) + pd.to_timedelta(results_gdf["duration_min"], unit="m")
-
-                results_gdf["wait_time_dest"] = (
-                    arrival_deadline - results_gdf["arrival_time"]
-                )
-
-                results_gdf["wait_time_dest_min"] = (
-                    results_gdf["wait_time_dest"].dt.total_seconds() / 60
-                )
-
-                study_area.plot(ax=ax, color="white", edgecolor="grey", linewidth=0.5)
-                results_gdf.plot(
-                    ax=ax,
-                    column="wait_time_dest_min",
-                    cmap="viridis",
-                    markersize=3,
-                    legend=True,
-                    legend_kwds={
-                        "label": "Waittime at destination (m)",
-                        "shrink": 0.6,
-                    },
-                )
-
-                ax.set_axis_off()
-                ax.set_title(
-                    f"{arrival_time} (k={i})",
-                    fontsize=9,
-                )
-
-                break  # Only plot for the first k (remove this if you want multiple neighbors plotted)
-
-        # Remove unused subplots if services < subplot slots
-        for j in range(len(arrival_times), len(axes)):
-            fig.delaxes(axes[j])
-
-        fig.suptitle(
-            f"{service['service_type'].title().replace('_',' ')} - Search Window: {search_window}",
-            fontsize=14,
-        )
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        fig.savefig(
-            results_path_plots
-            / f"waittime_{service['service_type']}_{search_window}.png",
-            dpi=300,
-            bbox_inches="tight",
-        )
-        plt.show()
-        plt.close()
-
-# %%
-# TODO: Make histograms instead of maps
-# small multiples of histograms of duration and wait time for each service type, search window, and arrival time combination
-# Add note with number of connected and disconnected points
 # %%
