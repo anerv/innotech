@@ -9,9 +9,7 @@ import duckdb
 from src.helper_functions import process_adresses, get_geo_address_sample
 import geopandas as gpd
 import time
-import matplotlib.pyplot as plt
-from IPython.display import display
-import math
+
 
 # Define the path to the config.yml file
 script_path = Path(__file__).resolve()
@@ -180,107 +178,4 @@ for search_window in search_windows:
 
 results_df = pd.DataFrame(results_parameters)
 results_df.to_csv(results_path_data / "results.csv", index=False)
-# %%
-
-# Make a pivot table for results data
-values = ["no_connection_count", "no_connection_percentage"]
-
-for value in values:
-
-    # Create a pivot table for results data
-    results_pivot = results_df.pivot_table(
-        index=["service_type"],
-        columns=["search_window", "arrival_time"],
-        values=[value],
-    )
-
-    # Save the pivot table to a CSV file
-    results_pivot.to_csv(results_path_data / f"results_pivot_{value}.csv")
-
-    styled_pivot = results_pivot.style.set_table_styles(
-        [
-            {"selector": "th", "props": [("font-weight", "bold")]},
-            {"selector": "td:hover", "props": [("background-color", "#FFFACD")]},
-        ]
-    ).format("{:.2f}")
-
-    # Display the styled pivot table
-    display(styled_pivot)
-
-# %%
-# Compute and plot average time elapsed for each service type, search window, and arrival time combination
-avg_time_elapsed = (
-    results_df.groupby(["search_window", "arrival_time"])["time_elapsed"]
-    .mean()
-    .reset_index()
-)
-display(avg_time_elapsed)
-# %%
-
-# Plot connected and disconnected points for each service type, search window, and arrival time combination
-study_area = gpd.read_file(study_area_fp)
-
-# Number of services (assumed to be 9)
-n_services = len(services)
-n_cols = 3
-n_rows = math.ceil(n_services / n_cols)
-
-for search_window in search_windows:
-    for arrival_time in arrival_times:
-
-        # Create one figure per (search_window, arrival_time)
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 15))
-        axes = axes.flatten()
-
-        for idx, service in enumerate(services):
-
-            for i in range(1, int(service["n_neighbors"]) + 1):
-
-                dataset = f"{service['service_type']}_{i}_{search_window}_{walk_speed}_{arrival_time}"
-                dataset = dataset.replace(":", "-").replace(".", "-")
-                tabelname = dataset.replace("-", "_")
-
-                results = otp_con.execute(f"SELECT * FROM {tabelname}").df()
-
-                results_gdf = gpd.GeoDataFrame(
-                    results,
-                    geometry=gpd.points_from_xy(
-                        results.from_lon, results.from_lat, crs="EPSG:4326"
-                    ),
-                )
-                results_gdf.to_crs(crs, inplace=True)
-
-                ax = axes[idx]
-
-                study_area.plot(ax=ax, color="white", edgecolor="grey", linewidth=0.5)
-                results_gdf.plot(ax=ax, color="black", markersize=1)
-                results_gdf[results_gdf.duration.isna()].plot(
-                    ax=ax, color="red", markersize=3
-                )
-
-                ax.set_axis_off()
-                ax.set_title(
-                    f"{service['service_type'].title().replace("_"," ")} (k={i})",
-                    fontsize=9,
-                )
-
-                break  # Only plot for the first k (remove this if you want multiple neighbors plotted)
-
-        # Remove unused subplots if services < subplot slots
-        for j in range(len(services), len(axes)):
-            fig.delaxes(axes[j])
-
-        fig.suptitle(
-            f"Search Window: {search_window}, Arrival Time: {arrival_time}", fontsize=14
-        )
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        fig.savefig(
-            results_path_plots
-            / f"connections_{search_window}_{arrival_time.replace(":","-")}.png",
-            dpi=300,
-            bbox_inches="tight",
-        )
-        plt.show()
-        plt.close()
-
 # %%
