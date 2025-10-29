@@ -26,6 +26,9 @@ study_area_config:
     id_column: "kommunekode" # The ID column used to identify the municipality in the data
 
 
+# Zone data for urban/rural classification
+zone_fp: "../data/input/byzoner/zonekort_dmp.parquet" 
+
 # CVR data
 cvr_address_input_fp: "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
 cvr_brancher_input_fp: "../data/input/cvr/CVR_V1_Branche_TotalDownload_csv_Current_8.csv"
