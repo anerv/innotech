@@ -21,7 +21,8 @@ for f in data_folders:
 input_base = "data/input"
 processed_base = "data/processed"
 
-input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit", "osm"]
+input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit", "osm", "byzoner"]
+
 processed_subfolders = [
     "cvr",
     "adresser",
