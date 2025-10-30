@@ -2,7 +2,7 @@
 
 import os
 
-parent_folders = ["data", "results"]
+parent_folders = ["data", "results", "results_rural"]
 
 for f in parent_folders:
     if not os.path.exists(f):
@@ -51,6 +51,12 @@ for f in result_subfolders:
         os.mkdir(os.path.join("results", f))
 
         print("Successfully created folder: " + os.path.join("results", f))
+
+for f in result_subfolders:
+    if not os.path.exists(os.path.join("results_rural", f)):
+        os.mkdir(os.path.join("results_rural", f))
+
+        print("Successfully created folder: " + os.path.join("results_rural", f))
 
 
 # illustration folder
