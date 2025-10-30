@@ -26,6 +26,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
 
     crs = parsed_yaml_file["crs"]
 
+    filter_rural = parsed_yaml_file["filter_rural_addresses"]
+
 
 # %%
 
@@ -111,21 +113,22 @@ addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
 # Assign rural/urban based on zone data
 
-zones = gpd.read_parquet(zone_fp)
-urban_zones = zones[zones["zonestatus"] == "Byzone"]
+if filter_rural:
 
+    zones = gpd.read_parquet(zone_fp)
+    urban_zones = zones[zones["zonestatus"] == "Byzone"]
 
-addresses_with_geoms = addresses_with_geoms.sjoin(
-    urban_zones[["geometry", "zonestatus"]], how="left", predicate="within"
-)
+    addresses_with_geoms = addresses_with_geoms.sjoin(
+        urban_zones[["geometry", "zonestatus"]], how="left", predicate="within"
+    )
 
-addresses_with_geoms["urban_rural"] = addresses_with_geoms["zonestatus"].apply(
-    lambda x: "urban" if x == "Byzone" else "rural"
-)
+    addresses_with_geoms["urban_rural"] = addresses_with_geoms["zonestatus"].apply(
+        lambda x: "urban" if x == "Byzone" else "rural"
+    )
 
-addresses_with_geoms.drop(columns=["zonestatus", "index_right"], inplace=True)
+    addresses_with_geoms.drop(columns=["zonestatus", "index_right"], inplace=True)
 
-addresses_with_geoms.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
+    addresses_with_geoms.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
 
 # %%
 
