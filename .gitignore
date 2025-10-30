@@ -12,6 +12,7 @@ __pycache__/
 results/*
 data/input/*
 data/processed/*
+results_rural/*
 
 illustrations/*.png
 illustrations/*.parquet
