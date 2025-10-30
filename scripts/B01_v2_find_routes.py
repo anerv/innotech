@@ -66,6 +66,8 @@ for arrival_time in arrival_times:
 
     print(f"Arrival time: {arrival_time}")
 
+    arrival_string = arrival_time.replace(":", "_")
+
     for service in services:
         for i in range(1, int(service["n_neighbors"]) + 1):
             dataset = f"{service['service_type']}_{i}"
@@ -91,7 +93,7 @@ for arrival_time in arrival_times:
             tabelname = dataset.replace("-", "_")
             otp_con.execute(
                 f"""
-                    COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_{arrival_time}_otp.parquet' (FORMAT 'parquet')
+                    COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_{arrival_string}_otp.parquet' (FORMAT 'parquet')
                 """
             )
 
@@ -101,6 +103,8 @@ for arrival_time in arrival_times:
 
     print(f"Arrival time: {arrival_time}")
 
+    arrival_string = arrival_time.replace(":", "_")
+
     for service in services:
         for i in range(1, int(service["n_neighbors"]) + 1):
             dataset = f"{service['service_type']}_{i}"
@@ -109,7 +113,7 @@ for arrival_time in arrival_times:
             print(f"Loading results for {dataset}...")
 
             results = pd.read_parquet(
-                f"{results_path}/{dataset}_{arrival_time}_otp.parquet"
+                f"{results_path}/{dataset}_{arrival_string}_otp.parquet"
             )
 
             input_data = pd.read_parquet(f"{data_path}/{dataset}.parquet")
@@ -121,7 +125,8 @@ for arrival_time in arrival_times:
             ]
 
             input_data_no_solution.to_parquet(
-                f"{data_path}/{dataset}_second_run.parquet", index=False
+                f"{data_path}/{dataset}_second_run.parquet",
+                index=False,
             )
 
             print(
@@ -153,7 +158,7 @@ for arrival_time in arrival_times:
             tabelname = dataset.replace("-", "_")
             otp_con.execute(
                 f"""
-                COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_{arrival_time}_otp.parquet' (FORMAT 'parquet')
+                COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_otp.parquet' (FORMAT 'parquet')
             """
             )
 
@@ -186,7 +191,7 @@ for arrival_time in arrival_times:
 
             # Export the combined results
             combined_results.to_parquet(
-                f"{results_path}/{dataset}_otp.parquet", index=False
+                f"{results_path}/{dataset}_{arrival_string}_otp.parquet", index=False
             )
 
             # remove exported files from second run
