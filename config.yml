@@ -21,7 +21,7 @@ study_area_config:
     - "0329"
     #- "Region Sjælland" # or code
     # if more than one region/municipality is wanted, add multiple names/codes here as a list
-    id_column: "navn"
+    id_column: "kommunekode"
   municipalities:
     inputpath: "../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg" 
     outputpath: "../data/processed/adm_boundaries/municipalities.parquet"
