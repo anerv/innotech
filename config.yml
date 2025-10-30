@@ -1,5 +1,7 @@
 # This is a configuration file for the service location model.
 
+filter_rural_addresses: true  # Whether to filter addresses to only rural areas when preparing BBR address data 
+
 # All data referenced under INPUT DATA must be downloaded and placed in the data directory. Update paths and file names as needed.
 # Additionally, transit data in the NeTEx-format must be downloaded and placed in the otp directory.
 
@@ -196,7 +198,7 @@ otp_results : "otp_results.db" # The persistant duckdb  where the OTP results ar
 
 # OBS: The date must be within the valid time range in the downloaded NeTEx data
 # For valid date, see one of the included HTML files in the otp/netex directory (check for dates in this pattern: <FromDate>202X-XX-XXT00:00:00</FromDate><ToDate>202X-XX-XXT00:00:00</ToDate>)
-travel_date : "2025-04-25" # The date used for the OTP query in the format YYYY-MM-DD
+travel_date : "2025-10-30" # The date used for the OTP query in the format YYYY-MM-DD
 
 
 # Filepaths for input data when calculating the travel matrix in the nearest.py (to and from)
