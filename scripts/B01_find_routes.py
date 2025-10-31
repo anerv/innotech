@@ -49,7 +49,7 @@ services = config_model["services"]
 
 for service in services:
 
-    arrival_times = service["arrival_times"]
+    arrival_times = service["arrival_time"]
 
     for i in range(1, int(service["n_neighbors"]) + 1):
 
@@ -95,7 +95,7 @@ services = config_model["services"]
 
 for service in services:
 
-    arrival_times = service["arrival_times"]
+    arrival_times = service["arrival_time"]
 
     for i in range(1, int(service["n_neighbors"]) + 1):
 
@@ -103,12 +103,14 @@ for service in services:
 
         for arrival_time in arrival_times:
 
+            print("************************************")
+
             results_filepath = (
                 results_path / f"{dataset}_{arrival_time.replace(':','_')}_otp.parquet"
             )
 
             # Load the results
-            print(f"Loading results for {dataset}...")
+            # print(f"Loading results for {dataset}...")
 
             results = pd.read_parquet(results_filepath)
 
@@ -120,16 +122,22 @@ for service in services:
                 )
             ]
 
+            if len(input_data_no_solution) == 0:
+                print(
+                    f"All addresses have a solution for {dataset} with arrival time {arrival_time}. Skipping rerun."
+                )
+                continue
+
             input_data_no_solution.to_parquet(
                 f"{data_path}/{dataset}_second_run.parquet", index=False
             )
 
             print(
-                f"Found {input_data_no_solution.shape[0]} addresses with no solution in the first run."
+                f"Found {input_data_no_solution.shape[0]} addresses with no solution in the first run for {dataset} with arrival time {arrival_time}."
             )
 
             print(
-                f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size} and search window {search_window} seconds"
+                f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size}, arrival time {arrival_time}, and search window {search_window} seconds"
             )
 
             dataset = f"{dataset}_second_run"  # Update dataset name for second run # no need to change arrival time as this is overwritten in every run
@@ -164,7 +172,7 @@ for service in services:
             results_second_run = pd.read_parquet(results_filepath)
 
             print(
-                f"Found {results_second_run[results_second_run.duration.notna()].shape[0]} results in the second run for {dataset}."
+                f"Found {results_second_run[results_second_run.duration.notna()].shape[0]} results in the second run for {dataset}, arrival time {arrival_time}."
             )
 
             # Combine the results
@@ -188,8 +196,11 @@ for service in services:
             combined_results.to_parquet(results_filepath, index=False)
 
             # remove exported files from second run
-            os.remove(f"{results_path}/{dataset}_second_run_otp.parquet")
-            os.remove(f"{data_path}/{dataset}_second_run.parquet")
+            if os.path.exists(f"{results_path}/{dataset}_second_run_otp.parquet"):
+                os.remove(f"{results_path}/{dataset}_second_run_otp.parquet")
+
+            if os.path.exists(f"{data_path}/{dataset}_second_run.parquet"):
+                os.remove(f"{data_path}/{dataset}_second_run.parquet")
 
 
 # %%
