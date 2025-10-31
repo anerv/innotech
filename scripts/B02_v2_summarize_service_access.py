@@ -91,7 +91,7 @@ for arrival_time in arrival_times:
             df.loc[df["source_id"] == df["target_id"], "waitingTime"] = 0
             df.loc[df["source_id"] == df["target_id"], "walkDistance"] = 0
             df.loc[df["source_id"] == df["target_id"], "startTime"] = (
-                config_model["travel_date"] + " " + service["arival_time"]
+                config_model["travel_date"] + " " + service["arrival_time"]
             )
 
             # Convert duration to minutes

@@ -78,7 +78,7 @@ for arrival_time in arrival_times:
             process_adresses(
                 dataset,
                 sample_size,
-                arrival_time,  # service["arival_time"],
+                arrival_time,  # service["arrival_time"],
                 date,
                 walk_speed,
                 search_window_first_run,
@@ -143,7 +143,7 @@ for arrival_time in arrival_times:
             process_adresses(
                 dataset,
                 sample_size,
-                arrival_time,  # service["arival_time"],
+                arrival_time,  # service["arrival_time"],
                 date,
                 walk_speed,
                 search_window,

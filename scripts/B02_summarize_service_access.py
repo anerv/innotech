@@ -42,186 +42,200 @@ address_points = gpd.read_parquet(config_model["addresses_fp_all"])
 services = config_model["services"]
 
 # %%
+
+# TODO: update all result paths to include arrival time in filename
+# TODO: figure out what to do with summary step
+# TODO: handle plotting
+
+
 summaries = []
 
 
 for service in services:
 
+    arrival_times = service["arrival_times"]
+
     for i in range(1, int(service["n_neighbors"]) + 1):
+
         dataset = f"{service['service_type']}_{i}"
         # Process each dataset
 
         print("-" * 40)
         print(f"Processing result dataset: {dataset}")
-        fp = results_path / f"data/{dataset}_otp.parquet"
-        if not fp.exists():
-            print(f"File {fp} does not exist. Skipping.")
-            continue
-        df = pd.read_parquet(fp)
-        print(f"Loaded {len(df)} rows from {fp}")
 
-        # Check for duplicates
-        if df.duplicated(subset=["source_id", "target_id"]).any():
-            print(f"Duplicates found in {dataset}. Dropping duplicates.")
-            df = df.drop_duplicates(subset=["source_id", "target_id"])
+        for arrival_time in arrival_times:
 
-        # Fill out rows where source and target are the same
-        df.loc[df["source_id"] == df["target_id"], "duration"] = 0
-        df.loc[df["source_id"] == df["target_id"], "waitingTime"] = 0
-        df.loc[df["source_id"] == df["target_id"], "walkDistance"] = 0
-        df.loc[df["source_id"] == df["target_id"], "startTime"] = (
-            config_model["travel_date"] + " " + service["arival_time"]
-        )
+            fp = results_path / f"data/{dataset}_{arrival_time}_otp.parquet"
+            if not fp.exists():
+                print(f"File {fp} does not exist. Skipping.")
+                continue
+            df = pd.read_parquet(fp)
+            print(f"Loaded {len(df)} rows from {fp}")
 
-        # Convert duration to minutes
-        df["duration_min"] = df["duration"] / 60
+            # Check for duplicates
+            if df.duplicated(subset=["source_id", "target_id"]).any():
+                print(f"Duplicates found in {dataset}. Dropping duplicates.")
+                df = df.drop_duplicates(subset=["source_id", "target_id"])
 
-        df["startTime"] = pd.to_datetime(df["startTime"]).dt.strftime("%Y-%m-%d %H:%M")
-
-        df["arrival_time"] = pd.to_datetime(df["startTime"]) + pd.to_timedelta(
-            df["duration_min"], unit="m"
-        )
-
-        arrival_deadline = pd.to_datetime(
-            f"{config_model['travel_date']} {service['arival_time']}"
-        )
-
-        # check that all arrival times are less than or equal to the arrival deadline
-        if (df["arrival_time"] > arrival_deadline).any():
-            print(
-                f"Warning: Some arrival times in {dataset} exceed the deadline of {arrival_deadline}."
+            # Fill out rows where source and target are the same
+            df.loc[df["source_id"] == df["target_id"], "duration"] = 0
+            df.loc[df["source_id"] == df["target_id"], "waitingTime"] = 0
+            df.loc[df["source_id"] == df["target_id"], "walkDistance"] = 0
+            df.loc[df["source_id"] == df["target_id"], "startTime"] = (
+                config_model["travel_date"] + " " + service["arrival_time"]
             )
 
-        result_count = df[df["duration"].notna()].shape[0]
-        print(f"{result_count} solutions found in {dataset} with {len(df)} rows.")
+            # Convert duration to minutes
+            df["duration_min"] = df["duration"] / 60
 
-        # Count sources with no results
-        no_results_count = df[df["duration"].isna()].shape[0]
-        if no_results_count > 0:
-            print(
-                f"{no_results_count} sources have no results in {dataset}. This may indicate that the search window was too small or that no transit solution is available."
+            df["startTime"] = pd.to_datetime(df["startTime"]).dt.strftime(
+                "%Y-%m-%d %H:%M"
             )
 
-        ave_duration = df["duration_min"].mean()
-        print(f"Average trip duration for {dataset}: {ave_duration:.2f} minutes")
+            df["arrival_time"] = pd.to_datetime(df["startTime"]) + pd.to_timedelta(
+                df["duration_min"], unit="m"
+            )
 
-        df["wait_time_dest"] = arrival_deadline - df["arrival_time"]
-        df["wait_time_dest_min"] = df["wait_time_dest"].dt.total_seconds() / 60
-        ave_wait_time = df["wait_time_dest_min"].mean()
-        print(
-            f"Average wait time at destination for {dataset}: {ave_wait_time:.2f} minutes"
-        )
+            arrival_deadline = pd.to_datetime(
+                f"{config_model['travel_date']} {service['arrival_time']}"
+            )
 
-        df["total_time_min"] = df["duration_min"] + df["wait_time_dest_min"]
+            # check that all arrival times are less than or equal to the arrival deadline
+            if (df["arrival_time"] > arrival_deadline).any():
+                print(
+                    f"Warning: Some arrival times in {dataset} exceed the deadline of {arrival_deadline}."
+                )
 
-        # extract modes
-        df = unpack_modes_from_json(df, "mode_durations_json")
+            result_count = df[df["duration"].notna()].shape[0]
+            print(f"{result_count} solutions found in {dataset} with {len(df)} rows.")
 
-        df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
+            # Count sources with no results
+            no_results_count = df[df["duration"].isna()].shape[0]
+            if no_results_count > 0:
+                print(
+                    f"{no_results_count} sources have no results in {dataset}. This may indicate that the search window was too small or that no transit solution is available."
+                )
 
-        # Export min, mean, max, and median duration and wait time
-        summary = {
-            "dataset": dataset,
-            "min_duration": float(f"{df['duration_min'].min():.2f}"),
-            "mean_duration": float(f"{df['duration_min'].mean():.2f}"),
-            "max_duration": float(f"{df['duration_min'].max():.2f}"),
-            "median_duration": float(f"{df['duration_min'].median():.2f}"),
-            "min_wait_time": float(f"{df['wait_time_dest_min'].min():.2f}"),
-            "mean_wait_time": float(f"{df['wait_time_dest_min'].mean():.2f}"),
-            "max_wait_time": float(f"{df['wait_time_dest_min'].max():.2f}"),
-            "median_wait_time": float(f"{df['wait_time_dest_min'].median():.2f}"),
-            "median_transfers": int(df["transfers"].median()),
-            "max_transfers": int(df["transfers"].max()),
-        }
+            ave_duration = df["duration_min"].mean()
+            print(f"Average trip duration for {dataset}: {ave_duration:.2f} minutes")
 
-        summaries.append(summary)
+            df["wait_time_dest"] = arrival_deadline - df["arrival_time"]
+            df["wait_time_dest_min"] = df["wait_time_dest"].dt.total_seconds() / 60
+            ave_wait_time = df["wait_time_dest_min"].mean()
+            print(
+                f"Average wait time at destination for {dataset}: {ave_wait_time:.2f} minutes"
+            )
 
-        # export to geoparquet
-        all_columns = df.columns.tolist()
-        keep_cols = [
-            "source_id",
-            "target_id",
-            "startTime",
-            "arrival_time",
-            "waitingTime",
-            "walkDistance",
-            "abs_dist",
-            "duration_min",
-            "wait_time_dest_min",
-            "total_time_min",
-            "transfers",
-            "geometry",
-        ]
-        keep_cols.extend([col for col in all_columns if col.endswith("_duration")])
+            df["total_time_min"] = df["duration_min"] + df["wait_time_dest_min"]
 
-        df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
-        gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-        gdf.to_crs(crs, inplace=True)
-        gdf[keep_cols].to_parquet(
-            results_path / f"data/{dataset}_otp_geo.parquet",
-            index=False,
-            engine="pyarrow",
-        )
+            # extract modes
+            df = unpack_modes_from_json(df, "mode_durations_json")
 
-        df.drop(columns=["geometry"], inplace=True)
-        address_travel_times = pd.merge(
-            df,
-            address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
-            left_on="source_id",
-            right_on="adresseIdentificerer",
-            how="left",
-        )
+            df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
 
-        address_travel_times.drop_duplicates(inplace=True)
+            # Export min, mean, max, and median duration and wait time
+            summary = {
+                "dataset": dataset,
+                "min_duration": float(f"{df['duration_min'].min():.2f}"),
+                "mean_duration": float(f"{df['duration_min'].mean():.2f}"),
+                "max_duration": float(f"{df['duration_min'].max():.2f}"),
+                "median_duration": float(f"{df['duration_min'].median():.2f}"),
+                "min_wait_time": float(f"{df['wait_time_dest_min'].min():.2f}"),
+                "mean_wait_time": float(f"{df['wait_time_dest_min'].mean():.2f}"),
+                "max_wait_time": float(f"{df['wait_time_dest_min'].max():.2f}"),
+                "median_wait_time": float(f"{df['wait_time_dest_min'].median():.2f}"),
+                "median_transfers": int(df["transfers"].median()),
+                "max_transfers": int(df["transfers"].max()),
+            }
 
-        assert (
-            address_travel_times["adgangspunkt"].notna().all()
-        ), "Some travel time results were not matched with an address. Please check the address data."
+            summaries.append(summary)
 
-        address_travel_times = gpd.GeoDataFrame(
-            address_travel_times,
-            geometry="geometry",
-            crs=crs,
-        )
-
-        address_travel_times[keep_cols].to_parquet(
-            results_path / f"data/{dataset}_addresses_otp_geo.parquet",
-            index=False,
-            engine="pyarrow",
-        )
-
-        # get travel times for all unique addresses - includes multiple data points for the same locations for apartment buildings etc.
-        all_addresses_travel_times = pd.merge(
-            address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
-            address_travel_times,
-            right_on="adgangspunkt",
-            left_on="adgangspunkt",
-            how="left",
-            suffixes=("", "_travel_times"),
-        )
-
-        all_addresses_travel_times = all_addresses_travel_times[
-            all_addresses_travel_times.source_id.notna()
-        ]
-
-        keep_cols.extend(
-            [
-                "adresseIdentificerer",
-                "adgangspunkt",
+            # export to geoparquet
+            all_columns = df.columns.tolist()
+            keep_cols = [
+                "source_id",
+                "target_id",
+                "startTime",
+                "arrival_time",
+                "waitingTime",
+                "walkDistance",
+                "abs_dist",
+                "duration_min",
+                "wait_time_dest_min",
+                "total_time_min",
+                "transfers",
+                "geometry",
             ]
-        )
+            keep_cols.extend([col for col in all_columns if col.endswith("_duration")])
 
-        all_addresses_travel_times = gpd.GeoDataFrame(
-            all_addresses_travel_times[keep_cols],
-            geometry="geometry",
-            crs=crs,
-        )
+            df["geometry"] = gpd.points_from_xy(df["from_lon"], df["from_lat"])
+            gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+            gdf.to_crs(crs, inplace=True)
+            gdf[keep_cols].to_parquet(
+                results_path / f"data/{dataset}_{arrival_time}_otp_geo.parquet",
+                index=False,
+                engine="pyarrow",
+            )
 
-        all_addresses_travel_times.to_parquet(
-            results_path / f"data/{dataset}_addresses_all_otp_geo.parquet",
-            index=False,
-            engine="pyarrow",
-        )
+            df.drop(columns=["geometry"], inplace=True)
+            address_travel_times = pd.merge(
+                df,
+                address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
+                left_on="source_id",
+                right_on="adresseIdentificerer",
+                how="left",
+            )
+
+            address_travel_times.drop_duplicates(inplace=True)
+
+            assert (
+                address_travel_times["adgangspunkt"].notna().all()
+            ), "Some travel time results were not matched with an address. Please check the address data."
+
+            address_travel_times = gpd.GeoDataFrame(
+                address_travel_times,
+                geometry="geometry",
+                crs=crs,
+            )
+
+            address_travel_times[keep_cols].to_parquet(
+                results_path / f"data/{dataset}_addresses_otp_geo.parquet",
+                index=False,
+                engine="pyarrow",
+            )
+
+            # get travel times for all unique addresses - includes multiple data points for the same locations for apartment buildings etc.
+            all_addresses_travel_times = pd.merge(
+                address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
+                address_travel_times,
+                right_on="adgangspunkt",
+                left_on="adgangspunkt",
+                how="left",
+                suffixes=("", "_travel_times"),
+            )
+
+            all_addresses_travel_times = all_addresses_travel_times[
+                all_addresses_travel_times.source_id.notna()
+            ]
+
+            keep_cols.extend(
+                [
+                    "adresseIdentificerer",
+                    "adgangspunkt",
+                ]
+            )
+
+            all_addresses_travel_times = gpd.GeoDataFrame(
+                all_addresses_travel_times[keep_cols],
+                geometry="geometry",
+                crs=crs,
+            )
+
+            all_addresses_travel_times.to_parquet(
+                results_path / f"data/{dataset}_addresses_all_otp_geo.parquet",
+                index=False,
+                engine="pyarrow",
+            )
 
 
 # Convert summaries to DataFrame
@@ -282,6 +296,9 @@ styled_table
 
 
 # %%
+
+# TODO: include arrival time in filenames for plots
+# TODO: update plotting to handle multiple arrival times
 
 # load study area for plotting
 
