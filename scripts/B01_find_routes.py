@@ -48,125 +48,148 @@ otp_con = duckdb.connect(otp_db_fp)
 services = config_model["services"]
 
 for service in services:
+
+    arrival_times = service["arrival_times"]
+
     for i in range(1, int(service["n_neighbors"]) + 1):
+
         dataset = f"{service['service_type']}_{i}"
-        # Process each dataset
-        print(
-            f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size} and search window {search_window_first_run} seconds"
-        )
-        process_adresses(
-            dataset,
-            sample_size,
-            service["arival_time"],
-            date,
-            walk_speed,
-            search_window_first_run,
-            url,
-            data_path,
-            otp_con,
-            con,
-            chunk_size,
-            parallelism,
-        )
-        # Export to parquet
-        tabelname = dataset.replace("-", "_")
-        otp_con.execute(
-            f"""
-            COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_otp.parquet' (FORMAT 'parquet')
-        """
-        )
+
+        for arrival_time in arrival_times:
+
+            results_filepath = (
+                results_path / f"{dataset}_{arrival_time.replace(':','_')}_otp.parquet"
+            )
+
+            # Process each dataset
+            print(
+                f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size}, arrival time {arrival_time} and search window {search_window_first_run} seconds"
+            )
+            process_adresses(
+                dataset,
+                sample_size,
+                arrival_time,
+                date,
+                walk_speed,
+                search_window_first_run,
+                url,
+                data_path,
+                otp_con,
+                con,
+                chunk_size,
+                parallelism,
+            )
+            # Export to parquet
+            tabelname = dataset.replace("-", "_")
+            otp_con.execute(
+                f"""
+                COPY (SELECT * FROM {tabelname}) TO '{results_filepath}' (FORMAT 'parquet')
+            """
+            )
 
 # %%
+
+# Rerun analysis with larger search window for addresses with no solution found
 
 services = config_model["services"]
 
 for service in services:
+
+    arrival_times = service["arrival_times"]
+
     for i in range(1, int(service["n_neighbors"]) + 1):
+
         dataset = f"{service['service_type']}_{i}"
 
-        # Load the results
-        print(f"Loading results for {dataset}...")
+        for arrival_time in arrival_times:
 
-        results = pd.read_parquet(f"{results_path}/{dataset}_otp.parquet")
-
-        input_data = pd.read_parquet(f"{data_path}/{dataset}.parquet")
-
-        input_data_no_solution = input_data[
-            input_data["source_address_id"].isin(
-                results[results.duration.isna()]["source_id"]
+            results_filepath = (
+                results_path / f"{dataset}_{arrival_time.replace(':','_')}_otp.parquet"
             )
-        ]
 
-        input_data_no_solution.to_parquet(
-            f"{data_path}/{dataset}_second_run.parquet", index=False
-        )
+            # Load the results
+            print(f"Loading results for {dataset}...")
 
-        print(
-            f"Found {input_data_no_solution.shape[0]} addresses with no solution in the first run."
-        )
+            results = pd.read_parquet(results_filepath)
 
-        print(
-            f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size} and search window {search_window} seconds"
-        )
+            input_data = pd.read_parquet(f"{data_path}/{dataset}.parquet")
 
-        dataset = f"{dataset}_second_run"  # Update dataset name for second run
+            input_data_no_solution = input_data[
+                input_data["source_address_id"].isin(
+                    results[results.duration.isna()]["source_id"]
+                )
+            ]
 
-        # set this as input for the next run
-        process_adresses(
-            dataset,
-            sample_size,
-            service["arival_time"],
-            date,
-            walk_speed,
-            search_window,
-            url,
-            data_path,
-            otp_con,
-            con,
-            chunk_size,
-            parallelism,
-        )
-        # Export to parquet
-        tabelname = dataset.replace("-", "_")
-        otp_con.execute(
-            f"""
-            COPY (SELECT * FROM {tabelname}) TO '{results_path}/{dataset}_otp.parquet' (FORMAT 'parquet')
-        """
-        )
+            input_data_no_solution.to_parquet(
+                f"{data_path}/{dataset}_second_run.parquet", index=False
+            )
 
-        results_first_run = results[results.duration.notna()]
+            print(
+                f"Found {input_data_no_solution.shape[0]} addresses with no solution in the first run."
+            )
 
-        results_second_run = pd.read_parquet(f"{results_path}/{dataset}_otp.parquet")
+            print(
+                f"Processing {dataset} with sample size {sample_size}, chunk size {chunk_size} and search window {search_window} seconds"
+            )
 
-        print(
-            f"Found {results_second_run[results_second_run.duration.notna()].shape[0]} results in the second run for {dataset}."
-        )
+            dataset = f"{dataset}_second_run"  # Update dataset name for second run # no need to change arrival time as this is overwritten in every run
 
-        # Combine the results
-        combined_results = pd.concat(
-            [results_first_run, results_second_run], ignore_index=True
-        )
+            # set this as input for the next run
+            process_adresses(
+                dataset,
+                sample_size,
+                arrival_time,
+                date,
+                walk_speed,
+                search_window,
+                url,
+                data_path,
+                otp_con,
+                con,
+                chunk_size,
+                parallelism,
+            )
+            # Export to parquet . overwrite previous results
+            tabelname = dataset.replace("-", "_")
+            otp_con.execute(
+                f"""
+                COPY (SELECT * FROM {tabelname}) TO '{results_filepath}' (FORMAT 'parquet')
+            """
+            )
 
-        assert (
-            combined_results.shape[0]
-            == results_first_run.shape[0] + results_second_run.shape[0]
-        ), "Combined results do not match the expected number of rows"
+            # results from first run in memory
+            results_first_run = results[results.duration.notna()]
 
-        assert (
-            combined_results.source_id.is_unique
-        ), "Source IDs are not unique in combined results"
+            # reading new results from second run
+            results_second_run = pd.read_parquet(results_filepath)
 
-        # reset dataset name for export
-        dataset = f"{service['service_type']}_{i}"
+            print(
+                f"Found {results_second_run[results_second_run.duration.notna()].shape[0]} results in the second run for {dataset}."
+            )
 
-        # Export the combined results
-        combined_results.to_parquet(
-            f"{results_path}/{dataset}_otp.parquet", index=False
-        )
+            # Combine the results
+            combined_results = pd.concat(
+                [results_first_run, results_second_run], ignore_index=True
+            )
 
-        # remove exported files from second run
-        os.remove(f"{results_path}/{dataset}_second_run_otp.parquet")
-        os.remove(f"{data_path}/{dataset}_second_run.parquet")
+            assert (
+                combined_results.shape[0]
+                == results_first_run.shape[0] + results_second_run.shape[0]
+            ), "Combined results do not match the expected number of rows"
+
+            assert (
+                combined_results.source_id.is_unique
+            ), "Source IDs are not unique in combined results"
+
+            # reset dataset name for export
+            dataset = f"{service['service_type']}_{i}"
+
+            # Export the combined results
+            combined_results.to_parquet(results_filepath, index=False)
+
+            # remove exported files from second run
+            os.remove(f"{results_path}/{dataset}_second_run_otp.parquet")
+            os.remove(f"{data_path}/{dataset}_second_run.parquet")
 
 
 # %%
