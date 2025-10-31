@@ -64,7 +64,7 @@ cvr_destinations_all_fp:  "../data/processed/cvr/cvr-services-all.gpkg"
 #    - service_type: doctor-gp Used to name the service
 #      spatial_restriction_type: Used to define the type of spatial restriction on the service emmpty or null means no restriction
 #      n_neighbors: 1  The number of neighbors to consider when calculating the service location
-#      arival_time: "11:00" The time of arrival at the service location
+#      arrival_time: "11:00" The time of arrival at the service location
 #      nace_codes: The NACE codes used to identify the service location in the CVR data
 #       - 862100
 #      osm_tags: The OSM tags used to identify the service location in the OSM data
@@ -72,7 +72,12 @@ services:
     - service_type: doctor
       spatial_restriction_type: 
       n_neighbors: 1
-      arival_time: "11:00"
+      arrival_time: 
+      #  - "11:00"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       nace_codes:
         - 862100
       osm_tags:
@@ -84,7 +89,12 @@ services:
     - service_type: dentist
       spatial_restriction_type: 
       n_neighbors: 1
-      arival_time: "11:00"
+      arrival_time: 
+      #  - "11:00"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       nace_codes:
         - 862300
       osm_tags:
@@ -93,7 +103,12 @@ services:
 
     - service_type: pharmacy
       n_neighbors: 1
-      arival_time: "15:00"
+      arrival_time: 
+      #  - "15:00"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       spatial_restriction_type: 
       nace_codes:
         - 477300
@@ -102,7 +117,12 @@ services:
 
     - service_type: kindergarten_nursery
       n_neighbors: 1
-      arival_time: "7:45"
+      arrival_time: 
+      #  - "7:45"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       spatial_restriction_type: "municipality"
       nace_codes:
         - 889130
@@ -114,7 +134,12 @@ services:
 
     - service_type: school
       n_neighbors: 1
-      arival_time: "7:45"
+      arrival_time: 
+      #  - "7:45"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       spatial_restriction_type: "municipality"
       nace_codes:
         - 852010
@@ -123,7 +148,12 @@ services:
 
     - service_type: supermarket
       n_neighbors: 1
-      arival_time: "17:00"
+      arrival_time: 
+      #  - "17:00"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       spatial_restriction_type:
       nace_codes:
         - 471120 # Supermarked
@@ -136,7 +166,12 @@ services:
     - service_type: library 
       spatial_restriction_type: 
       n_neighbors: 1
-      arival_time: "16:00"
+      arrival_time: 
+      #  - "16:00"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       nace_codes:
         - 911100
       osm_tags:
@@ -145,7 +180,12 @@ services:
     - service_type: train_station
       spatial_restriction_type: 
       n_neighbors: 1
-      arival_time: "7:30"
+      arrival_time:
+      #  - "7:30"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       nace_codes:
         - 49
       osm_tags:
@@ -154,7 +194,12 @@ services:
     - service_type: sports_facility
       spatial_restriction_type:
       n_neighbors: 1
-      arival_time: "19:00"
+      arrival_time: 
+      #  - "19:00"
+        - "08:00"
+        - "12:00"
+        - "17:00"
+        - "21:00"
       nace_codes:
         - 93
       osm_tags:
