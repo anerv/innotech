@@ -43,29 +43,30 @@ services = config_model["services"]
 
 # %%
 
-# TODO: update all result paths to include arrival time in filename
-# TODO: figure out what to do with summary step
-# TODO: handle plotting
-
-
 summaries = []
-
 
 for service in services:
 
-    arrival_times = service["arrival_times"]
+    service_summaries = []
+
+    arrival_times = service["arrival_time"]
 
     for i in range(1, int(service["n_neighbors"]) + 1):
 
         dataset = f"{service['service_type']}_{i}"
         # Process each dataset
 
-        print("-" * 40)
-        print(f"Processing result dataset: {dataset}")
-
         for arrival_time in arrival_times:
 
-            fp = results_path / f"data/{dataset}_{arrival_time}_otp.parquet"
+            print("-" * 40)
+            print(
+                f"Processing result dataset: {dataset} with arrival time {arrival_time}"
+            )
+
+            fp = (
+                results_path
+                / f"data/{dataset}_{arrival_time.replace(":","_")}_otp.parquet"
+            )
             if not fp.exists():
                 print(f"File {fp} does not exist. Skipping.")
                 continue
@@ -82,7 +83,7 @@ for service in services:
             df.loc[df["source_id"] == df["target_id"], "waitingTime"] = 0
             df.loc[df["source_id"] == df["target_id"], "walkDistance"] = 0
             df.loc[df["source_id"] == df["target_id"], "startTime"] = (
-                config_model["travel_date"] + " " + service["arrival_time"]
+                config_model["travel_date"] + " " + arrival_time
             )
 
             # Convert duration to minutes
@@ -97,7 +98,7 @@ for service in services:
             )
 
             arrival_deadline = pd.to_datetime(
-                f"{config_model['travel_date']} {service['arrival_time']}"
+                f"{config_model['travel_date']} {arrival_time}"
             )
 
             # check that all arrival times are less than or equal to the arrival deadline
@@ -146,9 +147,10 @@ for service in services:
                 "median_wait_time": float(f"{df['wait_time_dest_min'].median():.2f}"),
                 "median_transfers": int(df["transfers"].median()),
                 "max_transfers": int(df["transfers"].max()),
+                "arrival_time": arrival_time,
             }
 
-            summaries.append(summary)
+            service_summaries.append(summary)
 
             # export to geoparquet
             all_columns = df.columns.tolist()
@@ -172,12 +174,15 @@ for service in services:
             gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
             gdf.to_crs(crs, inplace=True)
             gdf[keep_cols].to_parquet(
-                results_path / f"data/{dataset}_{arrival_time}_otp_geo.parquet",
+                results_path
+                / f"data/{dataset}_{arrival_time.replace(":","_")}_otp_geo.parquet",
                 index=False,
                 engine="pyarrow",
             )
 
+            # Merge travel times with address points to get original locations (not access points)
             df.drop(columns=["geometry"], inplace=True)
+
             address_travel_times = pd.merge(
                 df,
                 address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
@@ -199,7 +204,8 @@ for service in services:
             )
 
             address_travel_times[keep_cols].to_parquet(
-                results_path / f"data/{dataset}_addresses_otp_geo.parquet",
+                results_path
+                / f"data/{dataset}_{arrival_time.replace(":","_")}_addresses_otp_geo.parquet",
                 index=False,
                 engine="pyarrow",
             )
@@ -232,12 +238,29 @@ for service in services:
             )
 
             all_addresses_travel_times.to_parquet(
-                results_path / f"data/{dataset}_addresses_all_otp_geo.parquet",
+                results_path
+                / f"data/{dataset}_{arrival_time.replace(":","_")}_addresses_all_otp_geo.parquet",
                 index=False,
                 engine="pyarrow",
             )
 
+    summaries.append(service_summaries)
 
+# %%
+
+# TODO: update summary plotting
+
+# TODO: make one summary per service/neighbor combination with the duration, wait time etc. for each arrival time
+# TODO: make summary table with all services for each neighbor/arrival time combination
+# TODO: in all tables, highlight the best and worst values
+
+for service_summary in summaries:
+
+    # Convert to DataFrame
+    summary_df = pd.DataFrame(service_summary)
+
+
+# %%
 # Convert summaries to DataFrame
 summary_df = pd.DataFrame(summaries)
 summary_df.set_index("dataset", inplace=True)
@@ -297,9 +320,6 @@ styled_table
 
 # %%
 
-# TODO: include arrival time in filenames for plots
-# TODO: update plotting to handle multiple arrival times
-
 # load study area for plotting
 
 study_area = gpd.read_file(config_model["study_area_config"]["regions"]["outputpath"])
@@ -308,54 +328,66 @@ services = config_model["services"]
 
 for service in services:
 
+    arrival_times = service["arrival_time"]
+
     for i in range(1, int(service["n_neighbors"]) + 1):
+
         dataset = f"{service['service_type']}_{i}"
 
-        gdf = gpd.read_parquet(
-            results_path / f"data/{dataset}_addresses_otp_geo.parquet"
-        )
-        # Process each dataset
+        for arrival_time in arrival_times:
 
-        plot_columns = [
-            "duration_min",
-            "wait_time_dest_min",
-            "total_time_min",
-        ]
-
-        labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
-
-        attribution_text = "KDS, OpenStreetMap"
-        font_size = 10
-
-        for i, plot_col in enumerate(plot_columns):
-            fp = results_path / f"maps/{dataset}_{plot_col}.png"
-
-            label = dataset.rsplit("_", 1)[0]
-
-            title = f"{labels[i]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} by public transport"
-
-            plot_traveltime_results(
-                gdf,
-                plot_col,
-                study_area,
-                attribution_text,
-                font_size,
-                title,
-                fp,
+            gdf = gpd.read_parquet(
+                results_path
+                / f"data/{dataset}_{arrival_time.replace(":","_")}_addresses_otp_geo.parquet"
             )
+            # Process each dataset
 
-        no_results = gdf[(gdf["duration_min"].isna()) & (gdf.abs_dist > 0)].copy()
-        if not no_results.empty:
-            fp_no_results = results_path / f"maps/{dataset}_no_results.png"
-            title_no_results = f"Locations with no results for {dataset.split('_')[-1]}. nearest {label.replace("_", " ")} by public transport"
+            plot_columns = [
+                "duration_min",
+                "wait_time_dest_min",
+                "total_time_min",
+            ]
 
-            plot_no_connection(
-                no_results,
-                study_area,
-                attribution_text,
-                font_size,
-                title_no_results,
-                fp_no_results,
-            )
+            labels = ["Travel time (min)", "Wait time (min)", "Total duration (min)"]
+
+            attribution_text = "KDS, OpenStreetMap"
+            font_size = 10
+
+            for i, plot_col in enumerate(plot_columns):
+                fp = (
+                    results_path
+                    / f"maps/{dataset}_{arrival_time.replace(":","_")}_{plot_col}.png"
+                )
+
+                label = dataset.rsplit("_", 1)[0]
+
+                title = f"{labels[i]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} by public transport"
+
+                plot_traveltime_results(
+                    gdf,
+                    plot_col,
+                    study_area,
+                    attribution_text,
+                    font_size,
+                    title,
+                    fp,
+                )
+
+            no_results = gdf[(gdf["duration_min"].isna()) & (gdf.abs_dist > 0)].copy()
+            if not no_results.empty:
+                fp_no_results = (
+                    results_path
+                    / f"maps/{dataset}_{arrival_time.replace(":","_")}_no_results.png"
+                )
+                title_no_results = f"Locations with no results for {dataset.split('_')[-1]}. nearest {label.replace("_", " ")} by public transport"
+
+                plot_no_connection(
+                    no_results,
+                    study_area,
+                    attribution_text,
+                    font_size,
+                    title_no_results,
+                    fp_no_results,
+                )
 
 # %%
