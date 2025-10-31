@@ -37,6 +37,10 @@ region = administrative_boundaries[
     )
 ]
 
+assert (
+    len(region) > 0
+), "No matching region found in the administrative boundaries data. Check the study area configuration."
+
 region = region[["navn", "geometry"]]
 
 region.to_file(study_area_fp)
