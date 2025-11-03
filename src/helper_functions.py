@@ -22,6 +22,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import reduce
 from pathlib import Path
+from IPython.display import display
 
 ######################## OTP FUNCTIONS ########################
 
@@ -911,6 +912,179 @@ def highlight_min_traveltime(s):
     """
     is_min = s == s.min()
     return ["color: blue" if v else "" for v in is_min]
+
+
+def summarize_service_access_for_services(summaries, results_path):
+    """Summarize service access for each service type across arrival times."""
+
+    for service_summary in summaries:
+
+        # Convert to DataFrame
+        summary_df = pd.DataFrame(service_summary)
+
+        service = service_summary[0]["dataset"].rsplit("_", 1)[0]
+
+        # Pivot the DataFrame to have arrival times as rows and metrics as columns
+        pivot_df = summary_df.pivot(
+            index="arrival_time",
+            columns="dataset",
+            values=[
+                "mean_duration",
+                "max_duration",
+                "median_duration",
+                "mean_wait_time",
+                "max_wait_time",
+                "median_wait_time",
+                "median_transfers",
+                "max_transfers",
+            ],
+        )
+
+        pivot_df.columns = pivot_df.columns.droplevel("dataset")
+
+        columns_to_style = [
+            "mean_duration",
+            "max_duration",
+            "median_duration",
+            "mean_wait_time",
+            "max_wait_time",
+            "median_wait_time",
+            "median_transfers",
+            "max_transfers",
+        ]
+
+        styled_table = (
+            pivot_df.style.apply(
+                highlight_max_traveltime,
+                axis=0,
+                subset=(
+                    pivot_df.index,
+                    columns_to_style,
+                ),
+            )
+            .apply(
+                highlight_min_traveltime,
+                axis=0,
+                subset=(
+                    pivot_df.index,
+                    columns_to_style,
+                ),
+            )
+            .format("{:.2f}")
+            .set_table_styles(
+                [
+                    {"selector": "th", "props": [("font-weight", "bold")]},
+                ]
+            )
+            .set_properties(
+                **{"text-align": "left", "font-size": "12px", "width": "100px"}
+            )
+            .set_caption(
+                f"{service.title().replace("_", " ")}: Travel and wait times with public transport."
+            )
+            .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
+        )
+
+        pivot_df.to_csv(
+            results_path / f"data/{service}_access_summary.csv",
+            index=True,
+            float_format="%.2f",
+        )
+
+        styled_table.to_html(
+            results_path / f"data/{service}_access_summary.html",
+            table_attributes='style="width: 50%; border-collapse: collapse;"',
+        )
+
+        display(styled_table)
+
+
+def summarize_service_access_for_arrival_time(
+    summaries,
+    arrival_times,
+    results_path,
+    value_columns=[
+        "mean_duration",
+        "max_duration",
+        "median_duration",
+        "mean_wait_time",
+        "max_wait_time",
+        "median_wait_time",
+        "median_transfers",
+        "max_transfers",
+    ],
+):
+
+    for arrival_time in arrival_times:
+
+        # extract summaries for this arrival time
+
+        arrival_time_summaries = []
+
+        for service_summary in summaries:
+
+            for summary in service_summary:
+                if summary["arrival_time"] == arrival_time:
+                    arrival_time_summaries.append(summary)
+
+        # Convert to DataFrame
+        summary_df = pd.DataFrame(arrival_time_summaries)
+
+        # Pivot the DataFrame to have datasets as rows and metrics as columns
+        pivot_df = summary_df.pivot(
+            index="dataset",
+            columns="arrival_time",
+            values=value_columns,
+        )
+
+        pivot_df.columns = pivot_df.columns.droplevel("arrival_time")
+
+        pivot_df.to_csv(
+            results_path
+            / f"data/service_access_summary_{arrival_time.replace(':','_')}.csv",
+            index=True,
+            float_format="%.2f",
+        )
+
+        styled_table = (
+            pivot_df.style.apply(
+                highlight_max_traveltime,
+                axis=0,
+                subset=(
+                    pivot_df.index,
+                    value_columns,
+                ),
+            )
+            .apply(
+                highlight_min_traveltime,
+                axis=0,
+                subset=(
+                    pivot_df.index,
+                    value_columns,
+                ),
+            )
+            .format("{:.2f}")
+            .set_table_styles(
+                [
+                    {"selector": "th", "props": [("font-weight", "bold")]},
+                ]
+            )
+            .set_properties(
+                **{"text-align": "left", "font-size": "12px", "width": "100px"}
+            )
+            .set_caption(
+                f"Travel and wait times with public transport for arrival time {arrival_time}."
+            )
+            .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
+        )
+
+        styled_table.to_html(
+            results_path
+            / f"data/service_access_summary_{arrival_time.replace(':','_')}.html",
+            table_attributes='style="width: 50%; border-collapse: collapse;"',
+        )
+
+        display(styled_table)
 
 
 def plot_no_connection(

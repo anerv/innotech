@@ -6,6 +6,7 @@ import pandas as pd
 import geopandas as gpd
 import yaml
 from pathlib import Path
+from IPython.display import display
 import os
 import sys
 from src.helper_functions import (
@@ -15,6 +16,8 @@ from src.helper_functions import (
     transfers_from_json,
     plot_traveltime_results,
     plot_no_connection,
+    summarize_service_access_for_arrival_time,
+    summarize_service_access_for_services,
 )
 
 
@@ -248,77 +251,28 @@ for service in services:
 
 # %%
 
-# TODO: update summary plotting
+# Summarize arrival times across all services
 
-# TODO: make one summary per service/neighbor combination with the duration, wait time etc. for each arrival time
-# TODO: make summary table with all services for each neighbor/arrival time combination
-# TODO: in all tables, highlight the best and worst values
+all_arrival_times = set()
 
-for service_summary in summaries:
+for service in services:
+    arrival_times = service["arrival_time"]
+    all_arrival_times.update(arrival_times)
 
-    # Convert to DataFrame
-    summary_df = pd.DataFrame(service_summary)
+all_arrival_times = sorted(list(all_arrival_times))
+
+summarize_service_access_for_arrival_time(summaries, all_arrival_times, results_path)
+
+# %%
+
+# Summarize for each service across all arrival times
+
+summarize_service_access_for_services(summaries, results_path)
 
 
 # %%
-# Convert summaries to DataFrame
-summary_df = pd.DataFrame(summaries)
-summary_df.set_index("dataset", inplace=True)
 
-rows_to_style = [
-    "mean_duration",
-    "max_duration",
-    "median_duration",
-    "mean_wait_time",
-    "max_wait_time",
-    "median_wait_time",
-    "median_transfers",
-    "max_transfers",
-]
-
-
-styled_table = (
-    summary_df.T.style.apply(
-        highlight_max_traveltime,
-        axis=1,
-        subset=(
-            rows_to_style,
-            summary_df.T.columns,
-        ),  # style only these rows for all columns
-    )
-    .apply(
-        highlight_min_traveltime,
-        axis=1,
-        subset=(
-            rows_to_style,
-            summary_df.T.columns,
-        ),  # style only these rows for all columns
-    )
-    .format("{:.2f}")
-    .set_table_styles(
-        [
-            {"selector": "th", "props": [("font-weight", "bold")]},
-        ]
-    )
-    .set_properties(**{"text-align": "left", "font-size": "12px", "width": "100px"})
-    .set_caption("Travel times and wait times for public transport to nearest services")
-    .set_table_attributes('style="width: 50%; border-collapse: collapse;"')
-)
-
-
-summary_df.to_csv(
-    results_path / "data/service_access_summary.csv", index=True, float_format="%.2f"
-)
-
-styled_table.to_html(
-    results_path / "data/service_access_summary.html",
-    table_attributes='style="width: 50%; border-collapse: collapse;"',
-)
-
-styled_table
-
-
-# %%
+# Plot travel time results
 
 # load study area for plotting
 
@@ -327,8 +281,6 @@ study_area = gpd.read_file(config_model["study_area_config"]["regions"]["outputp
 services = config_model["services"]
 
 for service in services:
-
-    arrival_times = service["arrival_time"]
 
     for i in range(1, int(service["n_neighbors"]) + 1):
 
@@ -361,7 +313,7 @@ for service in services:
 
                 label = dataset.rsplit("_", 1)[0]
 
-                title = f"{labels[i]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} by public transport"
+                title = f"{labels[i]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} with arrival time {arrival_time}"
 
                 plot_traveltime_results(
                     gdf,
@@ -379,7 +331,7 @@ for service in services:
                     results_path
                     / f"maps/{dataset}_{arrival_time.replace(":","_")}_no_results.png"
                 )
-                title_no_results = f"Locations with no results for {dataset.split('_')[-1]}. nearest {label.replace("_", " ")} by public transport"
+                title_no_results = f"Locations with no results for {dataset.split('_')[-1]}. nearest {label.replace("_", " ")} with arrival time {arrival_time}"
 
                 plot_no_connection(
                     no_results,
@@ -391,3 +343,6 @@ for service in services:
                 )
 
 # %%
+# TODO:
+
+# plot kde of travel time distributions for each service, with a curve for each arrival time
