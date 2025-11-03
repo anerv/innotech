@@ -6,12 +6,13 @@ import pandas as pd
 import geopandas as gpd
 import yaml
 from pathlib import Path
-from IPython.display import display
 import os
 import sys
+import math
+import numpy as np
 from src.helper_functions import (
-    highlight_max_traveltime,
-    highlight_min_traveltime,
+    # highlight_max_traveltime,
+    # highlight_min_traveltime,
     unpack_modes_from_json,
     transfers_from_json,
     plot_traveltime_results,
@@ -269,7 +270,6 @@ summarize_service_access_for_arrival_time(summaries, all_arrival_times, results_
 
 summarize_service_access_for_services(summaries, results_path)
 
-
 # %%
 
 # Plot travel time results
@@ -290,7 +290,7 @@ for service in services:
 
             gdf = gpd.read_parquet(
                 results_path
-                / f"data/{dataset}_{arrival_time.replace(":","_")}_addresses_otp_geo.parquet"
+                / f"data/{dataset}_{arrival_time.replace(":","_")}_otp_geo.parquet"
             )
             # Process each dataset
 
@@ -343,6 +343,336 @@ for service in services:
                 )
 
 # %%
-# TODO:
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# plot kde of travel time distributions for each service, with a curve for each arrival time
+for service in services:
+
+    time_dist_ratios_all = {}
+
+    arrival_times = service["arrival_time"]
+
+    # for i in range(1, int(service["n_neighbors"]) + 1):
+
+    dataset = f"{service['service_type']}_{1}"
+
+    service_time_dist_ratios = {}
+
+    fig, axes = plt.subplots(1, len(arrival_times), figsize=(20, 6))
+
+    axes = axes.flatten()
+
+    for i, arrival_time in enumerate(arrival_times):
+
+        gdf = gpd.read_parquet(
+            results_path
+            / f"data/{dataset}_{arrival_time.replace(':','_')}_otp_geo.parquet"
+        )
+
+        gdf["time_distance_ratio"] = gdf["duration_min"] / gdf["abs_dist"]
+
+        service_time_dist_ratios["min"] = gdf.time_distance_ratio.min()
+        service_time_dist_ratios["max"] = gdf.time_distance_ratio.max()
+        service_time_dist_ratios["mean"] = gdf.time_distance_ratio.mean()
+        service_time_dist_ratios["median"] = gdf.time_distance_ratio.median()
+
+        time_dist_ratios_all[arrival_time] = service_time_dist_ratios
+
+        study_area.boundary.plot(ax=axes[i], color="black", linewidth=1)
+        gdf.plot(
+            ax=axes[i],
+            column="time_distance_ratio",
+            legend=True,
+            legend_kwds={"shrink": 0.5},
+            cmap="viridis",
+        )
+
+        # TODO: set color scale to be the same for all plots
+
+        axes[i].set_title(f"Arrival time {arrival_time}")
+        axes[i].set_axis_off()
+
+        plt.suptitle(
+            f"Travel time vs. distance ratio for nearest {service['service_type']} by arrival time",
+            fontsize=16,
+        )
+
+        plt.tight_layout()
+
+        plt.savefig(
+            results_path
+            / f"maps/{dataset}_travel_time_vs_distance_ratio_by_arrival_time.png",
+            dpi=300,
+        )
+
+    times = list(time_dist_ratios_all.keys())
+    mins = [v["min"] for v in time_dist_ratios_all.values()]
+    means = [v["mean"] for v in time_dist_ratios_all.values()]
+    medians = [v["median"] for v in time_dist_ratios_all.values()]
+    maxs = [v["max"] for v in time_dist_ratios_all.values()]
+
+    # Create line plot
+    plt.figure(figsize=(8, 5))
+    plt.plot(times, mins, marker="o", label="Min", linestyle="--", color="blue")
+    plt.plot(times, means, marker="o", label="Mean", linestyle="-", color="green")
+    plt.plot(times, medians, marker="o", label="Median", linestyle="-.", color="orange")
+    plt.plot(times, maxs, marker="o", label="Max", linestyle=":", color="red")
+
+    # Add labels and title
+    plt.title("Travel time/distance ratio for nearest " + service["service_type"])
+    plt.xlabel("Arrival Time")
+    plt.ylabel("Travel time/distance ratio")
+
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), frameon=False)
+    plt.grid(True)
+    sns.despine(bottom=True, left=True)
+    plt.tight_layout()
+    plt.savefig(
+        results_path
+        / f"plots/{dataset}_travel_time_vs_distance_ratio_summary_by_arrival_time.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.show()
+
+# %%
+
+all_stats_travel = {}
+all_stats_wait = {}
+
+for service in services:
+
+    arrival_times = service["arrival_time"]
+
+    dataset = f"{service['service_type']}_{1}"
+
+    stats_travel = {}
+    stats_wait = {}
+
+    for i, arrival_time in enumerate(arrival_times):
+
+        gdf = gpd.read_parquet(
+            results_path
+            / f"data/{dataset}_{arrival_time.replace(':','_')}_otp_geo.parquet"
+        )
+
+        # Compute summary stats
+        stats_travel[arrival_time] = {
+            "min": gdf["duration_min"].min(),
+            "mean": gdf["duration_min"].mean(),
+            "max": gdf["duration_min"].max(),
+        }
+        stats_wait[arrival_time] = {
+            "min": gdf["wait_time_dest_min"].min(),
+            "mean": gdf["wait_time_dest_min"].mean(),
+            "max": gdf["wait_time_dest_min"].max(),
+        }
+
+    all_stats_travel[service["service_type"]] = stats_travel
+    all_stats_wait[service["service_type"]] = stats_wait
+
+
+def plot_single_stat(all_stats, stat, ylabel, title, results_path):
+    """Plot a single statistic (min, mean, or max) for each service."""
+    plt.figure(figsize=(10, 6))
+    for service_type, stats_dict in all_stats.items():
+        times = list(stats_dict.keys())
+        values = [v[stat] for v in stats_dict.values()]
+        plt.plot(times, values, marker="o", label=service_type)
+
+    plt.title(f"{title} ({stat})")
+    plt.xlabel("Arrival time")
+    plt.ylabel(ylabel)
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), frameon=False)
+    plt.grid(True)
+    sns.despine(bottom=True, left=True)
+    plt.tight_layout()
+    plt.savefig(
+        results_path
+        / f"plots/{stat}_{ylabel[0:-6].replace(' ', '_').lower()}_by_arrival_time.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+
+# Plot travel time stats (min, mean, max)
+for stat in ["min", "mean", "max"]:
+    plot_single_stat(
+        all_stats_travel,
+        stat,
+        "Travel time (min)",
+        "Travel time by arrival time",
+        results_path,
+    )
+
+# Plot wait time stats (min, mean, max)
+for stat in ["mean", "max"]:
+    plot_single_stat(
+        all_stats_wait,
+        stat,
+        "Wait time (min)",
+        "Wait time by arrival time",
+        results_path,
+    )
+
+plt.show()
+
+# %%
+
+# heatmap showing the arrival-time dependent travel time for each service and location
+
+for service in services:
+    arrival_times = service["arrival_time"]
+
+    dataset = f"{service['service_type']}_{1}"
+
+    heatmap_data = pd.DataFrame()
+
+    for i, arrival_time in enumerate(arrival_times):
+
+        gdf = gpd.read_parquet(
+            results_path
+            / f"data/{dataset}_{arrival_time.replace(':','_')}_otp_geo.parquet"
+        )
+
+        temp_df = gdf[["abs_dist", "duration_min"]].copy()
+        temp_df["arrival_time"] = arrival_time
+
+        heatmap_data = pd.concat([heatmap_data, temp_df], ignore_index=True)
+
+    # Pivot the data for heatmap
+    heatmap_pivot = heatmap_data.pivot(
+        index="abs_dist",
+        columns="arrival_time",
+        values="duration_min",
+    )
+
+    heatmap_pivot.sort_index(inplace=True, ascending=False)
+
+    plt.figure(figsize=(12, 8))
+    ax = sns.heatmap(
+        heatmap_pivot,
+        cmap="viridis",
+        cbar_kws={"label": "Travel time"},
+    )
+    plt.title(
+        f"Travel time heatmap for nearest: {service['service_type'].replace('_', ' ').title()}"
+    )
+    plt.xlabel("Arrival time")
+    plt.ylabel("Distance to destination (m)")
+
+    # --- Custom Y-axis ticks ---
+    distances = heatmap_pivot.index.values
+    ymin, ymax = ax.get_ylim()
+
+    # Generate 10 evenly spaced tick positions along the data index range
+    yticks = np.linspace(0, len(distances) - 1, 10)
+
+    # Get the corresponding distance values for those positions
+    # ylabels = [int(round(distances[int(i)] / 100) * 100) for i in yticks]
+    ylabels = [int(round(distances[int(i)], -2)) for i in yticks]
+
+    # Apply the ticks and labels
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(ylabels)
+
+    ax.set_ylim(len(distances), 0)
+
+    # # Ensure the plot orientation is correct (lowest distance at bottom)
+    # ax.invert_yaxis()
+
+    plt.tight_layout()
+    plt.savefig(
+        results_path / f"plots/{dataset}_travel_time_heatmap.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.show()
+
+# %%
+# travel time variation
+
+max_service_differences = []
+
+for service in services:
+
+    arrival_times = service["arrival_time"]
+
+    dataset = f"{service['service_type']}_{1}"
+
+    all_arrival_times_df = pd.DataFrame()
+
+    for arrival_time in arrival_times:
+
+        gdf = gpd.read_parquet(
+            results_path
+            / f"data/{dataset}_{arrival_time.replace(':','_')}_otp_geo.parquet"
+        )
+
+        gdf_temp = gdf[["source_id", "duration_min"]].copy()
+        gdf_temp["arrival_time"] = arrival_time
+        gdf_temp["service_type"] = service["service_type"]
+
+        all_arrival_times_df = pd.concat(
+            [all_arrival_times_df, gdf_temp], ignore_index=True
+        )
+
+    assert len(all_arrival_times_df) == len(gdf["source_id"].unique()) * len(
+        arrival_times
+    ), "Merged GeoDataFrame has unexpected length."
+
+    grouped = all_arrival_times_df.groupby("source_id")["duration_min"].agg(
+        ["min", "max"]
+    )
+    grouped[f"max_variation_{service}"] = grouped["max"] - grouped["min"]
+
+    gdf_grouped = gpd.GeoDataFrame(
+        grouped,
+        geometry=gdf.set_index("source_id").loc[grouped.index, "geometry"],
+        crs=crs,
+    )
+
+    max_service_differences.append(gdf_grouped)
+
+# plot max variation maps
+fig, axes = plt.subplots(2, math.ceil(len(services) / 2), figsize=(15, 8))
+axes = axes.flatten()
+
+# remove last unused axis if odd number of services
+if len(services) % 2 != 0:
+    fig.delaxes(axes[-1])
+
+# set color scale to be the same for all plots
+vmin = min(
+    gdf[f"max_variation_{service}"].min()
+    for gdf, service in zip(max_service_differences, services)
+)
+vmax = max(
+    gdf[f"max_variation_{service}"].max()
+    for gdf, service in zip(max_service_differences, services)
+)
+
+
+for i, service in enumerate(services):
+    gdf_grouped = max_service_differences[i]
+    study_area.boundary.plot(ax=axes[i], color="black", linewidth=1)
+    gdf_grouped.plot(
+        ax=axes[i],
+        column=f"max_variation_{service}",
+        legend=True,
+        vmin=vmin,
+        vmax=vmax,
+        legend_kwds={"shrink": 0.5},
+        cmap="viridis",
+    )
+    axes[i].set_title(f"{service['service_type'].replace('_',' ').title()}")
+    axes[i].set_axis_off()
+
+plt.suptitle("Max travel time variation by service type", fontsize=16)
+plt.tight_layout()
+plt.savefig(
+    results_path / f"maps/all_services_max_travel_time_variation.png",
+    dpi=300,
+)
+
+# %%
