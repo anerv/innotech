@@ -10,6 +10,8 @@ import os
 import sys
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from src.helper_functions import (
     # highlight_max_traveltime,
     # highlight_min_traveltime,
@@ -114,6 +116,48 @@ for service in services:
             result_count = df[df["duration"].notna()].shape[0]
             print(f"{result_count} solutions found in {dataset} with {len(df)} rows.")
 
+            # extract modes
+            df = unpack_modes_from_json(df, "mode_durations_json")
+
+            # count only walk
+            mode_cols = [col for col in df.columns if col.endswith("_duration")]
+            non_walk_modes = [col for col in mode_cols if col != "walk_duration"]
+
+            count_only_walk = ((df[non_walk_modes] == 0).all(axis=1)).sum()
+            percent_only_walk = (count_only_walk / len(df)) * 100
+            print(
+                f"Percent of trips using only walking for {dataset}: {percent_only_walk:.2f}%"
+            )
+
+            df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
+
+            if config_model["walk_threshold"]:
+                # identify trips where walk distance exceeds threshold
+                walk_threshold = config_model["walk_threshold"]
+                excessive_walks = df[df["walkDistance"] > walk_threshold].shape[0]
+
+                print(
+                    f"{excessive_walks} trips ({(excessive_walks / len(df)) * 100:.2f}%) have walk distance exceeding the threshold of {walk_threshold} meters in {dataset}."
+                )
+                print("Setting these trips to no solution.")
+                # set these trips to no solution # nan for duration, duration_min, walkDistance, arrival_time, all duration columns,
+                df.loc[
+                    df["walkDistance"] > walk_threshold,
+                    [
+                        "duration",
+                        "duration_min",
+                        "waitingTime",
+                        "walkDistance",
+                        "arrival_time",
+                        "mode_durations_json",
+                    ]
+                    + non_walk_modes,
+                ] = np.nan
+
+                # df = df[
+                #     df["walkDistance"] <= walk_threshold
+                # ]  # only works if walkdistance is nan, not 0, for no solution
+
             # Count sources with no results
             no_results_count = df[df["duration"].isna()].shape[0]
             if no_results_count > 0:
@@ -132,21 +176,6 @@ for service in services:
             )
 
             df["total_time_min"] = df["duration_min"] + df["wait_time_dest_min"]
-
-            # extract modes
-            df = unpack_modes_from_json(df, "mode_durations_json")
-
-            # count only walk
-            mode_cols = [col for col in df.columns if col.endswith("_duration")]
-            non_walk_modes = [col for col in mode_cols if col != "walk_duration"]
-
-            count_only_walk = ((df[non_walk_modes] == 0).all(axis=1)).sum()
-            percent_only_walk = (count_only_walk / len(df)) * 100
-            print(
-                f"Percent of trips using only walking for {dataset}: {percent_only_walk:.2f}%"
-            )
-
-            df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
 
             # Export min, mean, max, and median duration and wait time
             summary = {
@@ -353,8 +382,7 @@ for service in services:
                 )
 
 # %%
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 for service in services:
 
