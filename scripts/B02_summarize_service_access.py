@@ -369,19 +369,19 @@ for service in services:
             / f"data/{dataset}_{arrival_time.replace(':','_')}_otp_geo.parquet"
         )
 
-        gdf["time_distance_ratio"] = gdf["duration_min"] / gdf["abs_dist"]
+        gdf["distance_time_ratio"] = gdf["abs_dist"] / gdf["duration_min"]
 
-        service_time_dist_ratios["min"] = gdf.time_distance_ratio.min()
-        service_time_dist_ratios["max"] = gdf.time_distance_ratio.max()
-        service_time_dist_ratios["mean"] = gdf.time_distance_ratio.mean()
-        service_time_dist_ratios["median"] = gdf.time_distance_ratio.median()
+        service_time_dist_ratios["min"] = gdf.distance_time_ratio.min()
+        service_time_dist_ratios["max"] = gdf.distance_time_ratio.max()
+        service_time_dist_ratios["mean"] = gdf.distance_time_ratio.mean()
+        service_time_dist_ratios["median"] = gdf.distance_time_ratio.median()
 
         time_dist_ratios_all[arrival_time] = service_time_dist_ratios
 
         study_area.boundary.plot(ax=axes[i], color="black", linewidth=1)
         gdf.plot(
             ax=axes[i],
-            column="time_distance_ratio",
+            column="distance_time_ratio",
             legend=True,
             legend_kwds={"shrink": 0.5},
             cmap="viridis",
@@ -393,7 +393,7 @@ for service in services:
         axes[i].set_axis_off()
 
         plt.suptitle(
-            f"Travel time vs. distance ratio for nearest {service['service_type']} by arrival time",
+            f"Distance vs. travel time ratio for nearest {service['service_type']} by arrival time",
             fontsize=16,
         )
 
@@ -401,7 +401,7 @@ for service in services:
 
         plt.savefig(
             results_path
-            / f"maps/{dataset}_travel_time_vs_distance_ratio_by_arrival_time.png",
+            / f"maps/{dataset}_distance_vs_travel_time_ratio_by_arrival_time.png",
             dpi=300,
         )
 
@@ -419,9 +419,9 @@ for service in services:
     plt.plot(times, maxs, marker="o", label="Max", linestyle=":", color="red")
 
     # Add labels and title
-    plt.title("Travel time/distance ratio for nearest " + service["service_type"])
+    plt.title("Distance/travel time ratio for nearest " + service["service_type"])
     plt.xlabel("Arrival Time")
-    plt.ylabel("Travel time/distance ratio")
+    plt.ylabel("Distance/travel time ratio")
 
     plt.legend(loc="upper left", bbox_to_anchor=(1, 1), frameon=False)
     plt.grid(True)
@@ -429,7 +429,7 @@ for service in services:
     plt.tight_layout()
     plt.savefig(
         results_path
-        / f"plots/{dataset}_travel_time_vs_distance_ratio_summary_by_arrival_time.png",
+        / f"plots/{dataset}_distance_vs_travel_time_ratio_summary_by_arrival_time.png",
         dpi=300,
         bbox_inches="tight",
     )
@@ -541,10 +541,11 @@ for service in services:
         heatmap_data = pd.concat([heatmap_data, temp_df], ignore_index=True)
 
     # Pivot the data for heatmap
-    heatmap_pivot = heatmap_data.pivot(
+    heatmap_pivot = heatmap_data.pivot_table(
         index="abs_dist",
         columns="arrival_time",
         values="duration_min",
+        aggfunc="mean",
     )
 
     heatmap_pivot.sort_index(inplace=True, ascending=False)
@@ -662,6 +663,7 @@ for i, service in enumerate(services):
         legend=True,
         vmin=vmin,
         vmax=vmax,
+        markersize=1,
         legend_kwds={"shrink": 0.5},
         cmap="viridis",
     )
