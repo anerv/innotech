@@ -344,7 +344,7 @@ for service in services:
             attribution_text = "KDS, OpenStreetMap"
             font_size = 10
 
-            for i, plot_col in enumerate(plot_columns):
+            for idx, plot_col in enumerate(plot_columns):
                 fp = (
                     results_path
                     / f"maps/{dataset}_{arrival_time.replace(":","_")}_{plot_col}.png"
@@ -352,7 +352,7 @@ for service in services:
 
                 label = dataset.rsplit("_", 1)[0]
 
-                title = f"{labels[i]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} with arrival time {arrival_time}"
+                title = f"{labels[idx]} to {dataset.split("_")[-1]}. nearest {label.replace("_", " ")} with arrival time {arrival_time}"
 
                 plot_traveltime_results(
                     gdf,
