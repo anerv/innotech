@@ -136,6 +136,16 @@ for service in services:
             # extract modes
             df = unpack_modes_from_json(df, "mode_durations_json")
 
+            # count only walk
+            mode_cols = [col for col in df.columns if col.endswith("_duration")]
+            non_walk_modes = [col for col in mode_cols if col != "walk_duration"]
+
+            count_only_walk = ((df[non_walk_modes] == 0).all(axis=1)).sum()
+            percent_only_walk = (count_only_walk / len(df)) * 100
+            print(
+                f"Percent of trips using only walking for {dataset}: {percent_only_walk:.2f}%"
+            )
+
             df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
 
             # Export min, mean, max, and median duration and wait time
