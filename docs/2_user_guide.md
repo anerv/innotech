@@ -46,15 +46,16 @@ Se nedenstående tabel og ``config.yml`` for forventede filnavne og placeringer.
 
 > **_NOTE:_** *Ønsker du at køre analysen for Region Sjælland med standardinstillinger kan du springe dette skridt over*.
 
-* ``config.yml`` indeholder bl.a. filnavne og placeringer på inputdata og resultater, navnet på studieområdet, samt indstillinger for, visse destinationer analysen indholder.
+* ``config.yml`` indeholder bl.a. filnavne og placeringer på inputdata og resultater, navnet på studieområdet, samt indstillinger for hvilke destinationer analysen indholder.
 Hvis andre destinationer, ankomsttider, inputdata, m.m. ønskes opdateres de her. 
 
     Brug evt. script ```test/tune_otp_settings.py``` til at teste effekten af ankomsttid m.m.
 
-* ``build-config.json`` indeholder indstillinger for OpenTripPlanner. Opdater kun, hvis studieområdet er i anden anden tidszone end Danmark eller hvis et andet NeTEx-datasæt anvendes.
+* ``build-config.json`` indeholder indstillinger for den graf OpenTripPlanner anvender til ruteberegninger. Opdater kun, hvis studieområdet er i anden anden tidszone end Danmark eller hvis et andet NeTEx-datasæt anvendes.
 
-* Hvis specifikke indstillinger for ruteberegningen ønskes (f.eks. max antal skift, vægtning af ventetid vs. rejsetid, adgang for kørestole etc.) tilføjes en ``router-config.json`` til ``otp``-mappen. Se https://docs.opentripplanner.org/en/latest/RouteRequest/ for eksempel.
+* ``route-config.json`` indeholder indstillinger for selve ruteberegninger. Som udgangspunkt indeholder filen kun indstillinger for antal af ruter, der skal beregnes samt en omkostningsfunktion (*nonTransitGeneralizedCostLimit*) for ruteresultater, der *ikke* indeholder offentlig transport. Omkostningsfunktionen er sat til, så vidt muligt, at foretrække offentlig transport frem for gang for gåture over 20 minutter. OBS: Hvis OTP ikke kan finde gode forbindelser med offentlig transport, vil der stadig blive returneret potentielt meget længere gangruter.
 
+    Andre mulige indstillinger er f.eks. for antal skift, vægtning af ventetid vs. rejsetid, adgang for kørestole, etc. Se https://docs.opentripplanner.org/en/latest/RouteRequest/ for eksempel. OBS: Ændringer i route-config træder først i kraft, efter at OTP er blevet stoppet og startet igen.
 
 Har du fulgt Docker-installationsvejledningen skal du følge vejledning **3A**. Har du fulgt den manuelle installationsvejledning, følg vejledning **3B**.
 
