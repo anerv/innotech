@@ -663,7 +663,7 @@ for service in services:
     grouped = all_arrival_times_df.groupby("source_id")["duration_min"].agg(
         ["min", "max"]
     )
-    grouped[f"max_variation_{service}"] = grouped["max"] - grouped["min"]
+    grouped[f"max_variation_{service['service_type']}"] = grouped["max"] - grouped["min"]
 
     gdf_grouped = gpd.GeoDataFrame(
         grouped,
@@ -683,11 +683,11 @@ if len(services) % 2 != 0:
 
 # set color scale to be the same for all plots
 vmin = min(
-    gdf[f"max_variation_{service}"].min()
+    gdf[f"max_variation_{service['service_type']}"].min()
     for gdf, service in zip(max_service_differences, services)
 )
 vmax = max(
-    gdf[f"max_variation_{service}"].max()
+    gdf[f"max_variation_{service['service_type']}"].max()
     for gdf, service in zip(max_service_differences, services)
 )
 
@@ -697,7 +697,7 @@ for i, service in enumerate(services):
     study_area.boundary.plot(ax=axes[i], color="black", linewidth=1)
     gdf_grouped.plot(
         ax=axes[i],
-        column=f"max_variation_{service}",
+        column=f"max_variation_{service['service_type']}",
         legend=True,
         vmin=vmin,
         vmax=vmax,
