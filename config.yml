@@ -2,7 +2,7 @@
 
 filter_rural_addresses: true  # Whether to filter addresses to only rural areas when preparing BBR address data 
 
-walk_threshold: 3000 # filter out routes with a walking distance above this threshold (in meters). Leave empty to include all results
+walk_threshold: 1000 # filter out routes with a walking distance above this threshold (in meters). Leave empty to include all results
 # settings is necessary to avoid including unrealistic long walking distances when no transit connections are found
 
 # All data referenced under INPUT DATA must be downloaded and placed in the data directory. Update paths and file names as needed.
