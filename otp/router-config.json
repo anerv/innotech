@@ -3,6 +3,7 @@
         "numItineraries": 4,
         "itineraryFilters": {
             "nonTransitGeneralizedCostLimit": "20m + 1.0 x"
-        }
+        },
+        "walkReluctance": 10.0
     }
 }
