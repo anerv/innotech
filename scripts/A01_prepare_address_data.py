@@ -22,7 +22,11 @@ with open(r"../config.yml", encoding="utf-8") as file:
     study_area_fp = adm_boundaries_config["regions"]["outputpath"]
     study_area_name = adm_boundaries_config["regions"]["study_area_name"]
 
+    zone_fp = parsed_yaml_file["zone_fp"]
+
     crs = parsed_yaml_file["crs"]
+
+    filter_rural = parsed_yaml_file["filter_rural_addresses"]
 
 
 # %%
@@ -40,6 +44,7 @@ elif input_address_fp.endswith(".csv"):
 
 else:
     raise ValueError("Input file must be a .parquet or .csv file.")
+
 # %%
 
 address.drop_duplicates(subset=["id_lokalId"], inplace=True)
@@ -89,6 +94,8 @@ addresses_with_geoms = pd.merge(
 )
 
 
+# %%
+
 # Analysis requires WGS84 coordinates
 addresses_with_geoms["vej_pos_lat"] = addresses_with_geoms.geometry_vej.to_crs("4326").y
 addresses_with_geoms["vej_pos_lon"] = addresses_with_geoms.geometry_vej.to_crs("4326").x
@@ -102,7 +109,28 @@ addresses_with_geoms.rename(
 )
 addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
-addresses_with_geoms.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
+# %%
+
+# Assign rural/urban based on zone data
+
+if filter_rural:
+
+    zones = gpd.read_parquet(zone_fp)
+    urban_zones = zones[zones["zonestatus"] == "Byzone"]
+
+    addresses_with_geoms = addresses_with_geoms.sjoin(
+        urban_zones[["geometry", "zonestatus"]], how="left", predicate="within"
+    )
+
+    addresses_with_geoms["urban_rural"] = addresses_with_geoms["zonestatus"].apply(
+        lambda x: "urban" if x == "Byzone" else "rural"
+    )
+
+    addresses_with_geoms.drop(columns=["zonestatus", "index_right"], inplace=True)
+
+    addresses_with_geoms.drop_duplicates(subset=["adresseIdentificerer"], inplace=True)
+
+# %%
 
 addresses_with_geoms.to_parquet(addresses_fp_all, index=False)
 

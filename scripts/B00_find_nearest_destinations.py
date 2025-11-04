@@ -1,6 +1,6 @@
 # %% [markdown]
 # # 🚀 Nearest Neighbor Search
-# This script identifyes the cearest sercive to a given adress using Scikit-Learn.
+# This script identifies the nearest service to a given address using Scikit-Learn.
 # The script is designed so it can be run from the command line and takes a configuration file as input.
 # The output is a parquet file with the nearest neighbor for each dwelling. and a lat lon coordinate designed for use with Open Trip Planner
 

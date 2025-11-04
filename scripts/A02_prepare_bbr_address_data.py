@@ -21,6 +21,8 @@ with open(r"../config.yml", encoding="utf-8") as file:
     study_area_fp = adm_boundaries_config["regions"]["outputpath"]
     study_area_name = adm_boundaries_config["regions"]["study_area_name"]
 
+    filter_rural = parsed_yaml_file["filter_rural_addresses"]
+
 
 # %%
 
@@ -84,17 +86,20 @@ print(
 # Get unique access points
 bbr_access_points = bbr_addresses.drop_duplicates(subset=["adgangspunkt"])
 
-bbr_access_points = bbr_access_points[
-    [
-        "adresseIdentificerer",
-        "adgangspunkt",
-        "geometry",
-        "enh023Boligtype",
-        "id_lokalId",
-        "vej_pos_lat",
-        "vej_pos_lon",
-    ]
+filter_columns = [
+    "adresseIdentificerer",
+    "adgangspunkt",
+    "geometry",
+    "enh023Boligtype",
+    "id_lokalId",
+    "vej_pos_lat",
+    "vej_pos_lon",
 ]
+
+if filter_rural:
+    filter_columns.append("urban_rural")
+
+bbr_access_points = bbr_access_points[filter_columns]
 
 bbr_access_points.rename(
     columns={
@@ -108,7 +113,6 @@ bbr_access_points.rename(
 # filter addresses to only include those within the region
 region = gpd.read_file(study_area_fp)
 
-
 region.sindex
 bbr_access_points.sindex
 
@@ -117,6 +121,12 @@ region_bbr = gpd.sjoin(region, bbr_access_points, predicate="intersects")
 access_points_region = bbr_access_points[
     bbr_access_points.index.isin(region_bbr.index_right)
 ]
+
+if filter_rural:
+    # filter to only rural areas
+    access_points_region = access_points_region[
+        access_points_region.urban_rural.isin(["rural"])
+    ]
 
 # EXPORT TO PARQUET
 access_points_region.to_parquet(address_bbr_fp, index=False)

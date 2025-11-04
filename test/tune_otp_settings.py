@@ -93,6 +93,7 @@ for search_window in search_windows:
                     data_path / f"{service["service_type"]}_{i}.parquet"
                 )  # Load the nearest neighbor data for the service
 
+                # Create a GeoDataFrame from the nearest neighbors
                 nn_gdf = gpd.GeoDataFrame(
                     nearest_neighbors,
                     geometry=gpd.points_from_xy(
@@ -101,11 +102,14 @@ for search_window in search_windows:
                     crs="EPSG:4326",
                 )
 
+                # relabel dataset
                 dataset = f"{service['service_type']}_{i}_{search_window}_{walk_speed}_{arrival_time}"
 
                 dataset = dataset.replace(":", "-")
                 dataset = dataset.replace(".", "-")
 
+                # get sample of addresses based on h3 spatial sampling
+                # saves sample to data_path
                 sample = get_geo_address_sample(
                     dataset=nn_gdf,
                     data_path=data_test_path,

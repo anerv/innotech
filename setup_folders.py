@@ -2,7 +2,10 @@
 
 import os
 
-parent_folders = ["data", "results"]
+parent_folders = [
+    "data",
+    "results",
+]
 
 for f in parent_folders:
     if not os.path.exists(f):
@@ -21,7 +24,8 @@ for f in data_folders:
 input_base = "data/input"
 processed_base = "data/processed"
 
-input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit", "osm"]
+input_subfolders = ["cvr", "adresser", "bbr", "DK_AdministrativeUnit", "osm", "byzoner"]
+
 processed_subfolders = [
     "cvr",
     "adresser",
@@ -43,7 +47,7 @@ for f in processed_subfolders:
 
         print("Successfully created folder: " + os.path.join(processed_base, f))
 
-result_subfolders = ["data", "maps", "destination_data_evaluation"]
+result_subfolders = ["data", "maps", "destination_data_evaluation", "plots"]
 
 for f in result_subfolders:
     if not os.path.exists(os.path.join("results", f)):
