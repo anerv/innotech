@@ -53,7 +53,7 @@ Hvis andre destinationer, ankomsttider, inputdata, m.m. ønskes opdateres de her
 
 * ``build-config.json`` indeholder indstillinger for den graf OpenTripPlanner anvender til ruteberegninger. Opdater kun, hvis studieområdet er i anden anden tidszone end Danmark eller hvis et andet NeTEx-datasæt anvendes.
 
-* ``route-config.json`` indeholder indstillinger for selve ruteberegninger. Som udgangspunkt indeholder filen kun indstillinger for antal af ruter, der skal beregnes samt en omkostningsfunktion (*nonTransitGeneralizedCostLimit*) for ruteresultater, der *ikke* indeholder offentlig transport. Omkostningsfunktionen er sat til, så vidt muligt, at foretrække offentlig transport frem for gang for gåture over 20 minutter. OBS: Hvis OTP ikke kan finde gode forbindelser med offentlig transport, vil der stadig blive returneret potentielt meget længere gangruter.
+* ``route-config.json`` indeholder indstillinger for selve ruteberegninger. Som udgangspunkt indeholder filen kun indstillinger for antal af ruter, der skal beregnes, walk reluctance, samt en omkostningsfunktion (*nonTransitGeneralizedCostLimit*) for ruteresultater, der *ikke* indeholder offentlig transport. Omkostningsfunktionen er sat til, så vidt muligt, at foretrække offentlig transport frem for gang for gåture over 20 minutter. OBS: Hvis OTP ikke kan finde gode forbindelser med offentlig transport, vil der stadig blive returneret potentielt meget længere gangruter.
 
     Andre mulige indstillinger er f.eks. for antal skift, vægtning af ventetid vs. rejsetid, adgang for kørestole, etc. Se https://docs.opentripplanner.org/en/latest/RouteRequest/ for eksempel. OBS: Ændringer i route-config træder først i kraft, efter at OTP er blevet stoppet og startet igen.
 
