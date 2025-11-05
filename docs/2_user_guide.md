@@ -11,6 +11,7 @@ Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og des
 - BBR-data (enheder) for den ønskede region: 
 - CVR-data (produktionsenheder, CVR-enheder med brancher, og CVR-enheder med adresser) for den ønskede region.
 - Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml hvis et andet område end Region Sjælland ønskes.). 
+- [*Valgtfrit*] Datasæt på byzoner. Kun nødvendigt hvis analysen udelukkende skal køres for landadresser (indstilles i config.yml).
 
 Alle data kan downloades fra Datafordeler.dk.
 
@@ -38,6 +39,7 @@ Se nedenstående tabel og ``config.yml`` for forventede filnavne og placeringer.
 | **OpenStreetMap**      | OpenStreetmap        | osm_input_pbf                 | *"input/osm/denmark-latest.osm.pbf"*                                           |
 | **Regionsinddelinger** | Rergionspolygoner    | -                             | *"../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/regionsinddeling.gpkg"* |
 | **Kommuneinddelinger** | Kommunepolygoner     | -                             | *"../data/input/DAGI10MULTIGEOM_GPKG_HF_20250504080002/kommuneinddeling.gpkg"* |
+| **Byzoner** | Byzonepolygoner  | urban_zone_fp | *"../data/input/byzoner/zonekort_dmp.parquet"* |
 | **Rejseplansdata**     | NeTEx-rejseplansdata | -                             | *"otp/Rejseplanen+NeTEx.zip"*                                                  |
 
 
@@ -47,15 +49,19 @@ Se nedenstående tabel og ``config.yml`` for forventede filnavne og placeringer.
 > **_NOTE:_** *Ønsker du at køre analysen for Region Sjælland med standardinstillinger kan du springe dette skridt over*.
 
 * ``config.yml`` indeholder bl.a. filnavne og placeringer på inputdata og resultater, navnet på studieområdet, samt indstillinger for hvilke destinationer analysen indholder.
-Hvis andre destinationer, ankomsttider, inputdata, m.m. ønskes opdateres de her. 
+Hvis andre destinationer, ankomsttider, inputdata, m.m. ønskes opdateres de her.
 
     Brug evt. script ```test/tune_otp_settings.py``` til at teste effekten af ankomsttid m.m.
+
+> **_OBS:_** For at udelukke byadresser fra analysen, download et byzone-datasæt (se [Input data](#1-klargør-inputdata-file_folder)) og opdater config.yml (sæt *filter_rural_addresses* til *true*.). Standardindstilling er at inkludere både by og landadresser.
+
+> **_OBS:_** Det er muligt at frasortere rejsetids-resultater der indeholder for lange gåafstande eller for lang ventetid ved destinationen. For at filtrere resultater, udfyld værdier for *walk_threshold* og/eller *max_waittime* i config.yml. Standardindstilling er ikke at filterere resultaterne. Se [Oversigt over resultater](https://github.com/anerv/innotech/blob/main/docs/3_results_overview.md) for information om, hvilke resultater der filtreres.
 
 * ``build-config.json`` indeholder indstillinger for den graf OpenTripPlanner anvender til ruteberegninger. Opdater kun, hvis studieområdet er i anden anden tidszone end Danmark eller hvis et andet NeTEx-datasæt anvendes.
 
 * ``router-config.json`` indeholder indstillinger for selve ruteberegninger. Som udgangspunkt indeholder filen kun indstillinger for antal af ruter, der skal beregnes, walk reluctance, samt en omkostningsfunktion (*nonTransitGeneralizedCostLimit*) for ruteresultater, der *ikke* indeholder offentlig transport. Omkostningsfunktionen er sat til, så vidt muligt, at foretrække offentlig transport frem for gang for gåture over 20 minutter. OBS: Hvis OTP ikke kan finde gode forbindelser med offentlig transport, vil der stadig blive returneret potentielt meget længere gangruter.
 
-    Andre mulige indstillinger er f.eks. for antal skift, vægtning af ventetid vs. rejsetid, adgang for kørestole, etc. Se https://docs.opentripplanner.org/en/latest/RouteRequest/ for eksempel. OBS: Ændringer i router-config træder først i kraft, efter at OTP er blevet stoppet og startet igen.
+    Andre mulige indstillinger er f.eks. for antal skift, vægtning af ventetid vs. rejsetid, adgang for kørestole, etc. Se https://docs.opentripplanner.org/en/latest/RouteRequest/ for eksempel. **OBS:** Ændringer i router-config træder først i kraft, efter at OTP er blevet stoppet og startet igen.
 
 Har du fulgt Docker-installationsvejledningen skal du følge vejledning **3A**. Har du fulgt den manuelle installationsvejledning, følg vejledning **3B**.
 
