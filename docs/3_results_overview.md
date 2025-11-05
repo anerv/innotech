@@ -35,7 +35,7 @@
 | wait_time_dest_min | Ventetid på destinationen i minutter |
 | total_time_min | Samlet tid (rejse + ventetid) i minutter |
 | transfers | Antal skift |
-| bus_duration | Rejsetid med bus |
-| rail_duration | Rejsetid med tog |
-| walk_duration | Rejsetid gang |
+| bus_duration | Rejsetid med bus  (min) |
+| rail_duration | Rejsetid med tog  (min) |
+| walk_duration | Rejsetid gang  (min)|
 | geometry | Punktgeometri for startpunktet |
