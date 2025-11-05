@@ -79,6 +79,8 @@ for service in services:
             df = pd.read_parquet(fp)
             print(f"Loaded {len(df)} rows from {fp}")
 
+            original_row_count = len(df)
+
             # Check for duplicates
             if df.duplicated(subset=["source_id", "target_id"]).any():
                 print(f"Duplicates found in {dataset}. Dropping duplicates.")
@@ -124,7 +126,7 @@ for service in services:
             non_walk_modes = [col for col in mode_cols if col != "walk_duration"]
 
             count_only_walk = ((df[non_walk_modes] == 0).all(axis=1)).sum()
-            percent_only_walk = (count_only_walk / len(df)) * 100
+            percent_only_walk = (count_only_walk / original_row_count) * 100
             print(
                 f"Percent of trips using only walking for {dataset}: {percent_only_walk:.2f}%"
             )
@@ -132,12 +134,13 @@ for service in services:
             df["transfers"] = df["mode_durations_json"].apply(transfers_from_json)
 
             if config_model["walk_threshold"]:
+
                 # identify trips where walk distance exceeds threshold
                 walk_threshold = config_model["walk_threshold"]
                 excessive_walks = df[df["walkDistance"] > walk_threshold].shape[0]
 
                 print(
-                    f"{excessive_walks} trips ({(excessive_walks / len(df)) * 100:.2f}%) have walk distance exceeding the threshold of {walk_threshold} meters in {dataset}."
+                    f"{excessive_walks} trips ({(excessive_walks / original_row_count) * 100:.2f}%) have walk distance exceeding the threshold of {walk_threshold} meters in {dataset}."
                 )
                 print("Setting these trips to no solution.")
                 # set these trips to no solution # nan for duration, duration_min, walkDistance, arrival_time, all duration columns,
@@ -150,8 +153,39 @@ for service in services:
                         "walkDistance",
                         "arrival_time",
                         "mode_durations_json",
+                        "transfers",
                     ]
-                    + non_walk_modes,
+                    + mode_cols,
+                ] = np.nan
+
+            df["wait_time_dest"] = arrival_deadline - df["arrival_time"]
+            df["wait_time_dest_min"] = df["wait_time_dest"].dt.total_seconds() / 60
+            ave_wait_time = df["wait_time_dest_min"].mean()
+            print(
+                f"Average wait time at destination for {dataset}: {ave_wait_time:.2f} minutes"
+            )
+
+            if config_model["max_waittime"]:
+                max_waittime = config_model["max_waittime"]
+                excessive_waits = df[df["wait_time_dest_min"] > max_waittime].shape[0]
+                print(
+                    f"{excessive_waits} trips ({(excessive_waits / original_row_count) * 100:.2f}%) have wait time exceeding the threshold of {max_waittime} minutes in {dataset}."
+                )
+                print("Setting these trips to no solution.")
+                df.loc[
+                    df["wait_time_dest_min"] > max_waittime,
+                    [
+                        "duration",
+                        "duration_min",
+                        "waitingTime",
+                        "walkDistance",
+                        "arrival_time",
+                        "mode_durations_json",
+                        "transfers",
+                        "waittime_dest",
+                        "waittime_dest_min",
+                    ]
+                    + mode_cols,
                 ] = np.nan
 
             # Count sources with no results
@@ -163,13 +197,6 @@ for service in services:
 
             ave_duration = df["duration_min"].mean()
             print(f"Average trip duration for {dataset}: {ave_duration:.2f} minutes")
-
-            df["wait_time_dest"] = arrival_deadline - df["arrival_time"]
-            df["wait_time_dest_min"] = df["wait_time_dest"].dt.total_seconds() / 60
-            ave_wait_time = df["wait_time_dest_min"].mean()
-            print(
-                f"Average wait time at destination for {dataset}: {ave_wait_time:.2f} minutes"
-            )
 
             df["total_time_min"] = df["duration_min"] + df["wait_time_dest_min"]
 
@@ -245,40 +272,6 @@ for service in services:
             address_travel_times[keep_cols].to_parquet(
                 results_path
                 / f"data/{dataset}_{arrival_time.replace(":","_")}_addresses_otp_geo.parquet",
-                index=False,
-                engine="pyarrow",
-            )
-
-            # get travel times for all unique addresses - includes multiple data points for the same locations for apartment buildings etc.
-            all_addresses_travel_times = pd.merge(
-                address_points[["adresseIdentificerer", "adgangspunkt", "geometry"]],
-                address_travel_times,
-                right_on="adgangspunkt",
-                left_on="adgangspunkt",
-                how="left",
-                suffixes=("", "_travel_times"),
-            )
-
-            all_addresses_travel_times = all_addresses_travel_times[
-                all_addresses_travel_times.source_id.notna()
-            ]
-
-            keep_cols.extend(
-                [
-                    "adresseIdentificerer",
-                    "adgangspunkt",
-                ]
-            )
-
-            all_addresses_travel_times = gpd.GeoDataFrame(
-                all_addresses_travel_times[keep_cols],
-                geometry="geometry",
-                crs=crs,
-            )
-
-            all_addresses_travel_times.to_parquet(
-                results_path
-                / f"data/{dataset}_{arrival_time.replace(":","_")}_addresses_all_otp_geo.parquet",
                 index=False,
                 engine="pyarrow",
             )
