@@ -626,7 +626,9 @@ def unpack_modes_from_json(df, json_column="mode_durations_json"):
 
     # Initialize the new columns
     for raw_mode, col_name in mode_column_map.items():
-        df[col_name] = modes_dicts.apply(lambda d: d.get(raw_mode, 0))
+        df[col_name] = modes_dicts.apply(
+            lambda d: d.get(raw_mode, 0) / 60
+        )  # Convert to minutes
 
     # Ensure numeric type
     for col_name in mode_column_map.values():
