@@ -22,7 +22,7 @@ with open(r"../config.yml", encoding="utf-8") as file:
     study_area_fp = adm_boundaries_config["regions"]["outputpath"]
     study_area_name = adm_boundaries_config["regions"]["study_area_name"]
 
-    zone_fp = parsed_yaml_file["zone_fp"]
+    urban_zone_fp = parsed_yaml_file["urban_zone_fp"]
 
     crs = parsed_yaml_file["crs"]
 
@@ -115,7 +115,7 @@ addresses_with_geoms.drop(columns=["id_lokalId", "geometry_vej"], inplace=True)
 
 if filter_rural:
 
-    zones = gpd.read_parquet(zone_fp)
+    zones = gpd.read_parquet(urban_zone_fp)
     urban_zones = zones[zones["zonestatus"] == "Byzone"]
 
     addresses_with_geoms = addresses_with_geoms.sjoin(

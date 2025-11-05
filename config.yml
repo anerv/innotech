@@ -34,7 +34,7 @@ study_area_config:
 
 
 # Zone data for urban/rural classification
-zone_fp: "../data/input/byzoner/zonekort_dmp.parquet" 
+urban_zone_fp: "../data/input/byzoner/zonekort_dmp.parquet" 
 
 # CVR data
 cvr_address_input_fp: "../data/input/cvr/CVR_V1_Adressering_TotalDownload_csv_Current_8.csv"
