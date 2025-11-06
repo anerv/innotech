@@ -13,7 +13,7 @@ Grundelementerne i tilgængelighedsanalysen er data på husstandsadresser og des
 - Afgrænsning af studieområdet (data med danske administrative områder (regioner eller kommuner). Opdater config.yml hvis et andet område end Region Sjælland ønskes.). 
 - [*Valgtfrit*] Datasæt på byzoner. Kun nødvendigt hvis analysen udelukkende skal køres for landadresser (indstilles i config.yml).
 
-Alle data kan downloades fra Datafordeler.dk.
+Alle data kan downloades fra Datafordeler.dk, undtagen det valgfri [datasæt på byzoner](https://geodata-info.dk/srv/dan/catalog.search#/metadata/7cdbdf93-fc95-4b3d-b8e4-15d3c9891cb7), der kan downloades via Danmarks Miljøportal eller Plandata.dk.
 
 For en oversigt over dataspecifikationer og databehandling, se modelbeskrivelsen her: ***[LINK TIL RAPPORT]***.
 
