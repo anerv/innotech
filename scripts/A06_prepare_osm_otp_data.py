@@ -60,7 +60,7 @@ if output_pbf.exists():
     print(f"Output file {output_pbf} already exists. Deleting it.")
     output_pbf.unlink()
 
-osm_cmd = f"osmium extract -p {clipfile} -o {output_pbf} {input_pbf}"
+osm_cmd = f'osmium extract -p "{clipfile}" -o "{output_pbf}" "{input_pbf}"'
 os.system(osm_cmd)
 
 assert (
